@@ -1,4 +1,5 @@
 pub mod connection;
+pub mod msg;
 
 #[cfg(test)]
 mod tests {
