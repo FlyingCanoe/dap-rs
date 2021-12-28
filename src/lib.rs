@@ -1,5 +1,4 @@
-mod connection;
-mod header;
+pub mod connection;
 
 #[cfg(test)]
 mod tests {
