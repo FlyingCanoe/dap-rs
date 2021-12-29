@@ -84,7 +84,7 @@ impl SocketConnection {
         }
     }
 
-    pub fn try_read_msg(&mut self) -> anyhow::Result<Option<String>> {
+    fn try_read_raw_msg(&mut self) -> anyhow::Result<Option<String>> {
         if let Some(msg_size) = self.try_parse_header()? {
             let msg = self.read_exact(msg_size)?;
             let msg = String::from_utf8(msg)?;

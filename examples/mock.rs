@@ -10,7 +10,7 @@ fn main() {
         loop {
             match connection.try_read_msg().unwrap() {
                 Some(msg) => {
-                    println!("{}", msg)
+                    println!("{:?}", msg)
                 }
                 None => {}
             }
