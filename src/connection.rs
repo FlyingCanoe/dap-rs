@@ -5,6 +5,8 @@ use std::net::TcpStream;
 use anyhow::{bail, Error};
 use bstr::{BString, ByteSlice, B};
 
+use crate::msg::{parse_msg, Msg};
+
 pub struct SocketConnection {
     inner_connection: TcpStream,
     buf: BString,
@@ -84,10 +86,19 @@ impl SocketConnection {
         }
     }
 
-    pub fn try_read_msg(&mut self) -> anyhow::Result<Option<String>> {
+    fn try_read_raw_msg(&mut self) -> anyhow::Result<Option<String>> {
         if let Some(msg_size) = self.try_parse_header()? {
             let msg = self.read_exact(msg_size)?;
             let msg = String::from_utf8(msg)?;
+            Ok(Some(msg))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub fn try_read_msg(&mut self) -> anyhow::Result<Option<Msg>> {
+        if let Some(raw_msg) = self.try_read_raw_msg()? {
+            let msg = parse_msg(&raw_msg)?;
             Ok(Some(msg))
         } else {
             Ok(None)
