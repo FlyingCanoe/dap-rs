@@ -86,7 +86,7 @@ use self::threads::ThreadsRequest;
 use self::variables::VariablesRequest;
 use self::write_memory::WriteMemoryRequest;
 
-#[derive(Clone, Debug, Hash)]
+#[derive(Clone, Debug)]
 pub enum Request {
     Initialize(InitializeRequest),
     ConfigurationDone(ConfigurationDoneRequest),

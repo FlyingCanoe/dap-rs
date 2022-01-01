@@ -9,13 +9,13 @@ use event::Event;
 use request::Request;
 use response::Response;
 
-#[derive(Clone, Debug, Hash)]
+#[derive(Clone, Debug)]
 pub struct Msg {
     seq: u64,
     msg_type: MsgType,
 }
 
-#[derive(Clone, Debug, Hash)]
+#[derive(Clone, Debug)]
 pub enum MsgType {
     Request(Request),
     Response(Response),
