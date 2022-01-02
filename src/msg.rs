@@ -1,5 +1,7 @@
-use anyhow::{bail, Error};
+use anyhow::{bail, Context};
 use serde_json as json;
+
+use crate::utils::{get_str, get_u64};
 
 pub mod dap_type;
 pub mod event;
@@ -25,15 +27,9 @@ pub enum MsgType {
 
 pub(crate) fn parse_msg(raw_msg: &str) -> anyhow::Result<Msg> {
     let msg: json::Value = json::from_str(raw_msg)?;
-    let seq = msg
-        .get("seq")
-        .map_or(None, json::Value::as_u64)
-        .ok_or(Error::msg("invalid msg"))?;
 
-    let msg_type = msg
-        .get("type")
-        .map_or(None, json::Value::as_str)
-        .ok_or(Error::msg("invalid msg"))?;
+    let seq = get_u64(&msg, "seq").context("invalid_msg")?;
+    let msg_type = get_str(&msg, "type").context("invalid msg")?;
 
     let msg_type = match msg_type {
         "request" => MsgType::Request(Request::parse(msg)?),

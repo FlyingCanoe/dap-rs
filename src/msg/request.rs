@@ -1,5 +1,7 @@
-use anyhow::{bail, Error};
+use anyhow::{bail, Context};
 use serde_json as json;
+
+use crate::utils::get_str;
 
 mod attach;
 mod breakpoint_locations;
@@ -133,10 +135,7 @@ pub enum Request {
 
 impl Request {
     pub(crate) fn parse(msg: json::Value) -> anyhow::Result<Request> {
-        let request_type = msg
-            .get("command")
-            .map_or(None, json::Value::as_str)
-            .ok_or(Error::msg("invalid request"))?;
+        let request_type = get_str(&msg, "command").context("invalid request")?;
 
         let request = match request_type {
             "initialize" => Request::Initialize(InitializeRequest::parse(msg)?),
