@@ -4,7 +4,7 @@ use serde_json as json;
 pub struct CompletionsRequest {}
 
 impl CompletionsRequest {
-    pub(crate) fn parse(msg: json::Map<String, json::Value>) -> anyhow::Result<CompletionsRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<CompletionsRequest> {
         todo!()
     }
 }

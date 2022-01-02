@@ -4,7 +4,7 @@ use serde_json as json;
 pub struct StackTraceRequest {}
 
 impl StackTraceRequest {
-    pub(crate) fn parse(msg: json::Map<String, json::Value>) -> anyhow::Result<StackTraceRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<StackTraceRequest> {
         todo!()
     }
 }

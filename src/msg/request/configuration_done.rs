@@ -4,9 +4,7 @@ use serde_json as json;
 pub struct ConfigurationDoneRequest {}
 
 impl ConfigurationDoneRequest {
-    pub(crate) fn parse(
-        msg: json::Map<String, json::Value>,
-    ) -> anyhow::Result<ConfigurationDoneRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<ConfigurationDoneRequest> {
         todo!()
     }
 }

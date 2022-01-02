@@ -132,19 +132,13 @@ pub enum Request {
 }
 
 impl Request {
-    pub(crate) fn parse(mut msg: json::Map<String, json::Value>) -> anyhow::Result<Request> {
-        use json::map::Entry;
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<Request> {
+        let request_type = msg
+            .get("command")
+            .map_or(None, json::Value::as_str)
+            .ok_or(Error::msg("invalid request"))?;
 
-        let request_type = match msg.entry("command") {
-            Entry::Vacant(_) => bail!("invalid request"),
-            Entry::Occupied(ref entry) => entry
-                .get()
-                .as_str()
-                .ok_or(Error::msg("invalid request"))?
-                .to_owned(),
-        };
-
-        let request = match request_type.as_str() {
+        let request = match request_type {
             "initialize" => Request::Initialize(InitializeRequest::parse(msg)?),
             "configurationDone" => Request::ConfigurationDone(
                 configuration_done::ConfigurationDoneRequest::parse(msg)?,

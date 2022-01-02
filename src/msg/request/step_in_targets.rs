@@ -4,9 +4,7 @@ use serde_json as json;
 pub struct StepInTargetRequest {}
 
 impl StepInTargetRequest {
-    pub(crate) fn parse(
-        msg: json::Map<String, json::Value>,
-    ) -> anyhow::Result<StepInTargetRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<StepInTargetRequest> {
         todo!()
     }
 }

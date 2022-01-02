@@ -4,7 +4,7 @@ use serde_json as json;
 pub struct DisconnectRequest {}
 
 impl DisconnectRequest {
-    pub(crate) fn parse(msg: json::Map<String, json::Value>) -> anyhow::Result<DisconnectRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<DisconnectRequest> {
         todo!()
     }
 }

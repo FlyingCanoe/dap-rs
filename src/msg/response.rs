@@ -10,7 +10,7 @@ pub struct Response {
 pub enum ResponseType {}
 
 impl Response {
-    pub(crate) fn parse(msg: json::Map<String, json::Value>) -> anyhow::Result<Response> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<Response> {
         todo!()
     }
 }

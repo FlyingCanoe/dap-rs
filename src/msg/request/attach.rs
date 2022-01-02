@@ -6,7 +6,7 @@ pub struct AttachRequest {
 }
 
 impl AttachRequest {
-    pub(crate) fn parse(msg: json::Map<String, json::Value>) -> anyhow::Result<AttachRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<AttachRequest> {
         let restart_info = msg
             // get the request arguments
             .get("arguments")

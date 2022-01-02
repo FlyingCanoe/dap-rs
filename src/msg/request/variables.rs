@@ -4,7 +4,7 @@ use serde_json as json;
 pub struct VariablesRequest {}
 
 impl VariablesRequest {
-    pub(crate) fn parse(msg: json::Map<String, json::Value>) -> anyhow::Result<VariablesRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<VariablesRequest> {
         todo!()
     }
 }

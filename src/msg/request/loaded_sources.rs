@@ -4,9 +4,7 @@ use serde_json as json;
 pub struct LoadedSourcesRequest {}
 
 impl LoadedSourcesRequest {
-    pub(crate) fn parse(
-        msg: json::Map<String, json::Value>,
-    ) -> anyhow::Result<LoadedSourcesRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<LoadedSourcesRequest> {
         todo!()
     }
 }

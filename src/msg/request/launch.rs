@@ -4,7 +4,7 @@ use serde_json as json;
 pub struct LaunchRequest {}
 
 impl LaunchRequest {
-    pub(crate) fn parse(msg: json::Map<String, json::Value>) -> anyhow::Result<LaunchRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<LaunchRequest> {
         todo!()
     }
 }

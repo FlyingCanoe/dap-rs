@@ -4,7 +4,7 @@ use serde_json as json;
 pub enum Event {}
 
 impl Event {
-    pub(crate) fn parse(msg: json::Map<String, json::Value>) -> anyhow::Result<Event> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<Event> {
         todo!()
     }
 }

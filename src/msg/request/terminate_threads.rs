@@ -4,9 +4,7 @@ use serde_json as json;
 pub struct TerminateThreadsRequest {}
 
 impl TerminateThreadsRequest {
-    pub(crate) fn parse(
-        msg: json::Map<String, json::Value>,
-    ) -> anyhow::Result<TerminateThreadsRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<TerminateThreadsRequest> {
         todo!()
     }
 }

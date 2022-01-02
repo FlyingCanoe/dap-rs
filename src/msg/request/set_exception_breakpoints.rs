@@ -4,9 +4,7 @@ use serde_json as json;
 pub struct SetExceptionBreakpoints {}
 
 impl SetExceptionBreakpoints {
-    pub(crate) fn parse(
-        msg: json::Map<String, json::Value>,
-    ) -> anyhow::Result<SetExceptionBreakpoints> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<SetExceptionBreakpoints> {
         todo!()
     }
 }

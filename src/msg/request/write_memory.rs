@@ -4,7 +4,7 @@ use serde_json as json;
 pub struct WriteMemoryRequest {}
 
 impl WriteMemoryRequest {
-    pub(crate) fn parse(msg: json::Map<String, json::Value>) -> anyhow::Result<WriteMemoryRequest> {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<WriteMemoryRequest> {
         todo!()
     }
 }
