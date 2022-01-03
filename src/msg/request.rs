@@ -237,7 +237,7 @@ mod write_memory;
 use initialize::InitializeRequest;
 
 use self::attach::AttachRequest;
-use self::breakpoint_locations::BreakpointLocationRequest;
+use self::breakpoint_locations::BreakpointLocationsRequest;
 use self::completions::CompletionsRequest;
 use self::continue_request::ContinueRequest;
 use self::data_breakpoint_info::DataBreakPointInfoRequest;
@@ -284,7 +284,7 @@ pub enum Request {
     Restart(RestartRequest),
     Disconnect(DisconnectRequest),
     Terminate(TerminateRequest),
-    BreakpointLocations(BreakpointLocationRequest),
+    BreakpointLocations(BreakpointLocationsRequest),
     SetBreakpoints(SetBreakpointsRequest),
     SetFunctionBreakpoints(SetFunctionBreakpointRequest),
     SetExceptionBreakpoints(SetExceptionBreakpoints),
@@ -333,7 +333,7 @@ impl Request {
             "disconnect" => Request::Disconnect(disconnect::DisconnectRequest::parse(msg)?),
             "terminate" => Request::Terminate(terminate::TerminateRequest::parse(msg)?),
             "breakpointLocations" => Request::BreakpointLocations(
-                breakpoint_locations::BreakpointLocationRequest::parse(msg)?,
+                breakpoint_locations::BreakpointLocationsRequest::parse(msg)?,
             ),
             "setBreakpoints" => {
                 Request::SetBreakpoints(set_breakpoint::SetBreakpointsRequest::parse(msg)?)

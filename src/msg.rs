@@ -141,5 +141,6 @@ macro_rules! dap_type_enum {
     };
 }
 
+pub mod dap_type;
 pub mod event;
 pub mod request;
