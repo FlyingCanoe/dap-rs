@@ -47,3 +47,12 @@ pub(crate) fn get_optional_list(
         Ok(None)
     }
 }
+
+pub(crate) fn get_optional_bool(input: &json::Value, key: &str) -> anyhow::Result<Option<bool>> {
+    if let Some(value) = input.get(key) {
+        let output = value.as_bool().ok_or(Error::msg("parsing error"))?;
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
