@@ -6,7 +6,6 @@ use crate::utils::get_str;
 mod attach;
 mod breakpoint_locations;
 mod completions;
-mod configuration_done;
 mod continue_request;
 mod data_breakpoint_info;
 mod diassemble;
@@ -50,7 +49,6 @@ use initialize::InitializeRequest;
 use self::attach::AttachRequest;
 use self::breakpoint_locations::BreakpointLocationRequest;
 use self::completions::CompletionsRequest;
-use self::configuration_done::ConfigurationDoneRequest;
 use self::continue_request::ContinueRequest;
 use self::data_breakpoint_info::DataBreakPointInfoRequest;
 use self::diassemble::DiassambleRequest;
@@ -91,7 +89,7 @@ use self::write_memory::WriteMemoryRequest;
 #[derive(Clone, Debug)]
 pub enum Request {
     Initialize(InitializeRequest),
-    ConfigurationDone(ConfigurationDoneRequest),
+    ConfigurationDone,
     Completions(CompletionsRequest),
     Launch(LaunchRequest),
     Attach(AttachRequest),
@@ -139,9 +137,7 @@ impl Request {
 
         let request = match request_type {
             "initialize" => Request::Initialize(InitializeRequest::parse(msg)?),
-            "configurationDone" => Request::ConfigurationDone(
-                configuration_done::ConfigurationDoneRequest::parse(msg)?,
-            ),
+            "configurationDone" => Request::ConfigurationDone,
             "completions" => Request::Completions(completions::CompletionsRequest::parse(msg)?),
             "launch" => Request::Launch(launch::LaunchRequest::parse(msg)?),
             "attach" => Request::Attach(attach::AttachRequest::parse(msg)?),
