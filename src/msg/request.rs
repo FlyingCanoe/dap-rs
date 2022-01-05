@@ -240,7 +240,7 @@ use self::attach::AttachRequest;
 use self::breakpoint_locations::BreakpointLocationsRequest;
 use self::completions::CompletionsRequest;
 use self::continue_request::ContinueRequest;
-use self::data_breakpoint_info::DataBreakPointInfoRequest;
+use self::data_breakpoint_info::DataBreakpointInfoRequest;
 use self::diassemble::DiassambleRequest;
 use self::disconnect::DisconnectRequest;
 use self::evaluate::EvaluateRequest;
@@ -288,7 +288,7 @@ pub enum Request {
     SetBreakpoints(SetBreakpointsRequest),
     SetFunctionBreakpoints(SetFunctionBreakpointRequest),
     SetExceptionBreakpoints(SetExceptionBreakpoints),
-    DataBreakpointInfo(DataBreakPointInfoRequest),
+    DataBreakpointInfo(DataBreakpointInfoRequest),
     SetDataBreakpoints(SetDataBreakpointRequest),
     SetInstructionBreakpoints(SetInstructionBreakpointsRequest),
     ContinueRequest(ContinueRequest),
@@ -345,7 +345,7 @@ impl Request {
                 set_exception_breakpoints::SetExceptionBreakpoints::parse(msg)?,
             ),
             "dataBreakpointInfo" => Request::DataBreakpointInfo(
-                data_breakpoint_info::DataBreakPointInfoRequest::parse(msg)?,
+                data_breakpoint_info::DataBreakpointInfoRequest::parse(msg)?,
             ),
             "setDataBreakpoints" => Request::SetDataBreakpoints(
                 set_data_breakpoints::SetDataBreakpointRequest::parse(msg)?,
