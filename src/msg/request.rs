@@ -3,6 +3,202 @@ use serde_json as json;
 
 use crate::utils::get_str;
 
+macro_rules! request {
+    (
+        $request_name:ident {
+            optional_args = false;
+            u64 {
+                $(
+                    $(#[$u64_field_meta:meta])*
+                    $u64_field:ident: $u64_field_wire_name:literal,
+                )*
+
+            },
+            Option<u64> {
+                $(
+                    $(#[$optional_u64_field_meta:meta])*
+                    $optional_u64_field:ident: $optional_u64_field_wire_name:literal,
+                )*
+
+            },
+            String {
+                $(
+                    $(#[$string_field_meta:meta])*
+                    $string_field:ident: $string_field_wire_name:literal,
+                )*
+            },
+
+        }
+    ) => {
+        #[derive(Clone, Debug)]
+        pub struct $request_name {
+            $(
+                $(#[$u64_field_meta])*
+                $u64_field: u64,
+            )*
+
+            $(
+                $(#[$optional_u64_field_meta])*
+                $optional_u64_field: Option<u64>,
+            )*
+
+            $(
+                $(#[$string_field_meta])*
+                $string_field: String,
+            )*
+        }
+
+        impl $request_name {
+            pub(crate) fn parse(msg: serde_json::Value) -> anyhow::Result<$request_name> {
+                let args = msg.get("arguments").ok_or(anyhow::Error::msg("invalid request"))?;
+
+                $(
+                    let $u64_field = crate::utils::get_u64(&msg, $u64_field_wire_name)?;
+                )*
+
+                $(
+                    let $optional_u64_field = crate::utils::get_optional_u64(&msg, $optional_u64_field_wire_name)?;
+                )*
+
+                $(
+                    let $string_field = crate::utils::get_str(&msg, $string_field_wire_name)?.to_owned();
+                )*
+
+                let request = $request_name {
+                    $(
+                        $u64_field,
+                    )*
+                    $(
+                        $optional_u64_field,
+                    )*
+                    $(
+                        $string_field,
+                    )*
+                };
+                Ok(request)
+            }
+        }
+    };
+
+    (
+        $request_name:ident {
+            optional_args = true;
+            u64 {
+                $(
+                    $(#[$u64_field_meta:meta])*
+                    $u64_field:ident: $u64_field_wire_name:literal,
+                )*
+
+            },
+            Option<u64> {
+                $(
+                    $(#[$optional_u64_field_meta:meta])*
+                    $optional_u64_field:ident: $optional_u64_field_wire_name:literal,
+                )*
+
+            },
+            String {
+                $(
+                    $(#[$string_field_meta:meta])*
+                    $string_field:ident: $string_field_wire_name:literal,
+                )*
+            },
+            Custom {
+                $(
+                    {
+                        type = $custom_field_ty:ty;
+                        closure = $custom_field_closure:expr;
+                        $(#[$custom_field_meta:meta])*
+                        $custom_field:ident: $custom_field_wire_name:literal;
+
+                    },
+                )*
+            },
+
+        }
+    ) => {
+        #[derive(Clone, Debug)]
+        pub struct $request_name {
+            $(
+                $(#[$u64_field_meta])*
+                $u64_field: Option<u64>,
+            )*
+
+            $(
+                $(#[$optional_u64_field_meta])*
+                $optional_u64_field: Option<u64>,
+            )*
+
+            $(
+                $(#[$string_field_meta])*
+                $string_field: Option<String>,
+            )*
+            $(
+                $(#[$custom_field_meta])*
+                $custom_field: Option<$custom_field_ty>,
+            )*
+        }
+
+
+        impl BreakpointLocationRequest {
+            pub(crate) fn parse(msg: json::Value) -> anyhow::Result<BreakpointLocationRequest> {
+                let request;
+                if let Some(args) = msg.get("arguments") {
+
+
+                    $(
+                        let $u64_field = Some(crate::utils::get_u64(&msg, $u64_field_wire_name)?);
+                    )*
+
+                    $(
+                        let $optional_u64_field = crate::utils::get_optional_u64(&msg, $optional_u64_field_wire_name)?;
+                    )*
+
+                    $(
+                        let $string_field = Some(crate::utils::get_str(&msg, $string_field_wire_name)?.to_owned());
+                    )*
+
+                    $(
+                        let value = msg.get($custom_field_wire_name).ok_or(Error::msg("source"))?;
+                        let $custom_field = Some($custom_field_closure(value)?);
+                    )*
+
+                    request = BreakpointLocationRequest {
+                        $(
+                            $u64_field,
+                        )*
+                        $(
+                            $optional_u64_field,
+                        )*
+                        $(
+                            $string_field,
+                        )*
+                        $(
+                            $custom_field,
+                        )*
+                    }
+                } else {
+                    request = BreakpointLocationRequest {
+                        $(
+                            $u64_field: None,
+                        )*
+                        $(
+                            $optional_u64_field: None,
+                        )*
+                        $(
+                            $string_field: None,
+                        )*
+                        $(
+                            $custom_field: None,
+                        )*
+                    };
+                }
+                Ok(request)
+            }
+        }
+    }
+}
+
 mod attach;
 mod breakpoint_locations;
 mod completions;
