@@ -140,8 +140,8 @@ macro_rules! request {
         }
 
 
-        impl BreakpointLocationRequest {
-            pub(crate) fn parse(msg: json::Value) -> anyhow::Result<BreakpointLocationRequest> {
+        impl $request_name {
+            pub(crate) fn parse(msg: json::Value) -> anyhow::Result<$request_name> {
                 let request;
                 if let Some(args) = msg.get("arguments") {
 
@@ -163,7 +163,7 @@ macro_rules! request {
                         let $custom_field = Some($custom_field_closure(value)?);
                     )*
 
-                    request = BreakpointLocationRequest {
+                    request = $request_name {
                         $(
                             $u64_field,
                         )*
@@ -178,7 +178,7 @@ macro_rules! request {
                         )*
                     }
                 } else {
-                    request = BreakpointLocationRequest {
+                    request = $request_name {
                         $(
                             $u64_field: None,
                         )*
