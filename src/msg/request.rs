@@ -27,6 +27,12 @@ macro_rules! request {
                     $string_field:ident: $string_field_wire_name:literal,
                 )*
             },
+            Option<json::Value> {
+                $(
+                    $(#[$optional_any_field_meta:meta])*
+                    $optional_any_field:ident: $optional_any_wire_name:literal,
+                )*
+            },
 
         }
     ) => {
@@ -46,6 +52,11 @@ macro_rules! request {
                 $(#[$string_field_meta])*
                 $string_field: String,
             )*
+
+            $(
+                $(#[$optional_any_field_meta])*
+                $optional_any_field: Option<serde_json::Value>,
+            )*
         }
 
         impl $request_name {
@@ -64,6 +75,10 @@ macro_rules! request {
                     let $string_field = crate::utils::get_str(&msg, $string_field_wire_name)?.to_owned();
                 )*
 
+                $(
+                    let $optional_any_field = msg.get($optional_any_wire_name).cloned();
+                )*
+
                 let request = $request_name {
                     $(
                         $u64_field,
@@ -74,6 +89,10 @@ macro_rules! request {
                     $(
                         $string_field,
                     )*
+                    $(
+                        $optional_any_field,
+                    )*
+
                 };
                 Ok(request)
             }
