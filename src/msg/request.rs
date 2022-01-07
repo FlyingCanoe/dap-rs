@@ -21,6 +21,12 @@ macro_rules! request {
                 )*
 
             },
+            Option<bool> {
+                $(
+                    $(#[$optional_bool_field_meta:meta])*
+                    $optional_bool_field:ident: $optional_bool_field_wire_name:literal,
+                )*
+            },
             String {
                 $(
                     $(#[$string_field_meta:meta])*
@@ -49,6 +55,11 @@ macro_rules! request {
             )*
 
             $(
+                $(#[$optional_bool_field_meta])*
+                $optional_bool_field: Option<bool>,
+            )*
+
+            $(
                 $(#[$string_field_meta])*
                 $string_field: String,
             )*
@@ -72,6 +83,10 @@ macro_rules! request {
                 )*
 
                 $(
+                    let $optional_bool_field = crate::utils::get_optional_bool(&msg, $optional_bool_field_wire_name)?;
+                )*
+
+                $(
                     let $string_field = crate::utils::get_str(&msg, $string_field_wire_name)?.to_owned();
                 )*
 
@@ -85,6 +100,9 @@ macro_rules! request {
                     )*
                     $(
                         $optional_u64_field,
+                    )*
+                    $(
+                        $optional_bool_field,
                     )*
                     $(
                         $string_field,

@@ -3,6 +3,7 @@ AttachRequest {
     optional_args = false;
     u64 {},
     Option<u64> {},
+    Option<bool> {},
     String {},
     Option<json::Value> {
         /// Optional data from the previous, restarted session.
