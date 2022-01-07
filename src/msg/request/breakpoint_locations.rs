@@ -1,5 +1,4 @@
 use anyhow::Error;
-use serde_json as json;
 
 use crate::msg::dap_type::Source;
 
@@ -25,6 +24,7 @@ request!(
             /// end line.
             end_column: "endColumn",
         },
+        Option<bool> {},
         String {},
         Custom {
             {

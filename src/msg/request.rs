@@ -132,7 +132,12 @@ macro_rules! request {
                     $(#[$optional_u64_field_meta:meta])*
                     $optional_u64_field:ident: $optional_u64_field_wire_name:literal,
                 )*
-
+            },
+            Option<bool> {
+                $(
+                    $(#[$optional_bool_field_meta:meta])*
+                    $optional_bool_field:ident: $optional_bool_field_wire_name:literal,
+                )*
             },
             String {
                 $(
@@ -167,6 +172,11 @@ macro_rules! request {
             )*
 
             $(
+                $(#[$optional_bool_field_meta])*
+                $optional_bool_field: Option<bool>,
+            )*
+
+            $(
                 $(#[$string_field_meta])*
                 $string_field: Option<String>,
             )*
@@ -178,7 +188,7 @@ macro_rules! request {
 
 
         impl $request_name {
-            pub(crate) fn parse(msg: json::Value) -> anyhow::Result<$request_name> {
+            pub(crate) fn parse(msg: serde_json::Value) -> anyhow::Result<$request_name> {
                 let request;
                 if let Some(args) = msg.get("arguments") {
 
@@ -189,6 +199,10 @@ macro_rules! request {
 
                     $(
                         let $optional_u64_field = crate::utils::get_optional_u64(&msg, $optional_u64_field_wire_name)?;
+                    )*
+
+                    $(
+                        let $optional_bool_field = crate::utils::get_optional_bool(&msg, $optional_bool_field_wire_name)?;
                     )*
 
                     $(
@@ -208,6 +222,9 @@ macro_rules! request {
                             $optional_u64_field,
                         )*
                         $(
+                            $optional_bool_field,
+                        )*
+                        $(
                             $string_field,
                         )*
                         $(
@@ -221,6 +238,9 @@ macro_rules! request {
                         )*
                         $(
                             $optional_u64_field: None,
+                        )*
+                        $(
+                            $optional_bool_field: None,
                         )*
                         $(
                             $string_field: None,
