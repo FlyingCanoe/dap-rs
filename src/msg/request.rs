@@ -39,6 +39,17 @@ macro_rules! request {
                     $optional_any_field:ident: $optional_any_wire_name:literal,
                 )*
             },
+            Custom {
+                $(
+                    {
+                        type = $custom_field_ty:ty;
+                        closure = $custom_field_closure:expr;
+                        $(#[$custom_field_meta:meta])*
+                        $custom_field:ident: $custom_field_wire_name:literal;
+
+                    },
+                )*
+            },
 
         }
     ) => {
@@ -68,6 +79,10 @@ macro_rules! request {
                 $(#[$optional_any_field_meta])*
                 $optional_any_field: Option<serde_json::Value>,
             )*
+            $(
+                $(#[$custom_field_meta])*
+                $custom_field: $custom_field_ty,
+            )*
         }
 
         impl $request_name {
@@ -94,6 +109,11 @@ macro_rules! request {
                     let $optional_any_field = msg.get($optional_any_wire_name).cloned();
                 )*
 
+                $(
+                    let value = msg.get($custom_field_wire_name).ok_or(anyhow::Error::msg("invalid request"))?;
+                    let $custom_field = $custom_field_closure(value)?;
+                )*
+
                 let request = $request_name {
                     $(
                         $u64_field,
@@ -109,6 +129,9 @@ macro_rules! request {
                     )*
                     $(
                         $optional_any_field,
+                    )*
+                    $(
+                        $custom_field,
                     )*
 
                 };
@@ -210,7 +233,7 @@ macro_rules! request {
                     )*
 
                     $(
-                        let value = msg.get($custom_field_wire_name).ok_or(Error::msg("source"))?;
+                        let value = msg.get($custom_field_wire_name).ok_or(Error::msg("invalid request"))?;
                         let $custom_field = Some($custom_field_closure(value)?);
                     )*
 

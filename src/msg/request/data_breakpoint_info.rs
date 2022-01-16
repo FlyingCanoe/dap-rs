@@ -14,5 +14,6 @@ request!(
             name: "name",
         },
         Option<json::Value> {},
+        Custom {},
     }
 );

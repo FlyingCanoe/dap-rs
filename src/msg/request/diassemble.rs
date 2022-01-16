@@ -28,5 +28,6 @@ request!(
             memory_reference: "memoryReference",
         },
         Option<json::Value> {},
+        Custom {},
     }
 );

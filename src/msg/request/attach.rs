@@ -11,5 +11,6 @@ AttachRequest {
         /// The client should leave the data intact.
         restart_info: "__restart",
     },
+    Custom {},
 }
 );
