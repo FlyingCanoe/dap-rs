@@ -14,6 +14,7 @@ request!(
             /// The expression to evaluate.
             expression: "expression",
         },
+        Option<String> {},
         Option<json::Value> {},
         Custom {
             {
@@ -30,5 +31,6 @@ request!(
                 format: "format";
             },
         },
+        Option<Custom> {},
     }
 );

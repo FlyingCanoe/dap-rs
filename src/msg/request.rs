@@ -33,6 +33,13 @@ macro_rules! request {
                     $string_field:ident: $string_field_wire_name:literal,
                 )*
             },
+            Option<String> {
+                $(
+                    $(#[$optional_string_field_meta:meta])*
+                    $optional_string_field:ident: $optional_string_field_wire_name:literal,
+                )*
+            },
+
             Option<json::Value> {
                 $(
                     $(#[$optional_any_field_meta:meta])*
@@ -50,7 +57,17 @@ macro_rules! request {
                     },
                 )*
             },
+            Option<Custom> {
+                $(
+                    {
+                        type = $optional_custom_field_ty:ty;
+                        closure = $optional_custom_field_closure:expr;
+                        $(#[$optional_custom_field_meta:meta])*
+                        $optional_custom_field:ident: $optional_custom_field_wire_name:literal;
 
+                    },
+                )*
+            },
         }
     ) => {
         #[derive(Clone, Debug)]
@@ -83,6 +100,10 @@ macro_rules! request {
                 $(#[$custom_field_meta])*
                 $custom_field: $custom_field_ty,
             )*
+            $(
+                $(#[$optional_custom_field_meta])*
+                $optional_custom_field: Option<$optional_custom_field_ty>,
+            )*
         }
 
         impl $request_name {
@@ -106,12 +127,21 @@ macro_rules! request {
                 )*
 
                 $(
+                    let $optional_string_field = crate::utils::get_optional_str(&msg, $optional_string_field_wire_name)?.to_owned();
+                )*
+
+                $(
                     let $optional_any_field = msg.get($optional_any_wire_name).cloned();
                 )*
 
                 $(
                     let value = msg.get($custom_field_wire_name).ok_or(anyhow::Error::msg("invalid request"))?;
                     let $custom_field = $custom_field_closure(value)?;
+                )*
+
+                $(
+                    let value = msg.get($optional_custom_field_wire_name);
+                    let $optional_custom_field = $optional_custom_field_closure(value)?;
                 )*
 
                 let request = $request_name {
@@ -132,6 +162,9 @@ macro_rules! request {
                     )*
                     $(
                         $custom_field,
+                    )*
+                    $(
+                        $optional_custom_field,
                     )*
 
                 };

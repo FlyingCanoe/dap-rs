@@ -13,6 +13,7 @@ request!(
         },
         Option<bool> {},
         String {},
+        Option<String> {},
         Option<json::Value> {},
         Custom {
             {
@@ -21,5 +22,6 @@ request!(
                 source: "source";
             },
         },
+        Option<Custom> {},
     }
 );

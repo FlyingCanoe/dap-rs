@@ -14,7 +14,9 @@ request!(
             single_thread: "singleThread",
         },
         String {},
+        Option<String> {},
         Option<json::Value> {},
         Custom {},
+        Option<Custom> {},
     }
 );

@@ -10,7 +10,9 @@ request!(
         Option<u64> {},
         Option<bool> {},
         String {},
+        Option<String> {},
         Option<json::Value> {},
         Custom {},
+        Option<Custom> {},
     }
 );

@@ -27,7 +27,9 @@ request!(
             /// disassemble.
             memory_reference: "memoryReference",
         },
+        Option<String> {},
         Option<json::Value> {},
         Custom {},
+        Option<Custom> {},
     }
 );

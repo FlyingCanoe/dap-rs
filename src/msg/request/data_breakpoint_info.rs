@@ -13,7 +13,9 @@ request!(
             /// If variablesReference isn't provided, this can be an expression.
             name: "name",
         },
+        Option<String> {},
         Option<json::Value> {},
         Custom {},
+        Option<Custom> {},
     }
 );

@@ -20,7 +20,9 @@ request!(
             /// the debug console before he asked for completion.
             text: "text",
         },
+        Option<String> {},
         Option<json::Value> {},
         Custom {},
+        Option<Custom> {},
     }
 );
