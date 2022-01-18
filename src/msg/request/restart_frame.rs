@@ -1,10 +1,16 @@
-use serde_json as json;
-
-#[derive(Clone, Debug, Hash)]
-pub struct RestartFrameRequest {}
-
-impl RestartFrameRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<RestartFrameRequest> {
-        todo!()
+request!(
+    RestartFrameRequest {
+        optional_args = false;
+        u64 {
+            /// Restart this stackframe.
+            frame_id: "frameId",
+        },
+        Option<u64> {},
+        Option<bool> {},
+        String {},
+        Option<String> {},
+        Option<json::Value> {},
+        Custom {},
+        Option<Custom> {},
     }
-}
+);
