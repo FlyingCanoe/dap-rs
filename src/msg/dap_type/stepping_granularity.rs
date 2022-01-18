@@ -12,15 +12,18 @@ impl SteppingGranularity {
     pub(crate) fn parse(
         input: Option<&json::Value>,
     ) -> anyhow::Result<Option<SteppingGranularity>> {
-        let input = input.ok_or(Error::msg("parsing error"))?;
-        let input = input.as_str().ok_or(Error::msg("parsing error"))?;
+        if let Some(input) = input {
+            let input = input.as_str().ok_or(Error::msg("parsing error"))?;
 
-        let granularity = match input {
-            "statement" => SteppingGranularity::Statement,
-            "line" => SteppingGranularity::Line,
-            "instruction" => SteppingGranularity::Instruction,
-            _ => bail!("parsing error"),
-        };
-        Ok(Some(granularity))
+            let granularity = match input {
+                "statement" => SteppingGranularity::Statement,
+                "line" => SteppingGranularity::Line,
+                "instruction" => SteppingGranularity::Instruction,
+                _ => bail!("parsing error"),
+            };
+            Ok(Some(granularity))
+        } else {
+            Ok(None)
+        }
     }
 }
