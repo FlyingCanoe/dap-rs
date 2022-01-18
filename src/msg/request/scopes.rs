@@ -1,10 +1,16 @@
-use serde_json as json;
-
-#[derive(Clone, Debug, Hash)]
-pub struct ScopesRequest {}
-
-impl ScopesRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<ScopesRequest> {
-        todo!()
+request!(
+    ScopesRequest {
+        optional_args = false;
+        u64 {
+            /// Retrieve the scopes for this stackframe.
+            frame_id: "frameId",
+        },
+        Option<u64> {},
+        Option<bool> {},
+        String {},
+        Option<String> {},
+        Option<json::Value> {},
+        Custom {},
+        Option<Custom> {},
     }
-}
+);
