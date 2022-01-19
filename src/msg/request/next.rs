@@ -9,6 +9,7 @@ request!(
             thread_id: "threadId",
         },
         Option<u64> {},
+        Option<Vec<u64>> {},
         Option<bool> {
             /// If this optional flag is true, all other suspended threads are not resumed.
             single_thread: "singleThread",

@@ -6,6 +6,7 @@ request!(
             frame_id: "frameId",
         },
         Option<u64> {},
+        Option<Vec<u64>> {},
         Option<bool> {},
         String {},
         Option<String> {},

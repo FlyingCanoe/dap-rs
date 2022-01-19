@@ -5,6 +5,7 @@ request!(
         optional_args = false;
         u64 {},
         Option<u64> {},
+        Option<Vec<u64>> {},
         Option<bool> {
             /// If true all line numbers are 1-based (default).
             lines_start_at_1: "linesStartAt1",

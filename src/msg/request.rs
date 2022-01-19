@@ -21,6 +21,12 @@ macro_rules! request {
                 )*
 
             },
+            Option<Vec<u64>> {
+                $(
+                    $(#[$optional_u64_vec_field_meta:meta])*
+                    $optional_u64_vec_field:ident: $optional_u64_vec_field_wire_name:literal,
+                )*
+            },
             Option<bool> {
                 $(
                     $(#[$optional_bool_field_meta:meta])*
@@ -83,6 +89,11 @@ macro_rules! request {
             )*
 
             $(
+                $(#[$optional_u64_vec_field_meta])*
+                $optional_u64_vec_field: Option<Vec<u64>>,
+            )*
+
+            $(
                 $(#[$optional_bool_field_meta])*
                 $optional_bool_field: Option<bool>,
             )*
@@ -118,6 +129,11 @@ macro_rules! request {
                     let $optional_u64_field = crate::utils::get_optional_u64(&msg, $optional_u64_field_wire_name)?;
                 )*
 
+
+                $(
+                    let $optional_u64_vec_field = crate::utils::get_optional_u64_vec(&msg, $optional_u64_vec_field_wire_name)?;
+                )*
+
                 $(
                     let $optional_bool_field = crate::utils::get_optional_bool(&msg, $optional_bool_field_wire_name)?;
                 )*
@@ -150,6 +166,9 @@ macro_rules! request {
                     )*
                     $(
                         $optional_u64_field,
+                    )*
+                    $(
+                        $optional_u64_vec_field,
                     )*
                     $(
                         $optional_bool_field,

@@ -9,6 +9,7 @@ request!(
             /// the expression is evaluated in the global scope.
             frame_id: "frameId",
         },
+        Option<Vec<u64>> {},
         Option<bool> {},
         String {
             /// The expression to evaluate.

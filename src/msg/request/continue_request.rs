@@ -8,6 +8,7 @@ request!(
             thread_id: "threadId",
         },
         Option<u64> {},
+        Option<Vec<u64>> {},
         Option<bool> {
             /// If this optional flag is true, execution is resumed only for the thread
             /// with given 'threadId'.

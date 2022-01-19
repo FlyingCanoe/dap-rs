@@ -7,6 +7,7 @@ request!(
             /// a child of the container.
             variables_reference: "variablesReference",
         },
+        Option<Vec<u64>> {},
         Option<bool> {},
         String {
             /// The name of the Variable's child to obtain data breakpoint information for.

@@ -3,6 +3,7 @@ AttachRequest {
     optional_args = false;
     u64 {},
     Option<u64> {},
+    Option<Vec<u64>> {},
     Option<bool> {},
     String {},
     Option<String> {},

@@ -14,6 +14,7 @@ request!(
             /// missing the first line of the text is assumed.
             line: "line",
         },
+        Option<Vec<u64>> {},
         Option<bool> {},
         String {
             /// One or more source lines. Typically this is the text a user has typed into

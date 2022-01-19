@@ -9,6 +9,7 @@ request!(
             /// modules are returned.
             module_count: "moduleCount",
         },
+        Option<Vec<u64>> {},
         Option<bool> {},
         String {},
         Option<String> {},

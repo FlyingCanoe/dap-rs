@@ -10,6 +10,7 @@ request!(
             /// reading data. Can be negative.
             offset: "offset",
         },
+        Option<Vec<u64>> {},
         Option<bool> {},
         String {
             /// Memory reference to the base location from which data should be read.

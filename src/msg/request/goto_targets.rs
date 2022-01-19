@@ -11,6 +11,7 @@ request!(
             /// An optional column location for which the goto targets are determined.
             column: "column",
         },
+        Option<Vec<u64>> {},
         Option<bool> {},
         String {},
         Option<String> {},

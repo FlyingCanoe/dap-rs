@@ -3,6 +3,7 @@ request!(
         optional_args = false;
         u64 {},
         Option<u64> {},
+        Option<Vec<u64>> {},
         Option<bool> {
             /// If noDebug is true the launch request should launch the program without
             /// enabling debugging.

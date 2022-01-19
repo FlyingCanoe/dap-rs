@@ -6,6 +6,7 @@ request!(
             thread_id: "threadId",
         },
         Option<u64> {},
+        Option<Vec<u64>> {},
         Option<bool> {},
         String {},
         Option<String> {},

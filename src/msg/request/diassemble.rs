@@ -17,6 +17,7 @@ request!(
             /// any) before disassembling. Can be negative.
             instruction_offset: "instructionOffset",
         },
+        Option<Vec<u64>> {},
         Option<bool> {
             /// If true, the adapter should attempt to resolve memory addresses and other
             /// values to symbolic names.

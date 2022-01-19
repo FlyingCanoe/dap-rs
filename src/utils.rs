@@ -1,4 +1,5 @@
 use anyhow::Error;
+use fallible_iterator::{convert, FallibleIterator};
 use serde_json as json;
 
 pub(crate) fn get_str<'a>(input: &'a json::Value, key: &str) -> anyhow::Result<&'a str> {
@@ -30,6 +31,27 @@ pub(crate) fn get_optional_str<'a>(
 pub(crate) fn get_optional_u64(input: &json::Value, key: &str) -> anyhow::Result<Option<u64>> {
     if let Some(value) = input.get(key) {
         let output = value.as_u64().ok_or(Error::msg("parsing error"))?;
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
+
+pub(crate) fn get_optional_u64_vec(
+    input: &json::Value,
+    key: &str,
+) -> anyhow::Result<Option<Vec<u64>>> {
+    if let Some(value) = input.get(key) {
+        let output = value
+            .as_array()
+            .ok_or(Error::msg("parsing error"))?
+            .iter()
+            .map(json::Value::as_u64)
+            .map(|value| value.ok_or(Error::msg("parsing error")));
+
+        let output = convert(output);
+        let output: Vec<_> = output.collect()?;
+
         Ok(Some(output))
     } else {
         Ok(None)
