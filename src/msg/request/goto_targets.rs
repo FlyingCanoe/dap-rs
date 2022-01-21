@@ -1,10 +1,14 @@
-use serde_json as json;
+use crate::msg::dap_type::*;
 
-#[derive(Clone, Debug, Hash)]
-pub struct GotoTargetsRequest {}
+request!(
+    GotoTargetsRequest | "gotoTargets" {
+        /// The source location for which the goto targets are determined.
+        source | "source": Source,
 
-impl GotoTargetsRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<GotoTargetsRequest> {
-        todo!()
+        /// The line location for which the goto targets are determined.
+        line | "line": u64,
+
+        /// An optional column location for which the goto targets are determined.
+        column | "column": Option<u64>,
     }
-}
+);

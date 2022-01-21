@@ -1,5 +1,7 @@
 use serde_json as json;
 
+use crate::utils::Parse;
+
 use super::{Checksum, PresentationHint};
 
 #[derive(Clone, Debug)]
@@ -44,8 +46,8 @@ pub struct Source {
     checksums: Option<Vec<Checksum>>,
 }
 
-impl Source {
-    pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<Source> {
+impl Parse for Source {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<Source> {
         todo!()
     }
 }
