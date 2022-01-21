@@ -257,7 +257,7 @@ use self::restart_frame::RestartFrameRequest;
 use self::reverse_continue::ReverseContinueRequest;
 use self::scopes::ScopesRequest;
 use self::set_breakpoint::SetBreakpointsRequest;
-use self::set_data_breakpoints::SetDataBreakpointRequest;
+use self::set_data_breakpoints::SetDataBreakpointsRequest;
 use self::set_exception_breakpoints::SetExceptionBreakpoints;
 use self::set_expression::SetExpressionRequest;
 use self::set_function_breakpoints::SetFunctionBreakpointRequest;
@@ -289,7 +289,7 @@ pub enum Request {
     SetFunctionBreakpoints(SetFunctionBreakpointRequest),
     SetExceptionBreakpoints(SetExceptionBreakpoints),
     DataBreakpointInfo(DataBreakpointInfoRequest),
-    SetDataBreakpoints(SetDataBreakpointRequest),
+    SetDataBreakpoints(SetDataBreakpointsRequest),
     SetInstructionBreakpoints(SetInstructionBreakpointsRequest),
     ContinueRequest(ContinueRequest),
     Next(NextRequest),
@@ -348,7 +348,7 @@ impl Request {
                 data_breakpoint_info::DataBreakpointInfoRequest::parse(msg)?,
             ),
             "setDataBreakpoints" => Request::SetDataBreakpoints(
-                set_data_breakpoints::SetDataBreakpointRequest::parse(msg)?,
+                set_data_breakpoints::SetDataBreakpointsRequest::parse(msg)?,
             ),
             "setInstructionBreakpoints" => Request::SetInstructionBreakpoints(
                 set_instruction_breakpoints::SetInstructionBreakpointsRequest::parse(msg)?,

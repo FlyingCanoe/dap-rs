@@ -1,10 +1,10 @@
 use serde_json as json;
 
 #[derive(Clone, Debug, Hash)]
-pub struct SetDataBreakpointRequest {}
+pub struct SetDataBreakpointsRequest {}
 
-impl SetDataBreakpointRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<SetDataBreakpointRequest> {
+impl SetDataBreakpointsRequest {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<SetDataBreakpointsRequest> {
         todo!()
     }
 }
