@@ -358,7 +358,6 @@ mod goto;
 mod goto_targets;
 mod initialize;
 mod launch;
-mod loaded_sources;
 mod modules;
 mod next;
 mod pause;
@@ -400,7 +399,6 @@ use self::exception_info::ExceptionInfoRequest;
 use self::goto::GotoRequest;
 use self::goto_targets::GotoTargetsRequest;
 use self::launch::LaunchRequest;
-use self::loaded_sources::LoadedSourcesRequest;
 use self::modules::ModulesRequest;
 use self::next::NextRequest;
 use self::pause::PauseRequest;
@@ -462,7 +460,7 @@ pub enum Request {
     Threads(ThreadsRequest),
     TerminateThreads(TerminateThreadsRequest),
     Modules(ModulesRequest),
-    LoadedSources(LoadedSourcesRequest),
+    LoadedSources,
     Evaluate(EvaluateRequest),
     SetExpression(SetExpressionRequest),
     StepInTargets(StepInTargetRequest),
@@ -531,9 +529,7 @@ impl Request {
                 Request::TerminateThreads(terminate_threads::TerminateThreadsRequest::parse(msg)?)
             }
             "modules" => Request::Modules(modules::ModulesRequest::parse(msg)?),
-            "loadedSources" => {
-                Request::LoadedSources(loaded_sources::LoadedSourcesRequest::parse(msg)?)
-            }
+            "loadedSources" => Request::LoadedSources,
             "evaluate" => Request::Evaluate(evaluate::EvaluateRequest::parse(msg)?),
             "setExpression" => {
                 Request::SetExpression(set_expression::SetExpressionRequest::parse(msg)?)
