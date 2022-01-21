@@ -16,7 +16,7 @@ macro_rules! request2 {
         pub struct $request_name {
             $(
                 $(#[$field_meta])*
-                $field: $field_ty
+                $field: $field_ty,
             )*
         }
 

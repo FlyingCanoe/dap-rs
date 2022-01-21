@@ -78,3 +78,29 @@ pub(crate) fn get_optional_bool(input: &json::Value, key: &str) -> anyhow::Resul
         Ok(None)
     }
 }
+
+pub(crate) fn parse_u64(input: Option<&json::Value>) -> anyhow::Result<u64> {
+    input
+        .ok_or(Error::msg("parsing error"))?
+        .as_u64()
+        .ok_or(Error::msg("parsing error"))
+}
+
+pub(crate) fn parse_optional_u64(input: Option<&json::Value>) -> anyhow::Result<Option<u64>> {
+    if let Some(value) = input {
+        let output = value.as_u64().ok_or(Error::msg("parsing error"))?;
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
+
+pub(crate) fn parse_string(input: Option<&json::Value>) -> anyhow::Result<String> {
+    let output = input
+        .ok_or(Error::msg("parsing error"))?
+        .as_str()
+        .ok_or(Error::msg("parsing error"))?
+        .to_owned();
+
+    Ok(output)
+}
