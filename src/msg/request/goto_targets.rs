@@ -1,28 +1,15 @@
-use crate::msg::dap_type::Source;
+use crate::msg::dap_type::*;
+use crate::utils::{parse_optional_u64, parse_u64};
 
-request!(
+request2!(
     GotoTargetsRequest {
-        optional_args = false;
-        u64 {
-            /// The line location for which the goto targets are determined.
-            line: "line",
-        },
-        Option<u64> {
-            /// An optional column location for which the goto targets are determined.
-            column: "column",
-        },
-        Option<Vec<u64>> {},
-        Option<bool> {},
-        String {},
-        Option<String> {},
-        Option<json::Value> {},
-        Custom {
-            {
-                type = Source;
-                closure = Source::parse;
-                source: "source";
-            },
-        },
-        Option<Custom> {},
+        /// The source location for which the goto targets are determined.
+        source | "source": Source = Source::parse,
+
+        /// The line location for which the goto targets are determined.
+        line | "line": u64 = parse_u64,
+
+        /// An optional column location for which the goto targets are determined.
+        column | "column": Option<u64> = parse_optional_u64,
     }
 );
