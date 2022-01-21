@@ -1,5 +1,3 @@
-use anyhow::Error;
-
 use crate::msg::dap_type::Source;
 
 request!(
