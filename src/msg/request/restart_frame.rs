@@ -1,16 +1,8 @@
-request!(
+use crate::utils::parse_u64;
+
+request2!(
     RestartFrameRequest {
-        optional_args = false;
-        u64 {
-            /// Restart this stackframe.
-            frame_id: "frameId",
-        },
-        Option<u64> {},
-        Option<Vec<u64>> {},
-        Option<bool> {},
-        String {},
-        Option<String> {},
-        Option<json::Value> {},
-        Custom {},
+        /// Restart this stackframe.
+        frame_id | "frameId": u64 = parse_u64,
     }
 );
