@@ -9,7 +9,7 @@ pub enum SteppingGranularity {
 }
 
 impl SteppingGranularity {
-    pub(crate) fn parse(
+    pub(crate) fn parse_optional(
         input: Option<&json::Value>,
     ) -> anyhow::Result<Option<SteppingGranularity>> {
         if let Some(input) = input {

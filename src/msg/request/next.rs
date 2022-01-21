@@ -1,30 +1,17 @@
 use crate::msg::dap_type::SteppingGranularity;
+use crate::utils::{parse_optional_bool, parse_u64};
 
-request!(
+request2!(
     NextRequest {
-        optional_args = false;
-        u64 {
-            /// Specifies the thread for which to resume execution for one step (of the
-            /// given granularity).
-            thread_id: "threadId",
-        },
-        Option<u64> {},
-        Option<Vec<u64>> {},
-        Option<bool> {
-            /// If this optional flag is true, all other suspended threads are not resumed.
-            single_thread: "singleThread",
-        },
-        String {},
-        Option<String> {},
-        Option<json::Value> {},
-        Custom {
-            {
-                type = Option<SteppingGranularity>;
-                closure = SteppingGranularity::parse;
-                /// Optional granularity to step. If no granularity is specified, a granularity
-                /// of 'statement' is assumed.
-                granularity: "granularity";
-            },
-        },
+        /// Specifies the thread for which to resume execution for one step (of the
+        /// given granularity).
+        thread_id | "threadId": u64 = parse_u64,
+
+        /// If this optional flag is true, all other suspended threads are not resumed.
+        single_thread | "singleThread": Option<bool> = parse_optional_bool,
+
+        /// Optional granularity to step. If no granularity is specified, a granularity
+        /// of 'statement' is assumed.
+        granularity | "granularity": Option<SteppingGranularity> = SteppingGranularity::parse_optional,
     }
 );
