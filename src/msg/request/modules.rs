@@ -1,10 +1,10 @@
-use serde_json as json;
+request!(
+    ModulesRequest | "modules" {
+        /// The index of the first module to return if omitted modules start at 0.
+        start_module | "startModule": Option<u64>,
 
-#[derive(Clone, Debug, Hash)]
-pub struct ModulesRequest {}
-
-impl ModulesRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<ModulesRequest> {
-        todo!()
+        /// The u64 of modules to return. If moduleCount is not specified or 0, all
+        /// modules are returned.
+        module_count | "moduleCount": Option<u64>,
     }
-}
+);
