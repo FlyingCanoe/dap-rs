@@ -3,6 +3,44 @@ use serde_json as json;
 
 use crate::utils::get_str;
 
+macro_rules! request2 {
+    (
+        $request_name:ident {
+            $(
+                $(#[$field_meta:meta])*
+                $field:ident | $field_wire_name:literal: $field_ty:ty = $field_parsing_fn:expr,
+            )*
+        }
+    ) => {
+        #[derive(Clone, Debug)]
+        pub struct $request_name {
+            $(
+                $(#[$field_meta])*
+                $field: $field_ty
+            )*
+        }
+
+        impl $request_name {
+            pub(crate) fn parse(msg: serde_json::Value) -> anyhow::Result<$request_name> {
+                let args = msg.get("arguments").ok_or(anyhow::Error::msg("invalid request"))?;
+
+                $(
+                    let value = msg.get($field_wire_name);
+                    let $field = $field_parsing_fn(value)?;
+                )*
+
+                let request = $request_name {
+                    $(
+                        $field,
+                    )*
+
+                };
+                Ok(request)
+            }
+        }
+    };
+}
+
 macro_rules! request {
     (
         $request_name:ident {
@@ -74,6 +112,17 @@ macro_rules! request {
                     },
                 )*
             },
+            $(Vec<Custom> {
+                $(
+                    {
+                        type = $custom_field_vec_ty:ty;
+                        closure = $custom_field_vec_closure:expr;
+                        $(#[$custom_field_vec_meta:meta])*
+                        $custom_field_vec:ident: $custom_field_vec_wire_name:literal;
+
+                    },
+                )*
+            },)*
         }
     ) => {
         #[derive(Clone, Debug)]
@@ -115,6 +164,10 @@ macro_rules! request {
                 $(#[$optional_custom_field_meta])*
                 $optional_custom_field: Option<$optional_custom_field_ty>,
             )*
+            $($(
+                $(#[$custom_field_vec_meta])*
+                $custom_field_vec: Vec<$custom_field_vec_ty>,
+            )*)*
         }
 
         impl $request_name {
@@ -160,6 +213,11 @@ macro_rules! request {
                     let $optional_custom_field = $optional_custom_field_closure(value)?;
                 )*
 
+                $($(
+                    let value = msg.get($custom_field_vec_wire_name).ok_or(anyhow::Error::msg("invalid request"))?;
+                    let $custom_field_vec = $custom_field_vec_closure(value)?;
+                )*)*
+
                 let request = $request_name {
                     $(
                         $u64_field,
@@ -185,6 +243,9 @@ macro_rules! request {
                     $(
                         $optional_custom_field,
                     )*
+                    $($(
+                        $custom_field_vec
+                    )*)*
 
                 };
                 Ok(request)
@@ -396,7 +457,7 @@ use self::restart_frame::RestartFrameRequest;
 use self::reverse_continue::ReverseContinueRequest;
 use self::scopes::ScopesRequest;
 use self::set_breakpoint::SetBreakpointsRequest;
-use self::set_data_breakpoints::SetDataBreakpointRequest;
+use self::set_data_breakpoints::SetDataBreakpointsRequest;
 use self::set_exception_breakpoints::SetExceptionBreakpoints;
 use self::set_expression::SetExpressionRequest;
 use self::set_function_breakpoints::SetFunctionBreakpointRequest;
@@ -429,7 +490,7 @@ pub enum Request {
     SetFunctionBreakpoints(SetFunctionBreakpointRequest),
     SetExceptionBreakpoints(SetExceptionBreakpoints),
     DataBreakpointInfo(DataBreakpointInfoRequest),
-    SetDataBreakpoints(SetDataBreakpointRequest),
+    SetDataBreakpoints(SetDataBreakpointsRequest),
     SetInstructionBreakpoints(SetInstructionBreakpointsRequest),
     ContinueRequest(ContinueRequest),
     Next(NextRequest),
@@ -488,7 +549,7 @@ impl Request {
                 data_breakpoint_info::DataBreakpointInfoRequest::parse(msg)?,
             ),
             "setDataBreakpoints" => Request::SetDataBreakpoints(
-                set_data_breakpoints::SetDataBreakpointRequest::parse(msg)?,
+                set_data_breakpoints::SetDataBreakpointsRequest::parse(msg)?,
             ),
             "setInstructionBreakpoints" => Request::SetInstructionBreakpoints(
                 set_instruction_breakpoints::SetInstructionBreakpointsRequest::parse(msg)?,
