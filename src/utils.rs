@@ -79,6 +79,22 @@ pub(crate) fn get_optional_bool(input: &json::Value, key: &str) -> anyhow::Resul
     }
 }
 
+pub(crate) fn parse_bool(input: Option<&json::Value>) -> anyhow::Result<bool> {
+    input
+        .ok_or(Error::msg("parsing error"))?
+        .as_bool()
+        .ok_or(Error::msg("parsing error"))
+}
+
+pub(crate) fn parse_optional_bool(input: Option<&json::Value>) -> anyhow::Result<Option<bool>> {
+    if let Some(value) = input {
+        let output = value.as_bool().ok_or(Error::msg("parsing error"))?;
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
+
 pub(crate) fn parse_u64(input: Option<&json::Value>) -> anyhow::Result<u64> {
     input
         .ok_or(Error::msg("parsing error"))?
