@@ -1,5 +1,7 @@
 use serde_json as json;
 
+use crate::utils::Parse;
+
 #[derive(Debug, Clone)]
 pub struct DataBreakpoint {
     /// An id representing the data. This id is returned from the
@@ -13,18 +15,8 @@ pub struct DataBreakpoint {
     hit_condition: Option<String>,
 }
 
-impl DataBreakpoint {
-    pub(crate) fn parse(input: &json::Value) -> anyhow::Result<DataBreakpoint> {
+impl Parse for DataBreakpoint {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<DataBreakpoint> {
         todo!()
     }
 }
-
-// The access type of the data.
-/*access_type: Option<DataBreakpointAccessType>,
-
-let access_type = if let Some(value) = input.get("accessType") {
-    let access_type = DataBreakpointAccessType::parse(input)?;
-    Some(access_type)
-} else {
-    None
-};*/

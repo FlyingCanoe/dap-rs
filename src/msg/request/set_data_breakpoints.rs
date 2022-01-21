@@ -1,10 +1,9 @@
-use serde_json as json;
+use crate::msg::dap_type::DataBreakpoint;
 
-#[derive(Clone, Debug, Hash)]
-pub struct SetDataBreakpointsRequest {}
-
-impl SetDataBreakpointsRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<SetDataBreakpointsRequest> {
-        todo!()
+request2!(
+    SetDataBreakpointsRequest {
+        /// The contents of this array replaces all existing data breakpoints. An empty
+        /// array clears all data breakpoints.
+        breakpoints | "breakpoints": Vec<DataBreakpoint>,
     }
-}
+);
