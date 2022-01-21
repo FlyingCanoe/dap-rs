@@ -18,7 +18,8 @@ pub struct DataBreakpoint {
 }
 
 impl DataBreakpoint {
-    pub(crate) fn parse(input: &json::Value) -> anyhow::Result<DataBreakpoint> {
+    pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<DataBreakpoint> {
+        let input = input.ok_or(Error::msg("parsing error"))?;
         let data_id = get_str(input, "dataId")?.to_owned();
         let condition = get_optional_str(input, "condition")?.map(str::to_owned);
         let hit_condition = get_optional_str(input, "hitCondition")?.map(str::to_owned);
@@ -31,12 +32,13 @@ impl DataBreakpoint {
         Ok(breakpoint)
     }
 
-    pub(crate) fn parse_vec(input: &json::Value) -> anyhow::Result<Vec<DataBreakpoint>> {
+    pub(crate) fn parse_vec(input: Option<&json::Value>) -> anyhow::Result<Vec<DataBreakpoint>> {
         let iter = input
+            .ok_or(Error::msg("parsing error"))?
             .as_array()
             .ok_or(Error::msg("parsing error"))?
             .iter()
-            .map(|value| DataBreakpoint::parse(value));
+            .map(|value| DataBreakpoint::parse(Some(value)));
         let breakpoint_vec: Vec<_> = convert(iter).collect()?;
         Ok(breakpoint_vec)
     }

@@ -1,3 +1,4 @@
+use anyhow::Error;
 use serde_json as json;
 
 use super::ChecksumAlgorithm;
@@ -13,7 +14,8 @@ pub struct Checksum {
 }
 
 impl Checksum {
-    pub(crate) fn parse(input: &json::Value) -> anyhow::Result<Checksum> {
+    pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<Checksum> {
+        let input = input.ok_or(Error::msg("parsing error"))?;
         let algorithm = get_str(input, "algorithm")?;
         let algorithm = ChecksumAlgorithm::parse(algorithm)?;
         let checksum = get_str(input, "checksum")?.to_owned();

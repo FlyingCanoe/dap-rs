@@ -101,28 +101,6 @@ macro_rules! request {
                     },
                 )*
             },
-            Option<Custom> {
-                $(
-                    {
-                        type = $optional_custom_field_ty:ty;
-                        closure = $optional_custom_field_closure:expr;
-                        $(#[$optional_custom_field_meta:meta])*
-                        $optional_custom_field:ident: $optional_custom_field_wire_name:literal;
-
-                    },
-                )*
-            },
-            $(Vec<Custom> {
-                $(
-                    {
-                        type = $custom_field_vec_ty:ty;
-                        closure = $custom_field_vec_closure:expr;
-                        $(#[$custom_field_vec_meta:meta])*
-                        $custom_field_vec:ident: $custom_field_vec_wire_name:literal;
-
-                    },
-                )*
-            },)*
         }
     ) => {
         #[derive(Clone, Debug)]
@@ -160,14 +138,6 @@ macro_rules! request {
                 $(#[$custom_field_meta])*
                 $custom_field: $custom_field_ty,
             )*
-            $(
-                $(#[$optional_custom_field_meta])*
-                $optional_custom_field: Option<$optional_custom_field_ty>,
-            )*
-            $($(
-                $(#[$custom_field_vec_meta])*
-                $custom_field_vec: Vec<$custom_field_vec_ty>,
-            )*)*
         }
 
         impl $request_name {
@@ -204,19 +174,9 @@ macro_rules! request {
                 )*
 
                 $(
-                    let value = msg.get($custom_field_wire_name).ok_or(anyhow::Error::msg("invalid request"))?;
+                    let value = msg.get($custom_field_wire_name);
                     let $custom_field = $custom_field_closure(value)?;
                 )*
-
-                $(
-                    let value = msg.get($optional_custom_field_wire_name);
-                    let $optional_custom_field = $optional_custom_field_closure(value)?;
-                )*
-
-                $($(
-                    let value = msg.get($custom_field_vec_wire_name).ok_or(anyhow::Error::msg("invalid request"))?;
-                    let $custom_field_vec = $custom_field_vec_closure(value)?;
-                )*)*
 
                 let request = $request_name {
                     $(
@@ -240,13 +200,6 @@ macro_rules! request {
                     $(
                         $custom_field,
                     )*
-                    $(
-                        $optional_custom_field,
-                    )*
-                    $($(
-                        $custom_field_vec
-                    )*)*
-
                 };
                 Ok(request)
             }
@@ -346,7 +299,7 @@ macro_rules! request {
                     )*
 
                     $(
-                        let value = msg.get($custom_field_wire_name).ok_or(Error::msg("invalid request"))?;
+                        let value = msg.get($custom_field_wire_name);
                         let $custom_field = Some($custom_field_closure(value)?);
                     )*
 

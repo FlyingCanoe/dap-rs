@@ -40,10 +40,9 @@ request!(
             locale: "locale",
         },
         Option<json::Value> {},
-        Custom {},
-        Option<Custom> {
+        Custom {
             {
-                type = PathFormat;
+                type = Option<PathFormat>;
                 closure = PathFormat::parse;
                 /// Determines in what format paths are specified. The default is 'path', which
                 /// is the native format.

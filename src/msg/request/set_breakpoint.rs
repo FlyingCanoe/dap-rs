@@ -23,11 +23,9 @@ request!(
                 closure = Source::parse;
                 source: "source";
             },
-        },
-        Option<Custom> {
             {
-                type = Vec<SourceBreakpoint>;
-                closure = SourceBreakpoint::parse_vec;
+                type = Option<Vec<SourceBreakpoint>>;
+                closure = SourceBreakpoint::parse_optional_vec;
                 breakpoints: "breakpoints";
             },
         },

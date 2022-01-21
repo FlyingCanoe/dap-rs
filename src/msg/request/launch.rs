@@ -18,6 +18,5 @@ request!(
             restart_info: "__restart",
         },
         Custom {},
-        Option<Custom> {},
     }
 );

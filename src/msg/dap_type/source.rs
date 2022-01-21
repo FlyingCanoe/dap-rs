@@ -1,3 +1,4 @@
+use anyhow::Error;
 use fallible_iterator::*;
 use serde_json as json;
 
@@ -47,7 +48,8 @@ pub struct Source {
 }
 
 impl Source {
-    pub(crate) fn parse(input: &json::Value) -> anyhow::Result<Source> {
+    pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<Source> {
+        let input = input.ok_or(Error::msg("parsing error"))?;
         let name = get_optional_str(input, "name")?.map(str::to_owned);
         let path = get_optional_str(input, "path")?.map(str::to_owned);
         let source_reference = get_optional_u64(input, "sourceReference")?;
@@ -62,14 +64,14 @@ impl Source {
         };
 
         let sources = if let Some(sources) = get_optional_list(input, "sources")? {
-            let sources = sources.iter().map(|value| Source::parse(value));
+            let sources = sources.iter().map(|value| Source::parse(Some(value)));
             let sources: Vec<_> = convert(sources).collect()?;
             Some(sources)
         } else {
             None
         };
         let checksums = if let Some(checksums) = get_optional_list(input, "checksums")? {
-            let checksums = checksums.iter().map(|value| Checksum::parse(value));
+            let checksums = checksums.iter().map(|value| Checksum::parse(Some(value)));
             let checksums: Vec<_> = convert(checksums).collect()?;
             Some(checksums)
         } else {

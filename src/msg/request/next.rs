@@ -17,10 +17,9 @@ request!(
         String {},
         Option<String> {},
         Option<json::Value> {},
-        Custom {},
-        Option<Custom> {
+        Custom {
             {
-                type = SteppingGranularity;
+                type = Option<SteppingGranularity>;
                 closure = SteppingGranularity::parse;
                 /// Optional granularity to step. If no granularity is specified, a granularity
                 /// of 'statement' is assumed.

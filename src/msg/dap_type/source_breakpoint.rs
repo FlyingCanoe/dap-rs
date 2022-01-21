@@ -33,7 +33,8 @@ pub struct SourceBreakpoint {
 }
 
 impl SourceBreakpoint {
-    pub(crate) fn parse(input: &json::Value) -> anyhow::Result<SourceBreakpoint> {
+    pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<SourceBreakpoint> {
+        let input = input.ok_or(Error::msg("parsing error"))?;
         let line = get_u64(input, "line")?;
         let column = get_optional_u64(input, "column")?;
         let condition = get_optional_str(input, "condition")?.map(str::to_owned);
@@ -50,12 +51,14 @@ impl SourceBreakpoint {
         Ok(breakpoint)
     }
 
-    pub(crate) fn parse_vec(
+    pub(crate) fn parse_optional_vec(
         input: Option<&json::Value>,
     ) -> anyhow::Result<Option<Vec<SourceBreakpoint>>> {
         if let Some(input) = input {
             let input = input.as_array().ok_or(Error::msg("parsing error"))?;
-            let breakpoint_iter = input.iter().map(|value| SourceBreakpoint::parse(value));
+            let breakpoint_iter = input
+                .iter()
+                .map(|value| SourceBreakpoint::parse(Some(value)));
             let breakpoint_list: Vec<_> = convert(breakpoint_iter).collect()?;
             Ok(Some(breakpoint_list))
         } else {

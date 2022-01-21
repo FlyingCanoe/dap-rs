@@ -10,11 +10,9 @@ request!(
         String {},
         Option<String> {},
         Option<json::Value> {},
-        Custom {},
-        Option<Custom> {},
-        Vec<Custom> {
+        Custom {
             {
-                type = DataBreakpoint;
+                type = Vec<DataBreakpoint>;
                 closure = DataBreakpoint::parse_vec;
                 ///  The contents of this array replaces all existing data breakpoints. An empty
                 ///  array clears all data breakpoints.
@@ -23,5 +21,3 @@ request!(
         },
     }
 );
-
-// breakpoints: DataBreakpoint[];

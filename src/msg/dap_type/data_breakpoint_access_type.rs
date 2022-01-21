@@ -9,7 +9,8 @@ pub enum DataBreakpointAccessType {
 }
 
 impl DataBreakpointAccessType {
-    pub(crate) fn parse(input: &json::Value) -> anyhow::Result<DataBreakpointAccessType> {
+    pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<DataBreakpointAccessType> {
+        let input = input.ok_or(Error::msg("parsing error"))?;
         let input = input.as_str().ok_or(Error::msg("parsing error"))?;
         let access_type = match input {
             "read" => DataBreakpointAccessType::Read,
