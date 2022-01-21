@@ -1,10 +1,29 @@
-use serde_json as json;
+use crate::msg::dap_type::{EvaluateCtx, ValueFormat};
 
-#[derive(Clone, Debug, Hash)]
-pub struct EvaluateRequest {}
+request!(
+    EvaluateRequest | "evaluate" {
+        /// The expression to evaluate.
+        expression | "expression": String,
 
-impl EvaluateRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<EvaluateRequest> {
-        todo!()
+        /// Evaluate the expression in the scope of this stack frame. If not specified,
+        /// the expression is evaluated in the global scope.
+        frame_id | "frameId": Option<u64>,
+
+        /// The context in which the evaluate request is run.
+        /// Values:
+        /// 'watch': evaluate is run in a watch.
+        /// 'repl': evaluate is run from REPL console.
+        /// 'hover': evaluate is run from a data hover.
+        /// 'clipboard': evaluate is run to generate the value that will be stored in
+        /// the clipboard.
+        /// The attribute is only honored by a debug adapter if the capability
+        /// 'supportsClipboardContext' is true.
+        /// etc.
+        context | "context": Option<EvaluateCtx>,
+
+        /// Specifies details on how to format the Evaluate result.
+        /// The attribute is only honored by a debug adapter if the capability
+        /// 'supportsValueFormattingOptions' is true.
+        format | "format": Option<ValueFormat>,
     }
-}
+);
