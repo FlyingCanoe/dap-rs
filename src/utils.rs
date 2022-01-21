@@ -111,6 +111,23 @@ pub(crate) fn parse_optional_u64(input: Option<&json::Value>) -> anyhow::Result<
     }
 }
 
+pub(crate) fn parse_optional_u64_vec(
+    input: Option<&json::Value>,
+) -> anyhow::Result<Option<Vec<u64>>> {
+    if let Some(value) = input {
+        let iter = value
+            .as_array()
+            .ok_or(Error::msg("parsing error"))?
+            .into_iter()
+            .map(|value| parse_u64(Some(value)));
+
+        let output: Vec<_> = convert(iter).collect()?;
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
+
 pub(crate) fn parse_string(input: Option<&json::Value>) -> anyhow::Result<String> {
     let output = input
         .ok_or(Error::msg("parsing error"))?
