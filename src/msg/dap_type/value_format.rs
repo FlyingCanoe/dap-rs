@@ -8,13 +8,21 @@ pub struct ValueFormat {
 }
 
 impl ValueFormat {
-    pub(crate) fn parse(input: &json::Value) -> anyhow::Result<ValueFormat> {
-        let value_format = if let Some(hex) = input.get("hex") {
+    pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<ValueFormat> {
+        let value_format = if let Some(hex) = input.ok_or(Error::msg("parsing error"))?.get("hex") {
             let hex = hex.as_bool().ok_or(Error::msg("parsing error"))?;
             ValueFormat { hex: Some(hex) }
         } else {
             ValueFormat { hex: None }
         };
         Ok(value_format)
+    }
+
+    pub(crate) fn parse_option(input: Option<&json::Value>) -> anyhow::Result<Option<ValueFormat>> {
+        if input.is_some() {
+            Ok(Some(ValueFormat::parse(input)?))
+        } else {
+            Ok(None)
+        }
     }
 }

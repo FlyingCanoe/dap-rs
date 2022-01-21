@@ -10,8 +10,11 @@ pub enum EvaluateCtx {
 }
 
 impl EvaluateCtx {
-    pub(crate) fn parse(input: &json::Value) -> anyhow::Result<EvaluateCtx> {
-        let input = input.as_str().ok_or(Error::msg("parsing error"))?;
+    pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<EvaluateCtx> {
+        let input = input
+            .ok_or(Error::msg("parsing error"))?
+            .as_str()
+            .ok_or(Error::msg("parsing error"))?;
         let ctx = match input {
             "watch" => EvaluateCtx::Watch,
             "repl" => EvaluateCtx::Repl,
@@ -20,5 +23,13 @@ impl EvaluateCtx {
             _ => bail!("parsing error"),
         };
         Ok(ctx)
+    }
+
+    pub(crate) fn parse_option(input: Option<&json::Value>) -> anyhow::Result<Option<EvaluateCtx>> {
+        if input.is_some() {
+            Ok(Some(EvaluateCtx::parse(input)?))
+        } else {
+            Ok(None)
+        }
     }
 }
