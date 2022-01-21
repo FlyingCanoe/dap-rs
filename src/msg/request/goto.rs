@@ -1,10 +1,9 @@
-use serde_json as json;
+request!(
+    GotoRequest | "goto" {
+        /// Set the goto target for this thread.
+        thread_id | "threadId": u64 ,
 
-#[derive(Clone, Debug, Hash)]
-pub struct GotoRequest {}
-
-impl GotoRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<GotoRequest> {
-        todo!()
+        /// The location where the debuggee will continue to run.
+        target_id | "targetId": u64 ,
     }
-}
+);
