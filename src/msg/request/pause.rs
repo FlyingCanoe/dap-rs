@@ -1,10 +1,6 @@
-use serde_json as json;
-
-#[derive(Clone, Debug, Hash)]
-pub struct PauseRequest {}
-
-impl PauseRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<PauseRequest> {
-        todo!()
+request!(
+    PauseRequest | "pause" {
+        /// Pause execution for this thread.
+        thread_id | "threadId": u64,
     }
-}
+);
