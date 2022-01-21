@@ -1,10 +1,19 @@
-use serde_json as json;
+use crate::msg::dap_type::{Source, SourceBreakpoint};
 
-#[derive(Clone, Debug, Hash)]
-pub struct SetBreakpointsRequest {}
+request2!(
+    SetBreakpointsRequest {
+        /// The source location of the breakpoints either 'source.path' or
+        /// 'source.reference' must be specified.
+        source | "source": Source,
 
-impl SetBreakpointsRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<SetBreakpointsRequest> {
-        todo!()
+        /// The code locations of the breakpoints.
+        breakpoints | "breakpoints": Option<Vec<SourceBreakpoint>>,
+
+        /// Deprecated: The code locations of the breakpoints.
+        lines | "lines": Option<Vec<u64>>,
+
+        /// A value of true indicates that the underlying source has been modified
+        /// which results in new breakpoint locations.
+        source_modified | "sourceModified": Option<bool>,
     }
-}
+);
