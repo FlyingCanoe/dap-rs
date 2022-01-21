@@ -9,7 +9,9 @@ pub enum PathFormat {
 }
 
 impl PathFormat {
-    pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<Option<PathFormat>> {
+    pub(crate) fn parse_optional(
+        input: Option<&json::Value>,
+    ) -> anyhow::Result<Option<PathFormat>> {
         if let Some(input) = input {
             let path_format = match input.as_str().ok_or(Error::msg("parsing error"))? {
                 "path" => PathFormat::Path,

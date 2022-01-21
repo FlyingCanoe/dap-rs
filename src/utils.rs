@@ -120,3 +120,15 @@ pub(crate) fn parse_string(input: Option<&json::Value>) -> anyhow::Result<String
 
     Ok(output)
 }
+
+pub(crate) fn parse_optional_string(input: Option<&json::Value>) -> anyhow::Result<Option<String>> {
+    if let Some(value) = input {
+        let output = value
+            .as_str()
+            .ok_or(Error::msg("parsing error"))?
+            .to_owned();
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
