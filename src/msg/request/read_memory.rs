@@ -1,10 +1,13 @@
-use serde_json as json;
+request!(
+    ReadMemoryRequest | "readMemory" {
+        /// Memory reference to the base location from which data should be read.
+        memory_reference | "memoryReference": String,
 
-#[derive(Clone, Debug, Hash)]
-pub struct ReadMemoryRequest {}
+        /// Optional offset (in bytes) to be applied to the reference location before
+        /// reading data. Can be negative.
+        offset | "offset": Option<u64>,
 
-impl ReadMemoryRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<ReadMemoryRequest> {
-        todo!()
+        /// Number of bytes to read at the specified location and offset.
+        count | "count": u64,
     }
-}
+);
