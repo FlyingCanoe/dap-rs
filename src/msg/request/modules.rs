@@ -1,19 +1,12 @@
-request!(
+use crate::utils::parse_optional_u64;
+
+request2!(
     ModulesRequest {
-        optional_args = false;
-        u64 {},
-        Option<u64> {
-            /// The index of the first module to return if omitted modules start at 0.
-            start_module: "startModule",
-            /// The number of modules to return. If moduleCount is not specified or 0, all
-            /// modules are returned.
-            module_count: "moduleCount",
-        },
-        Option<Vec<u64>> {},
-        Option<bool> {},
-        String {},
-        Option<String> {},
-        Option<json::Value> {},
-        Custom {},
+        /// The index of the first module to return if omitted modules start at 0.
+        start_module | "startModule": Option<u64> = parse_optional_u64,
+
+        /// The u64 of modules to return. If moduleCount is not specified or 0, all
+        /// modules are returned.
+        module_count | "moduleCount": Option<u64> = parse_optional_u64,
     }
 );
