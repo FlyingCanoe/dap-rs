@@ -1,16 +1,8 @@
-request!(
+use crate::utils::parse_u64;
+
+request2!(
     PauseRequest {
-        optional_args = false;
-        u64 {
-            /// Pause execution for this thread.
-            thread_id: "threadId",
-        },
-        Option<u64> {},
-        Option<Vec<u64>> {},
-        Option<bool> {},
-        String {},
-        Option<String> {},
-        Option<json::Value> {},
-        Custom {},
+        /// Pause execution for this thread.
+        thread_id | "threadId": u64 = parse_u64,
     }
 );
