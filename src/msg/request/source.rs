@@ -1,10 +1,15 @@
-use serde_json as json;
+use crate::msg::dap_type::Source;
+use crate::utils::parse_u64;
 
-#[derive(Clone, Debug, Hash)]
-pub struct SourceRequest {}
+request2!(
+    SourceRequest {
+        /// Specifies the source content to load. Either source.path or
+        /// source.sourceReference must be specified.
+        source | "source": Option<Source> = Source::parse_option,
 
-impl SourceRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<SourceRequest> {
-        todo!()
+        /// The reference to the source. This is the same as source.sourceReference.
+        /// This is provided for backward compatibility since old backends do not
+        /// understand the 'source' attribute.
+        source_reference | "sourceReference": u64 = parse_u64,
     }
-}
+);
