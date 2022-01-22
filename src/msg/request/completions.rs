@@ -1,6 +1,6 @@
 use crate::utils::{parse_optional_u64, parse_string, parse_u64};
 
-request2!(
+request!(
     CompletionsRequest {
         /// Returns completions in the scope of this stack frame. If not specified, the
         /// completions are returned for the global scope.

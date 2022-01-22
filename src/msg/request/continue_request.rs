@@ -1,6 +1,6 @@
 use crate::utils::{parse_optional_bool, parse_u64};
 
-request2!(
+request!(
     ContinueRequest {
         /// Specifies the active thread. If the debug adapter supports single thread
         /// execution (see 'supportsSingleThreadExecutionRequests') and the optional

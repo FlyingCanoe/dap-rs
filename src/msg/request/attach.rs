@@ -1,6 +1,6 @@
 use serde_json as json;
 
-request2!(
+request!(
     AttachRequest {
         /// Optional data from the previous, restarted session.
         /// The data is sent as the 'restart' attribute of the 'terminated' event.

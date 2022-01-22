@@ -1,7 +1,7 @@
 use crate::msg::dap_type::ValueFormat;
 use crate::utils::{parse_optional_u64, parse_string};
 
-request2!(
+request!(
     SetExpressionRequest {
         /// The l-value expression to assign to.
         expression | "expression": String = parse_string,

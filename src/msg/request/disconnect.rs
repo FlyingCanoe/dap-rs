@@ -1,7 +1,7 @@
 use crate::utils::parse_optional_bool;
 // todo undo
 
-request2!(
+request!(
     DisconnectRequest {
         /// A value of true indicates that this 'disconnect' request is part of a
         /// restart sequence.

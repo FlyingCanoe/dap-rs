@@ -1,7 +1,7 @@
 use crate::msg::dap_type::PathFormat;
 use crate::utils::{parse_optional_bool, parse_optional_string, parse_string};
 
-request2!(
+request!(
     InitializeRequest {
         /// The ID of the (frontend) client using this adapter.
         client_id | "clientID": Option<String> = parse_optional_string,

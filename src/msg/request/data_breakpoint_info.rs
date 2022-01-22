@@ -1,6 +1,6 @@
 use crate::utils::{parse_optional_u64, parse_string};
 
-request2!(
+request!(
     DataBreakpointInfoRequest {
         /// Reference to the Variable container if the data breakpoint is requested for
         /// a child of the container.

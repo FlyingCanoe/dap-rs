@@ -1,7 +1,7 @@
 use crate::msg::dap_type::SteppingGranularity;
 use crate::utils::{parse_optional_bool, parse_u64};
 
-request2!(
+request!(
     NextRequest {
         /// Specifies the thread for which to resume execution for one step (of the
         /// given granularity).

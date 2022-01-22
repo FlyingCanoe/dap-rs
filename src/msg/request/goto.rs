@@ -1,6 +1,6 @@
 use crate::utils::parse_u64;
 
-request2!(
+request!(
     GotoRequest {
         /// Set the goto target for this thread.
         thread_id | "threadId": u64 = parse_u64,

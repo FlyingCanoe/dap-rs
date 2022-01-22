@@ -1,6 +1,6 @@
 use crate::utils::parse_optional_u64;
 
-request2!(
+request!(
     ModulesRequest {
         /// The index of the first module to return if omitted modules start at 0.
         start_module | "startModule": Option<u64> = parse_optional_u64,

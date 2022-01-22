@@ -1,7 +1,7 @@
 use crate::msg::dap_type::ValueFormat;
 use crate::utils::{parse_string, parse_u64};
 
-request2!(
+request!(
     SetVariableRequest {
         /// The reference of the variable container.
         variables_reference | "variablesReference": u64 = parse_u64,

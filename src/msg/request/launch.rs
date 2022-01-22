@@ -2,7 +2,7 @@ use serde_json as json;
 
 use crate::utils::parse_optional_bool;
 
-request2!(
+request!(
     LaunchRequest {
         /// If noDebug is true the launch request should launch the program without
         /// enabling debugging.

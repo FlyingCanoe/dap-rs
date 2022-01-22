@@ -1,7 +1,7 @@
 use crate::msg::dap_type::{Source, SourceBreakpoint};
 use crate::utils::{parse_optional_bool, parse_optional_u64_vec};
 
-request2!(
+request!(
     SetBreakpointsRequest {
         /// The source location of the breakpoints either 'source.path' or
         /// 'source.reference' must be specified.

@@ -1,6 +1,6 @@
 use crate::utils::{parse_optional_u64, parse_string, parse_u64};
 
-request2!(
+request!(
     ReadMemoryRequest {
         /// Memory reference to the base location from which data should be read.
         memory_reference | "memoryReference": String = parse_string,

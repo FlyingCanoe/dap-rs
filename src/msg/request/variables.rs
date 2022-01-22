@@ -1,7 +1,7 @@
 use crate::msg::dap_type::{ValueFormat, VariablesFilter};
 use crate::utils::{parse_optional_u64, parse_u64};
 
-request2!(
+request!(
     VariablesRequest {
         /// The Variable reference.
         variables_reference | "variablesReference": u64 = parse_u64,

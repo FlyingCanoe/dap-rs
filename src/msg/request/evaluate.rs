@@ -1,7 +1,7 @@
 use crate::msg::dap_type::{EvaluateCtx, ValueFormat};
 use crate::utils::{parse_optional_u64, parse_string};
 
-request2!(
+request!(
     EvaluateRequest {
         /// The expression to evaluate.
         expression | "expression": String = parse_string,

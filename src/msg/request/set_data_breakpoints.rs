@@ -1,6 +1,6 @@
 use crate::msg::dap_type::DataBreakpoint;
 
-request2!(
+request!(
     SetDataBreakpointsRequest {
         /// The contents of this array replaces all existing data breakpoints. An empty
         /// array clears all data breakpoints.

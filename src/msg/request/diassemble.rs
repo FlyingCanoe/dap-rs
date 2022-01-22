@@ -1,6 +1,6 @@
 use crate::utils::{parse_optional_bool, parse_optional_u64, parse_string, parse_u64};
 
-request2!(
+request!(
     DiassambleRequest {
         /// Memory reference to the base location containing the instructions to
         /// disassemble.

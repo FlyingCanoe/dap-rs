@@ -1,7 +1,7 @@
 use crate::msg::dap_type::*;
 use crate::utils::{parse_optional_u64, parse_u64};
 
-request2!(
+request!(
     GotoTargetsRequest {
         /// The source location for which the goto targets are determined.
         source | "source": Source = Source::parse,

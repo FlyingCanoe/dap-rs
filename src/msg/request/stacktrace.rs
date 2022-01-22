@@ -1,7 +1,7 @@
 use crate::msg::dap_type::StackFrameFormat;
 use crate::utils::{parse_optional_u64, parse_u64};
 
-request2!(
+request!(
     StackTraceRequest {
         /// Retrieve the stacktrace for this thread.
         thread_id | "threadId": u64 = parse_u64,

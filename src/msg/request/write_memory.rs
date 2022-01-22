@@ -1,6 +1,6 @@
 use crate::utils::{parse_optional_bool, parse_optional_u64, parse_string};
 
-request2!(
+request!(
     WriteMemoryRequest {
         /// Memory reference to the base location to which data should be written.
         memory_reference | "memoryReference": String = parse_string,
