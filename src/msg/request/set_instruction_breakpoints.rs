@@ -1,10 +1,8 @@
-use serde_json as json;
+use crate::msg::dap_type::InstructionBreakpoint;
 
-#[derive(Clone, Debug, Hash)]
-pub struct SetInstructionBreakpointsRequest {}
-
-impl SetInstructionBreakpointsRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<SetInstructionBreakpointsRequest> {
-        todo!()
+request2!(
+    SetInstructionBreakpointsRequest {
+        /// The instruction references of the breakpoints
+        breakpoints | "breakpoints": Vec<InstructionBreakpoint>,
     }
-}
+);
