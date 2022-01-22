@@ -1,6 +1,6 @@
 use crate::msg::dap_type::{ExceptionFilterOptions, ExceptionOptions};
 
-request2!(
+request!(
     SetExceptionBreakpointsRequest {
         /// Set of exception filters specified by their ID. The set of all possible
         /// exception filters is defined by the 'exceptionBreakpointFilters'

@@ -1,6 +1,6 @@
 use crate::msg::dap_type::Source;
 
-request2!(
+request!(
     SourceRequest {
         /// Specifies the source content to load. Either source.path or
         /// source.sourceReference must be specified.

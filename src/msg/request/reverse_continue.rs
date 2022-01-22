@@ -1,4 +1,4 @@
-request2!(
+request!(
     ReverseContinueRequest {
         /// Specifies the active thread. If the debug adapter supports single thread
         /// execution (see 'supportsSingleThreadExecutionRequests') and the optional

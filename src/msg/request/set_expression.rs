@@ -1,6 +1,6 @@
 use crate::msg::dap_type::ValueFormat;
 
-request2!(
+request!(
     SetExpressionRequest {
         /// The l-value expression to assign to.
         expression | "expression": String,

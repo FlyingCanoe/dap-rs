@@ -1,6 +1,6 @@
 use crate::msg::dap_type::{Source, SourceBreakpoint};
 
-request2!(
+request!(
     SetBreakpointsRequest {
         /// The source location of the breakpoints either 'source.path' or
         /// 'source.reference' must be specified.

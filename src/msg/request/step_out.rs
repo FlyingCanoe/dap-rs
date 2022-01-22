@@ -1,6 +1,6 @@
 use crate::msg::dap_type::SteppingGranularity;
 
-request2!(
+request!(
     StepOutRequest {
         /// Specifies the thread for which to resume execution for one step-out (of the
         /// given granularity).
