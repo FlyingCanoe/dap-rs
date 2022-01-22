@@ -101,7 +101,7 @@ macro_rules! dap_type_enum {
                 Ok(output)
             }
 
-            pub(crate) fn parse_option(
+            pub(crate) fn parse_optional(
                 input: Option<&serde_json::Value>,
             ) -> anyhow::Result<Option<$type_name>> {
                 if input.is_some() {

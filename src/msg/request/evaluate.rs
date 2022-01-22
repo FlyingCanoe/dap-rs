@@ -20,7 +20,7 @@ request!(
         /// The attribute is only honored by a debug adapter if the capability
         /// 'supportsClipboardContext' is true.
         /// etc.
-        context | "context": Option<EvaluateCtx> = EvaluateCtx::parse_option,
+        context | "context": Option<EvaluateCtx> = EvaluateCtx::parse_optional,
 
         /// Specifies details on how to format the Evaluate result.
         /// The attribute is only honored by a debug adapter if the capability

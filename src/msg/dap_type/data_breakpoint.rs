@@ -9,7 +9,7 @@ dap_type_struct!(
         data_id | "dataId": String = parse_string,
 
         /// The access type of the data.
-        access_type | "accessType": Option<DataBreakpointAccessType> = DataBreakpointAccessType::parse_option,
+        access_type | "accessType": Option<DataBreakpointAccessType> = DataBreakpointAccessType::parse_optional,
 
         /// An optional expression for conditional breakpoints.
         condition | "condition": Option<String> = parse_optional_string,
