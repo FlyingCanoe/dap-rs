@@ -9,7 +9,6 @@ macro_rules! dap_type_struct {
     ) => {
         use anyhow::Error;
         use fallible_iterator::{convert, FallibleIterator};
-        use serde_json as json;
 
 
         #[derive(Debug, Clone)]
@@ -21,7 +20,7 @@ macro_rules! dap_type_struct {
         }
 
         impl $type_name {
-            pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<$type_name> {
+            pub(crate) fn parse(input: Option<&serde_json::Value>) -> anyhow::Result<$type_name> {
                 let input = input.ok_or(Error::msg("parsing error"))?;
                 $(
                     let value = input.get($field_wire_name);
@@ -36,8 +35,17 @@ macro_rules! dap_type_struct {
                 Ok(output)
             }
 
+            pub(crate) fn parse_optional(input: Option<&serde_json::Value>) -> anyhow::Result<Option<$type_name>> {
+                if input.is_some() {
+                    let output = $type_name::parse(input)?;
+                    Ok(Some(output))
+                } else
+                    {Ok(None)
+                }
+            }
+
             pub(crate) fn parse_vec(
-                input: Option<&json::Value>,
+                input: Option<&serde_json::Value>,
             ) -> anyhow::Result<Vec<$type_name>> {
                 let input = input.ok_or(Error::msg("parsing error"))?;
                 let iter = input
@@ -50,7 +58,7 @@ macro_rules! dap_type_struct {
             }
 
             pub(crate) fn parse_optional_vec(
-                input: Option<&json::Value>,
+                input: Option<&serde_json::Value>,
             ) -> anyhow::Result<Option<Vec<$type_name>>> {
                 if input.is_some() {
                     let output = $type_name::parse_vec(input)?;
