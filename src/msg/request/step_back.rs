@@ -1,10 +1,17 @@
-use serde_json as json;
+use crate::msg::dap_type::SteppingGranularity;
+use crate::utils::{parse_optional_bool, parse_u64};
 
-#[derive(Clone, Debug, Hash)]
-pub struct StepBackRequest {}
+request2!(
+    StepBackRequest {
+        /// Specifies the thread for which to resume execution for one step backwards
+        /// (of the given granularity).
+        thread_id | "threadId": u64 = parse_u64,
 
-impl StepBackRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<StepBackRequest> {
-        todo!()
+        /// If this optional flag is true, all other suspended threads are not resumed.
+        single_thread | "singleThread": Option<bool> = parse_optional_bool,
+
+        /// Optional granularity to step. If no granularity is specified, a granularity
+        /// of 'statement' is assumed.
+        granularity | "granularity": Option<SteppingGranularity> = SteppingGranularity::parse_option,
     }
-}
+);
