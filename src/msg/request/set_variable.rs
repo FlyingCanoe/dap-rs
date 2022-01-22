@@ -1,10 +1,17 @@
-use serde_json as json;
+use crate::msg::dap_type::ValueFormat;
 
-#[derive(Clone, Debug, Hash)]
-pub struct SetVariableRequest {}
+request2!(
+    SetVariableRequest {
+        /// The reference of the variable container.
+        variables_reference | "variablesReference": u64,
 
-impl SetVariableRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<SetVariableRequest> {
-        todo!()
+        /// The name of the variable in the container.
+        name | "name": String,
+
+        /// The value of the variable.
+        value | "value": String,
+
+        /// Specifies details on how to format the response value.
+        format | "format": Option<ValueFormat>,
     }
-}
+);
