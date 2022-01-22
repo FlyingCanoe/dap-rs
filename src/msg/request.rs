@@ -418,7 +418,7 @@ use self::source::SourceRequest;
 use self::stacktrace::StackTraceRequest;
 use self::step_back::StepBackRequest;
 use self::step_in::StepInRequest;
-use self::step_in_targets::StepInTargetRequest;
+use self::step_in_targets::StepInTargetsRequest;
 use self::step_out::StepOutRequest;
 use self::terminate::TerminateRequest;
 use self::terminate_threads::TerminateThreadsRequest;
@@ -463,7 +463,7 @@ pub enum Request {
     LoadedSources,
     Evaluate(EvaluateRequest),
     SetExpression(SetExpressionRequest),
-    StepInTargets(StepInTargetRequest),
+    StepInTargets(StepInTargetsRequest),
     GotoTargets(GotoTargetsRequest),
     ExceptionInfo(ExceptionInfoRequest),
     ReadMemory(ReadMemoryRequest),
@@ -535,7 +535,7 @@ impl Request {
                 Request::SetExpression(set_expression::SetExpressionRequest::parse(msg)?)
             }
             "stepInTargets" => {
-                Request::StepInTargets(step_in_targets::StepInTargetRequest::parse(msg)?)
+                Request::StepInTargets(step_in_targets::StepInTargetsRequest::parse(msg)?)
             }
             "gotoTargets" => Request::GotoTargets(goto_targets::GotoTargetsRequest::parse(msg)?),
             "exceptionInfo" => {

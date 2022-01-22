@@ -1,10 +1,8 @@
-use serde_json as json;
+use crate::utils::parse_u64;
 
-#[derive(Clone, Debug, Hash)]
-pub struct StepInTargetRequest {}
-
-impl StepInTargetRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<StepInTargetRequest> {
-        todo!()
+request2!(
+    StepInTargetsRequest {
+        /// The stack frame for which to retrieve the possible stepIn targets.
+        frame_id | "frameId": u64 = parse_u64,
     }
-}
+);
