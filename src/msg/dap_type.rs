@@ -71,6 +71,50 @@ macro_rules! dap_type_struct {
     };
 }
 
+macro_rules! dap_type_enum {
+    (
+        $type_name:ident {
+            $(
+                $(#[$field_meta:meta])*
+                $field:ident | $field_wire_name:literal,
+            )*
+        }
+    ) => {
+        #[derive(Clone, Debug)]
+        pub enum $type_name {
+            $(
+                $(#[$field_meta])*
+                $field,
+            )*
+        }
+
+        impl $type_name {
+            pub(crate) fn parse(input: Option<&serde_json::Value>) -> anyhow::Result<$type_name> {
+                let input = input
+                    .ok_or(anyhow::Error::msg("parsing error"))?
+                    .as_str()
+                    .ok_or(anyhow::Error::msg("parsing error"))?;
+                let output = match input {
+                    $($field_wire_name => $type_name::$field,)*
+                    _ => anyhow::bail!("parsing error"),
+                };
+                Ok(output)
+            }
+
+            pub(crate) fn parse_option(
+                input: Option<&serde_json::Value>,
+            ) -> anyhow::Result<Option<$type_name>> {
+                if input.is_some() {
+                    let output = $type_name::parse(input)?;
+                    Ok(Some(output))
+                } else {
+                    Ok(None)
+                }
+            }
+        }
+    };
+}
+
 mod checksum;
 mod checksum_algorithm;
 mod data_breakpoint;
