@@ -6,7 +6,7 @@ dap_type_struct!(
         /// missing, the whole tree is selected.
         /// By convention the first segment of the path is a category that is used to
         /// group exceptions in the UI.
-        path | "path": Option<Vec<ExceptionPathSegment>> = ExceptionPathSegment::parse_option_vec,
+        path | "path": Option<Vec<ExceptionPathSegment>> = ExceptionPathSegment::parse_optional_vec,
 
         /// Condition when a thrown exception should result in a break.
         break_mode | "breakMode": ExceptionBreakMode = ExceptionBreakMode::parse,
