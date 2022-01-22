@@ -381,7 +381,6 @@ mod step_in_targets;
 mod step_out;
 mod terminate;
 mod terminate_threads;
-mod threads;
 mod variables;
 mod write_memory;
 
@@ -422,7 +421,6 @@ use self::step_in_targets::StepInTargetsRequest;
 use self::step_out::StepOutRequest;
 use self::terminate::TerminateRequest;
 use self::terminate_threads::TerminateThreadsRequest;
-use self::threads::ThreadsRequest;
 use self::variables::VariablesRequest;
 use self::write_memory::WriteMemoryRequest;
 
@@ -457,7 +455,7 @@ pub enum Request {
     Variables(VariablesRequest),
     SetVariable(SetVariableRequest),
     Source(SourceRequest),
-    Threads(ThreadsRequest),
+    Threads,
     TerminateThreads(TerminateThreadsRequest),
     Modules(ModulesRequest),
     LoadedSources,
@@ -524,7 +522,7 @@ impl Request {
             "variables" => Request::Variables(variables::VariablesRequest::parse(msg)?),
             "setVariable" => Request::SetVariable(set_variable::SetVariableRequest::parse(msg)?),
             "source" => Request::Source(source::SourceRequest::parse(msg)?),
-            "threads" => Request::Threads(threads::ThreadsRequest::parse(msg)?),
+            "threads" => Request::Threads,
             "terminateThreads" => {
                 Request::TerminateThreads(terminate_threads::TerminateThreadsRequest::parse(msg)?)
             }
