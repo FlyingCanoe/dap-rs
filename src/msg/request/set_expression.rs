@@ -14,6 +14,6 @@ request!(
         frame_id | "frameId": Option<u64> = parse_optional_u64,
 
         /// Specifies how the resulting value should be formatted.
-        format | "format": Option<ValueFormat> = ValueFormat::parse_option,
+        format | "format": Option<ValueFormat> = ValueFormat::parse_optional,
     }
 );

@@ -13,6 +13,6 @@ request!(
         value | "value": String = parse_string,
 
         /// Specifies details on how to format the response value.
-        format | "format": Option<ValueFormat> = ValueFormat::parse_option,
+        format | "format": Option<ValueFormat> = ValueFormat::parse_optional,
     }
 );

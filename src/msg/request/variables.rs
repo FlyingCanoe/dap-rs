@@ -21,6 +21,6 @@ request!(
         /// Specifies details on how to format the Variable values.
         /// The attribute is only honored by a debug adapter if the capability
         /// 'supportsValueFormattingOptions' is true.
-        format | "format": Option<ValueFormat> = ValueFormat::parse_option,
+        format | "format": Option<ValueFormat> = ValueFormat::parse_optional,
     }
 );
