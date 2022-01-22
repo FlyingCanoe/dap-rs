@@ -1,10 +1,8 @@
-use serde_json as json;
+use crate::msg::dap_type::FunctionBreakpoint;
 
-#[derive(Clone, Debug, Hash)]
-pub struct SetFunctionBreakpointRequest {}
-
-impl SetFunctionBreakpointRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<SetFunctionBreakpointRequest> {
-        todo!()
+request2!(
+    SetFunctionBreakpointsRequest {
+        /// The function names of the breakpoints.
+        breakpoints | "breakpoints": Vec<FunctionBreakpoint>,
     }
-}
+);

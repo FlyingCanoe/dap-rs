@@ -260,7 +260,7 @@ use self::set_breakpoint::SetBreakpointsRequest;
 use self::set_data_breakpoints::SetDataBreakpointsRequest;
 use self::set_exception_breakpoints::SetExceptionBreakpointsRequest;
 use self::set_expression::SetExpressionRequest;
-use self::set_function_breakpoints::SetFunctionBreakpointRequest;
+use self::set_function_breakpoints::SetFunctionBreakpointsRequest;
 use self::set_instruction_breakpoints::SetInstructionBreakpointsRequest;
 use self::set_variable::SetVariableRequest;
 use self::source::SourceRequest;
@@ -286,7 +286,7 @@ pub enum Request {
     Terminate(TerminateRequest),
     BreakpointLocations(BreakpointLocationsRequest),
     SetBreakpoints(SetBreakpointsRequest),
-    SetFunctionBreakpoints(SetFunctionBreakpointRequest),
+    SetFunctionBreakpoints(SetFunctionBreakpointsRequest),
     SetExceptionBreakpoints(SetExceptionBreakpointsRequest),
     DataBreakpointInfo(DataBreakpointInfoRequest),
     SetDataBreakpoints(SetDataBreakpointsRequest),
@@ -339,7 +339,7 @@ impl Request {
                 Request::SetBreakpoints(set_breakpoint::SetBreakpointsRequest::parse(msg)?)
             }
             "setFunctionBreakpoints" => Request::SetFunctionBreakpoints(
-                set_function_breakpoints::SetFunctionBreakpointRequest::parse(msg)?,
+                set_function_breakpoints::SetFunctionBreakpointsRequest::parse(msg)?,
             ),
             "setExceptionBreakpoints" => Request::SetExceptionBreakpoints(
                 set_exception_breakpoints::SetExceptionBreakpointsRequest::parse(msg)?,
