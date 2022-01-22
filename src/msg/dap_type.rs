@@ -1,6 +1,70 @@
+macro_rules! dap_type_struct {
+    (
+        $type_name:ident {
+            $(
+                $(#[$field_meta:meta])*
+                $field:ident | $field_wire_name:literal: $field_ty:ty = $field_parsing_fn:expr,
+            )*
+        }
+    ) => {
+        use anyhow::Error;
+        use fallible_iterator::{convert, FallibleIterator};
+        use serde_json as json;
+
+
+        #[derive(Debug, Clone)]
+        pub struct $type_name {
+            $(
+                $(#[$field_meta])*
+                $field: $field_ty,
+            )*
+        }
+
+        impl $type_name {
+            pub(crate) fn parse(input: Option<&json::Value>) -> anyhow::Result<$type_name> {
+                let input = input.ok_or(Error::msg("parsing error"))?;
+                $(
+                    let value = input.get($field_wire_name);
+                    let $field = $field_parsing_fn(value)?;
+                )*
+
+                let output = $type_name {
+                    $(
+                        $field,
+                    )*
+                };
+                Ok(output)
+            }
+
+            pub(crate) fn parse_vec(
+                input: Option<&json::Value>,
+            ) -> anyhow::Result<Vec<$type_name>> {
+                let input = input.ok_or(Error::msg("parsing error"))?;
+                let iter = input
+                    .as_array()
+                    .ok_or(Error::msg("parsing error"))?
+                    .iter()
+                    .map(|value| $type_name::parse(Some(value)));
+                let output: Vec<_> = convert(iter).collect()?;
+                Ok(output)
+            }
+
+            pub(crate) fn parse_optional_vec(
+                input: Option<&json::Value>,
+            ) -> anyhow::Result<Option<Vec<$type_name>>> {
+                if input.is_some() {
+                    let output = $type_name::parse_vec(input)?;
+                    Ok(Some(output))
+                } else {
+                    Ok(None)
+                }
+            }
+        }
+    };
+}
+
 mod checksum;
 mod checksum_algorithm;
-
 mod data_breakpoint;
 mod data_breakpoint_access_type;
 mod evaluate_ctx;
