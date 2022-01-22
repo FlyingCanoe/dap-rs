@@ -21,4 +21,10 @@ impl DataBreakpointAccessType {
         };
         Ok(access_type)
     }
+
+    pub(crate) fn parse_option(
+        input: Option<&json::Value>,
+    ) -> anyhow::Result<Option<DataBreakpointAccessType>> {
+        todo!()
+    }
 }
