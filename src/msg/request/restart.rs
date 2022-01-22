@@ -1,10 +1,12 @@
 use serde_json as json;
 
-#[derive(Clone, Debug, Hash)]
-pub struct RestartRequest {}
+use crate::utils::parse_optional_bool;
 
-impl RestartRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<RestartRequest> {
-        todo!()
+request!(
+    RestartRequest {
+        no_debug | "noDebug": Option<bool> = parse_optional_bool,
+        restart | "__restart": Option<json::Value> = |value: Option<&json::Value>| -> anyhow::Result<Option<json::Value>> {
+            Ok(value.cloned())
+        },
     }
-}
+);
