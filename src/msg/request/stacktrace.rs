@@ -16,6 +16,6 @@ request!(
         /// Specifies details on how to format the stack frames.
         /// The attribute is only honored by a debug adapter if the capability
         /// 'supportsValueFormattingOptions' is true.
-        format | "format": Option<StackFrameFormat> = StackFrameFormat::parse_option,
+        format | "format": Option<StackFrameFormat> = StackFrameFormat::parse_optional,
     }
 );
