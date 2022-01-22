@@ -1,10 +1,9 @@
-use serde_json as json;
+use crate::utils::parse_optional_bool;
 
-#[derive(Clone, Debug, Hash)]
-pub struct TerminateRequest {}
-
-impl TerminateRequest {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<TerminateRequest> {
-        todo!()
+request2!(
+    TerminateRequest {
+        /// A value of true indicates that this 'terminate' request is part of a
+        /// restart sequence.
+        restart | "restart": Option<bool> = parse_optional_bool,
     }
-}
+);
