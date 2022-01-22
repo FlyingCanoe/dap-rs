@@ -27,7 +27,7 @@ dap_type_struct!(
         /// A value of 'deemphasize' can be used to indicate that the source is not
         /// available or that it is skipped on stepping.
         /// Values: 'normal', 'emphasize', 'deemphasize', etc.
-        presentation_hint | "presentationHint": Option<PresentationHint> = PresentationHint::parse_option,
+        presentation_hint | "presentationHint": Option<PresentationHint> = PresentationHint::parse_optional,
 
         /// The (optional) origin of this source: possible values 'internal module',
         /// 'inlined content from source map', etc.
