@@ -16,6 +16,7 @@ mod path_format;
 mod presentation_hint;
 mod source;
 mod source_breakpoint;
+mod stack_frame_format;
 mod stepping_granularity;
 mod value_format;
 
@@ -37,5 +38,6 @@ pub use path_format::PathFormat;
 pub use presentation_hint::PresentationHint;
 pub use source::Source;
 pub use source_breakpoint::SourceBreakpoint;
+pub use stack_frame_format::StackFrameFormat;
 pub use stepping_granularity::SteppingGranularity;
 pub use value_format::ValueFormat;
