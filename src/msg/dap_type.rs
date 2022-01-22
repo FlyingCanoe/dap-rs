@@ -19,6 +19,7 @@ mod source_breakpoint;
 mod stack_frame_format;
 mod stepping_granularity;
 mod value_format;
+mod variables_filter;
 
 pub use breakpoint_location::BreakpointLocation;
 pub use checksum::Checksum;
@@ -41,3 +42,4 @@ pub use source_breakpoint::SourceBreakpoint;
 pub use stack_frame_format::StackFrameFormat;
 pub use stepping_granularity::SteppingGranularity;
 pub use value_format::ValueFormat;
+pub use variables_filter::VariablesFilter;
