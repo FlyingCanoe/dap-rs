@@ -9,7 +9,7 @@ request!(
         /// Optional filter to limit the child variables to either named or indexed. If
         /// omitted, both types are fetched.
         /// Values: 'indexed', 'named', etc.
-        filter | "filter": Option<VariablesFilter> = VariablesFilter::parse_option,
+        filter | "filter": Option<VariablesFilter> = VariablesFilter::parse_optional,
 
         /// The index of the first variable to return if omitted children start at 0.
         start | "start": Option<u64> = parse_optional_u64,
