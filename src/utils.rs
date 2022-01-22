@@ -149,3 +149,15 @@ pub(crate) fn parse_optional_string(input: Option<&json::Value>) -> anyhow::Resu
         Ok(None)
     }
 }
+
+pub(crate) fn parse_string_vec(input: Option<&json::Value>) -> anyhow::Result<Vec<String>> {
+    let iter = input
+        .ok_or(Error::msg("parsing error"))?
+        .as_array()
+        .ok_or(Error::msg("parsing error"))?
+        .into_iter()
+        .map(|value| parse_string(Some(value)));
+
+    let output: Vec<_> = convert(iter).collect()?;
+    Ok(output)
+}
