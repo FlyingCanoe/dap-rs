@@ -15,6 +15,6 @@ request!(
 
         /// Optional granularity to step. If no granularity is specified, a granularity
         /// of 'statement' is assumed.
-        granularity | "granularity": Option<SteppingGranularity> = SteppingGranularity::parse_option,
+        granularity | "granularity": Option<SteppingGranularity> = SteppingGranularity::parse_optional,
     }
 );
