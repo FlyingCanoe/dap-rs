@@ -227,7 +227,7 @@ impl Ast {
             r#"
 use crate::utils::{{parse_u64, parse_optional_u64, parse_string, parse_bool, parse_optional_bool, parse_optional_string, parse_optional_u64_vec, parse_string_vec}};
 
-request2!(
+event!(
     {} {{
 {}
     }}
