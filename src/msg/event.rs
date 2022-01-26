@@ -44,11 +44,13 @@ macro_rules! event {
 mod capabilities;
 mod continued_event;
 
+pub use capabilities::CapabilitiesEvent;
 pub use continued_event::ContinuedEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
     Continue(ContinuedEvent),
+    Capabilities(CapabilitiesEvent),
 }
 
 impl Event {
@@ -57,6 +59,7 @@ impl Event {
 
         let event = match event_type.as_str() {
             "continued" => Event::Continue(ContinuedEvent::parse(msg)?),
+            "capabilities" => Event::Capabilities(CapabilitiesEvent::parse(msg)?),
             _ => bail!("invalid event"),
         };
         Ok(event)
