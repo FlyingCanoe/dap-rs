@@ -42,11 +42,11 @@ macro_rules! event {
 }
 
 mod capabilities;
-mod continued_event;
+mod continued;
 mod exited;
 
 pub use capabilities::CapabilitiesEvent;
-pub use continued_event::ContinuedEvent;
+pub use continued::ContinuedEvent;
 pub use exited::ExitedEvent;
 
 #[derive(Clone, Debug)]
@@ -54,6 +54,7 @@ pub enum Event {
     Continue(ContinuedEvent),
     Capabilities(CapabilitiesEvent),
     Exited(ExitedEvent),
+    Initialized,
 }
 
 impl Event {
@@ -64,6 +65,7 @@ impl Event {
             "continued" => Event::Continue(ContinuedEvent::parse(msg)?),
             "capabilities" => Event::Capabilities(CapabilitiesEvent::parse(msg)?),
             "exited" => Event::Exited(ExitedEvent::parse(msg)?),
+            "initialized" => Event::Initialized,
             _ => bail!("invalid event"),
         };
         Ok(event)
