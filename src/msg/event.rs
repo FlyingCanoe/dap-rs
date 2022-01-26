@@ -42,15 +42,21 @@ macro_rules! event {
 }
 
 mod capabilities;
+mod continued_event;
+
+pub use continued_event::ContinuedEvent;
 
 #[derive(Clone, Debug)]
-pub enum Event {}
+pub enum Event {
+    Continue(ContinuedEvent),
+}
 
 impl Event {
     pub(crate) fn parse(msg: json::Value) -> anyhow::Result<Event> {
         let event_type = parse_string(msg.get("event"))?;
 
-        let event = match event_type {
+        let event = match event_type.as_str() {
+            "continued" => Event::Continue(ContinuedEvent::parse(msg)?),
             _ => bail!("invalid event"),
         };
         Ok(event)
