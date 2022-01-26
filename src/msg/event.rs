@@ -46,18 +46,22 @@ macro_rules! event {
 }
 
 mod capabilities;
+mod continued;
 
 pub use capabilities::CapabilitiesEvent;
+pub use continued::ContinuedEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
     Capabilities(CapabilitiesEvent),
+    Continue(ContinuedEvent),
 }
 
 impl ToValue for Event {
     fn to_value(self) -> Option<serde_json::Value> {
         match self {
             Event::Capabilities(event) => event.to_value(),
+            Event::Continue(event) => event.to_value(),
         }
     }
 }
