@@ -1,3 +1,5 @@
+use crate::utils::ToValue;
+
 macro_rules! event {
     (
         $(#[$event_meta:meta])*
@@ -42,5 +44,20 @@ macro_rules! event {
         }
     };
 }
+
+mod capabilities;
+
+pub use capabilities::CapabilitiesEvent;
+
 #[derive(Clone, Debug)]
-pub enum Event {}
+pub enum Event {
+    Capabilities(CapabilitiesEvent),
+}
+
+impl ToValue for Event {
+    fn to_value(self) -> Option<serde_json::Value> {
+        match self {
+            Event::Capabilities(event) => event.to_value(),
+        }
+    }
+}
