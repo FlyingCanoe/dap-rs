@@ -47,14 +47,17 @@ macro_rules! event {
 
 mod capabilities;
 mod continued;
+mod exited;
 
 pub use capabilities::CapabilitiesEvent;
 pub use continued::ContinuedEvent;
+pub use exited::ExitedEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
     Capabilities(CapabilitiesEvent),
     Continue(ContinuedEvent),
+    Exited(ExitedEvent),
 }
 
 impl ToValue for Event {
@@ -62,6 +65,7 @@ impl ToValue for Event {
         match self {
             Event::Capabilities(event) => event.to_value(),
             Event::Continue(event) => event.to_value(),
+            Event::Exited(event) => event.to_value(),
         }
     }
 }
