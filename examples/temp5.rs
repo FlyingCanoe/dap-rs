@@ -11,6 +11,7 @@ struct Ast {
 struct Field {
     comment: String,
     name: String,
+    wire_name: String,
     field_type: String,
 }
 
@@ -47,10 +48,35 @@ fn post_process_comment(comment: &str) -> String {
         .to_owned()
 }
 
-fn parse_struct_name(input: &str) -> (&str, &str) {
+fn post_process_name(name: &str) -> String {
+    let mut rem = name;
+    let mut part_list = Vec::new();
+    while !rem.is_empty() {
+        let mut part = rem.chars().next().unwrap().to_string();
+        part.push_str(
+            rem.chars()
+                .skip(1)
+                .take_while(|ch| ch.is_lowercase())
+                .collect::<String>()
+                .as_str(),
+        );
+        rem = &rem[part.len()..];
+        part_list.push(part);
+    }
+    let mut output = String::new();
+
+    for part in part_list {
+        output.push_str(&part.to_ascii_lowercase());
+        output.push_str("_");
+    }
+    output.pop();
+    output
+}
+
+fn parse_struct_name(input: &str) -> (String, &str) {
     let (_, rem) = input.split_once("interface").unwrap();
     let name = rem.split_whitespace().next().unwrap();
-    let (_, rem) = rem.split_once(name).unwrap();
+    let name = post_process_name(name);
 
     (name, rem)
 }
@@ -59,34 +85,38 @@ fn parse_field(input: &str) -> Option<(Field, &str)> {
     let (_, rem) = input.split_once("/**")?;
     let (comment, rem) = rem.split_once("*/\n")?;
 
-    let (field, rem) = if let Some((field, rem)) = rem.split_once('\n') {
-        (field, rem)
+    let (name, wire_name, rem) = if let Some((field, rem)) = rem.split_once('\n') {
+        (post_process_name(field), field, rem)
     } else {
         if !rem.trim().is_empty() {
-            (rem, "")
+            (rem.to_string(), rem, "")
         } else {
             return None;
         }
     };
 
-    if field.contains("[]") {
-        let field = field.replace("[]", "");
-        if field.contains("?:") {
-            let (name, field_type) = field.split_once("?:").unwrap();
+    if wire_name.contains("[]") {
+        let name = name.replace("[]", "");
+        let wire_name = wire_name.replace("[]", "");
+        if wire_name.contains("?:") {
+            let (name, _) = name.split_once("_?_:").unwrap();
+            let (wire_name, field_type) = wire_name.split_once("?:").unwrap();
             let field_type = field_type.trim();
 
             let name = name.to_owned();
+            let wire_name = wire_name.to_owned();
             let field_type = format!("Option<Vec<{field_type}>>");
 
             let comment = post_process_comment(comment);
             let field = Field {
                 comment,
                 name,
+                wire_name,
                 field_type,
             };
             Some((field, rem))
         } else {
-            let (name, field_type) = field.split_once(":").unwrap();
+            let (name, field_type) = name.split_once(":").unwrap();
             let field_type = field_type.trim();
 
             let name = name.to_owned();
@@ -95,37 +125,46 @@ fn parse_field(input: &str) -> Option<(Field, &str)> {
             let comment = post_process_comment(comment);
             let field = Field {
                 comment,
+                wire_name,
                 name,
                 field_type,
             };
             Some((field, rem))
         }
     } else {
-        if field.contains("?:") {
-            let (name, field_type) = field.split_once("?:").unwrap();
+        if wire_name.contains("?:") {
+            let (name, _) = name.split_once("_?_:").unwrap();
+            let (wire_name, field_type) = wire_name.split_once("?:").unwrap();
             let field_type = field_type.trim();
 
             let name = name.to_owned();
+            let wire_name = wire_name.to_owned();
+
             let field_type = format!("Option<{field_type}>");
 
             let comment = post_process_comment(comment);
             let field = Field {
                 comment,
                 name,
+                wire_name,
                 field_type,
             };
             Some((field, rem))
         } else {
-            let (name, field_type) = field.split_once(":").unwrap();
+            let (name, _) = name.split_once(":").unwrap();
+            let (wire_name, field_type) = wire_name.split_once(":").unwrap();
             let field_type = field_type.trim();
 
             let name = name.to_owned();
+            let wire_name = wire_name.to_owned();
+
             let field_type = field_type.to_owned();
 
             let comment = post_process_comment(comment);
             let field = Field {
                 comment,
                 name,
+                wire_name,
                 field_type,
             };
             Some((field, rem))
@@ -157,36 +196,36 @@ impl Ast {
             .iter()
             .map(|field| match field.field_type.as_str() {
                 "bool" => format!(
-                    "{0}\n\t\t{1} | \"{1}\": {2} = parse_bool,\n\n",
-                    field.comment, field.name, field.field_type
+                    "{0}\n\t\t{1} | \"{2}\": {3} = parse_bool,\n\n",
+                    field.comment, field.name, field.wire_name, field.field_type
                 ),
                 "Option<bool>" => format!(
-                    "{0}\n\t\t{1} | \"{1}\": {2} = parse_optional_bool,\n\n",
-                    field.comment, field.name, field.field_type
+                    "{0}\n\t\t{1} | \"{2}\": {3} = parse_optional_bool,\n\n",
+                    field.comment, field.name, field.wire_name, field.field_type
                 ),
                 "u64" => format!(
-                    "{0}\n\t\t{1} | \"{1}\": {2} = parse_u64,\n\n",
-                    field.comment, field.name, field.field_type
+                    "{0}\n\t\t{1} | \"{2}\": {3} = parse_u64,\n\n",
+                    field.comment, field.name, field.wire_name, field.field_type
                 ),
                 "Option<u64>" => format!(
-                    "{0}\n\t\t{1} | \"{1}\": {2} = parse_optional_u64,\n\n",
-                    field.comment, field.name, field.field_type
+                    "{0}\n\t\t{1} | \"{2}\": {3} = parse_optional_u64,\n\n",
+                    field.comment, field.name, field.wire_name, field.field_type
                 ),
                 "Option<Vec<u64>>" => format!(
-                    "{0}\n\t\t{1} | \"{1}\": {2} = parse_optional_u64_vec,\n\n",
-                    field.comment, field.name, field.field_type
+                    "{0}\n\t\t{1} | \"{2}\": {3} = parse_optional_u64_vec,\n\n",
+                    field.comment, field.name, field.wire_name, field.field_type
                 ),
                 "String" => format!(
-                    "{0}\n\t\t{1} | \"{1}\": {2} = parse_string,\n\n",
-                    field.comment, field.name, field.field_type
+                    "{0}\n\t\t{1} | \"{2}\": {3} = parse_string,\n\n",
+                    field.comment, field.name, field.wire_name, field.field_type
                 ),
                 "Option<String>" => format!(
-                    "{0}\n\t\t{1} | \"{1}\": {2} = parse_optional_string,\n\n",
-                    field.comment, field.name, field.field_type
+                    "{0}\n\t\t{1} | \"{2}\": {3} = parse_optional_string,\n\n",
+                    field.comment, field.name, field.wire_name, field.field_type
                 ),
                 "Vec<String>" => format!(
-                    "{0}\n\t\t{1} | \"{1}\": {2} = parse_string_vec,\n\n",
-                    field.comment, field.name, field.field_type
+                    "{0}\n\t\t{1} | \"{2}\": {3} = parse_string_vec,\n\n",
+                    field.comment, field.name, field.wire_name, field.field_type
                 ),
                 _ if field.field_type.contains("Option<Vec") => {
                     let inner_type = field
@@ -198,8 +237,8 @@ impl Ast {
                         .unwrap()
                         .0;
                     format!(
-                        "{0}\n\t\t{1} | \"{1}\": {2} = {3}::parse_optional_vec,\n\n",
-                        field.comment, field.name, field.field_type, inner_type
+                        "{0}\n\t\t{1} | \"{2}\": {3} = {4}::parse_optional_vec,\n\n",
+                        field.comment, field.name, field.wire_name, field.field_type, inner_type
                     )
                 }
                 _ if field.field_type.contains("Option") => {
@@ -212,13 +251,13 @@ impl Ast {
                         .unwrap()
                         .0;
                     format!(
-                        "{0}\n\t\t{1} | \"{1}\": {2} = {3}::parse_optional,\n\n",
-                        field.comment, field.name, field.field_type, inner_type
+                        "{0}\n\t\t{1} | \"{2}\": {3} = {4}::parse_optional,\n\n",
+                        field.comment, field.name, field.wire_name, field.field_type, inner_type
                     )
                 }
                 _ => format!(
-                    "{0}\n\t\t{1} | \"{1}\": {2} = {2}::parse,\n\n",
-                    field.comment, field.name, field.field_type
+                    "{0}\n\t\t{1} | \"{2}\": {3} = {3}::parse,\n\n",
+                    field.comment, field.name, field.wire_name, field.field_type
                 ),
             })
             .collect();
@@ -236,6 +275,8 @@ dap_type_struct!(
             self.name, field_declaration
         )
         .replace("\n\n\n", "\n")
+        .replace("_?_", "")
+        .replace("?\"", "\"")
     }
 }
 
