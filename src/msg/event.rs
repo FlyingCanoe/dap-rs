@@ -41,6 +41,8 @@ macro_rules! event {
     };
 }
 
+mod capabilities;
+
 #[derive(Clone, Debug)]
 pub enum Event {}
 

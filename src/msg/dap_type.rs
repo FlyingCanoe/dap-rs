@@ -1,9 +1,12 @@
+mod capabilities;
 mod checksum;
 mod checksum_algorithm;
+mod column_descriptor;
 mod data_breakpoint;
 mod data_breakpoint_access_type;
 mod evaluate_ctx;
 mod exception_break_mode;
+mod exception_breakpoints_filter;
 mod exception_filter_option;
 mod exception_options;
 mod exception_path_segment;
@@ -18,12 +21,15 @@ mod stepping_granularity;
 mod value_format;
 mod variables_filter;
 
+pub use capabilities::Capabilities;
 pub use checksum::Checksum;
 pub use checksum_algorithm::ChecksumAlgorithm;
+pub use column_descriptor::ColumnDescriptor;
 pub use data_breakpoint::DataBreakpoint;
 pub use data_breakpoint_access_type::DataBreakpointAccessType;
 pub use evaluate_ctx::EvaluateCtx;
 pub use exception_break_mode::ExceptionBreakMode;
+pub use exception_breakpoints_filter::ExceptionBreakpointsFilter;
 pub use exception_filter_option::ExceptionFilterOptions;
 pub use exception_options::ExceptionOptions;
 pub use exception_path_segment::ExceptionPathSegment;

@@ -116,6 +116,27 @@ macro_rules! dap_type_enum {
                     Ok(None)
                 }
             }
+
+            pub(crate) fn parse_vec(
+                input: Option<&serde_json::Value>,
+            ) -> anyhow::Result<Vec<$type_name>> {
+                use fallible_iterator::FallibleIterator;
+
+                let iter = input.ok_or(anyhow::Error::msg("parsing error"))?.as_array().ok_or(anyhow::Error::msg("parsing error"))?.iter().map(|value| $type_name::parse(Some(value)));
+                let output: Vec<_> = fallible_iterator::convert(iter).collect()?;
+                Ok(output)
+            }
+
+            pub(crate) fn parse_optional_vec(
+                input: Option<&serde_json::Value>,
+            ) -> anyhow::Result<Option<Vec<$type_name>>> {
+                if input.is_some() {
+                    let output = $type_name::parse_vec(input)?;
+                    Ok(Some(output))
+                } else {
+                    Ok(None)
+                }
+            }
         }
     };
 }
