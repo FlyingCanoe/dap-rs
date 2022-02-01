@@ -48,10 +48,12 @@ macro_rules! event {
 mod capabilities;
 mod continued;
 mod exited;
+mod invalidated;
 
 pub use capabilities::CapabilitiesEvent;
 pub use continued::ContinuedEvent;
 pub use exited::ExitedEvent;
+pub use invalidated::InvalidatedEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
@@ -68,6 +70,7 @@ pub enum Event {
     /// - frontend sends other future configuration requests
     /// - frontend sends one 'configurationDone' request to indicate the end of the configuration.
     Initialized,
+    Invalidated(InvalidatedEvent),
 }
 
 impl ToValue for Event {
@@ -81,6 +84,7 @@ impl ToValue for Event {
                 msg.insert("event".to_string(), "initialized".into());
                 Some(msg.into())
             }
+            Event::Invalidated(event) => event.to_value(),
         }
     }
 }
