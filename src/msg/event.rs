@@ -59,8 +59,8 @@ pub enum Event {
     Capabilities(CapabilitiesEvent),
     Exited(ExitedEvent),
     Initialized,
-    LoadedSource(LoadedSourceEvent),
     Invalidated(InvalidatedEvent),
+    LoadedSource(LoadedSourceEvent),
 }
 
 impl Event {
@@ -72,8 +72,8 @@ impl Event {
             "capabilities" => Event::Capabilities(CapabilitiesEvent::parse(msg)?),
             "exited" => Event::Exited(ExitedEvent::parse(msg)?),
             "initialized" => Event::Initialized,
-            "loaded_source" => Event::LoadedSource(LoadedSourceEvent::parse(msg)?),
             "invalidated" => Event::Invalidated(InvalidatedEvent::parse(msg)?),
+            "loaded_source" => Event::LoadedSource(LoadedSourceEvent::parse(msg)?),
             _ => bail!("invalid event"),
         };
         Ok(event)
