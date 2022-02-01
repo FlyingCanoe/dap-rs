@@ -45,17 +45,19 @@ macro_rules! event {
     };
 }
 
-mod capabilities;
-mod continued;
-mod exited;
-mod invalidated;
-mod loaded_source;
+pub mod capabilities;
+pub mod continued;
+pub mod exited;
+pub mod invalidated;
+pub mod loaded_source;
+pub mod memory_event;
 
-pub use capabilities::CapabilitiesEvent;
-pub use continued::ContinuedEvent;
-pub use exited::ExitedEvent;
-pub use invalidated::InvalidatedEvent;
-pub use loaded_source::LoadedSourceEvent;
+use capabilities::CapabilitiesEvent;
+use continued::ContinuedEvent;
+use exited::ExitedEvent;
+use invalidated::InvalidatedEvent;
+use loaded_source::LoadedSourceEvent;
+use memory_event::MemoryEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
@@ -74,6 +76,7 @@ pub enum Event {
     Initialized,
     Invalidated(InvalidatedEvent),
     LoadedSource(LoadedSourceEvent),
+    MemoryEvent(MemoryEvent),
 }
 
 impl ToValue for Event {
@@ -89,6 +92,7 @@ impl ToValue for Event {
             }
             Event::Invalidated(event) => event.to_value(),
             Event::LoadedSource(event) => event.to_value(),
+            Event::MemoryEvent(event) => event.to_value(),
         }
     }
 }
