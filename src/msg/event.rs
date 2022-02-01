@@ -45,16 +45,19 @@ mod capabilities;
 mod continued;
 mod exited;
 mod invalidated;
+mod loaded_source;
 
 pub use capabilities::CapabilitiesEvent;
 pub use continued::ContinuedEvent;
 pub use exited::ExitedEvent;
+pub use loaded_source::LoadedSourceEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
     Continue(ContinuedEvent),
     Capabilities(CapabilitiesEvent),
     Exited(ExitedEvent),
+    LoadedSource(LoadedSourceEvent),
     Initialized,
 }
 
