@@ -46,12 +46,14 @@ mod continued;
 mod exited;
 mod invalidated;
 mod loaded_source;
+mod memory_event;
 
 pub use capabilities::CapabilitiesEvent;
 pub use continued::ContinuedEvent;
 pub use exited::ExitedEvent;
 pub use invalidated::InvalidatedEvent;
 pub use loaded_source::LoadedSourceEvent;
+pub use memory_event::MemoryEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
@@ -61,6 +63,7 @@ pub enum Event {
     Initialized,
     Invalidated(InvalidatedEvent),
     LoadedSource(LoadedSourceEvent),
+    MemoryEvent(MemoryEvent),
 }
 
 impl Event {
@@ -74,6 +77,7 @@ impl Event {
             "initialized" => Event::Initialized,
             "invalidated" => Event::Invalidated(InvalidatedEvent::parse(msg)?),
             "loaded_source" => Event::LoadedSource(LoadedSourceEvent::parse(msg)?),
+            "memory_event" => Event::MemoryEvent(MemoryEvent::parse(msg)?),
             _ => bail!("invalid event"),
         };
         Ok(event)
