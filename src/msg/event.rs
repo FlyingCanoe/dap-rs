@@ -49,11 +49,13 @@ mod capabilities;
 mod continued;
 mod exited;
 mod invalidated;
+mod loaded_source;
 
 pub use capabilities::CapabilitiesEvent;
 pub use continued::ContinuedEvent;
 pub use exited::ExitedEvent;
 pub use invalidated::InvalidatedEvent;
+pub use loaded_source::LoadedSourceEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
@@ -71,6 +73,7 @@ pub enum Event {
     /// - frontend sends one 'configurationDone' request to indicate the end of the configuration.
     Initialized,
     Invalidated(InvalidatedEvent),
+    LoadedSource(LoadedSourceEvent),
 }
 
 impl ToValue for Event {
@@ -85,6 +88,7 @@ impl ToValue for Event {
                 Some(msg.into())
             }
             Event::Invalidated(event) => event.to_value(),
+            Event::LoadedSource(event) => event.to_value(),
         }
     }
 }
