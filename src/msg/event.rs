@@ -44,6 +44,7 @@ macro_rules! event {
 mod capabilities;
 mod continued;
 mod exited;
+mod invalidated;
 
 pub use capabilities::CapabilitiesEvent;
 pub use continued::ContinuedEvent;
