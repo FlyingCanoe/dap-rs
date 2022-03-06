@@ -2,80 +2,69 @@ use anyhow::Error;
 use fallible_iterator::{convert, FallibleIterator};
 use serde_json as json;
 
-pub(crate) fn get_str<'a>(input: &'a json::Value, key: &str) -> anyhow::Result<&'a str> {
-    input
-        .get(key)
-        .map_or(None, json::Value::as_str)
-        .ok_or(Error::msg("parsing error"))
+pub(crate) trait Parse {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<Self>
+    where
+        Self: Sized;
 }
 
-pub(crate) fn get_u64(input: &json::Value, key: &str) -> anyhow::Result<u64> {
-    input
-        .get(key)
-        .map_or(None, json::Value::as_u64)
-        .ok_or(Error::msg("parsing error"))
-}
-
-pub(crate) fn get_optional_str<'a>(
-    input: &'a json::Value,
-    key: &str,
-) -> anyhow::Result<Option<&'a str>> {
-    if let Some(value) = input.get(key) {
-        let output = value.as_str().ok_or(Error::msg("parsing error"))?;
-        Ok(Some(output))
-    } else {
-        Ok(None)
+impl Parse for bool {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<bool> {
+        input
+            .ok_or(Error::msg("parsing error"))?
+            .as_bool()
+            .ok_or(Error::msg("parsing error"))
     }
 }
 
-pub(crate) fn get_optional_u64(input: &json::Value, key: &str) -> anyhow::Result<Option<u64>> {
-    if let Some(value) = input.get(key) {
-        let output = value.as_u64().ok_or(Error::msg("parsing error"))?;
-        Ok(Some(output))
-    } else {
-        Ok(None)
+impl Parse for u64 {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<u64> {
+        input
+            .ok_or(Error::msg("parsing error"))?
+            .as_u64()
+            .ok_or(Error::msg("parsing error"))
+    }
+    
+}
+
+impl Parse for String {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<String> {
+        let output = input
+            .ok_or(Error::msg("parsing error"))?
+            .as_str()
+            .ok_or(Error::msg("parsing error"))?
+            .to_owned();
+
+        Ok(output)
     }
 }
 
-pub(crate) fn get_optional_u64_vec(
-    input: &json::Value,
-    key: &str,
-) -> anyhow::Result<Option<Vec<u64>>> {
-    if let Some(value) = input.get(key) {
-        let output = value
+impl<T> Parse for Option<T>
+where T: Parse {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<Option<T>>
+    where
+    {
+        if let Some(value) = input {
+            let output = T::parse(Some(value))?;
+            Ok(Some(output))
+        } else {
+            Ok(None)
+        }
+    }
+}
+
+impl<T> Parse for Vec<T>
+where T: Parse {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<Vec<T>> {
+            let iter = input
+            .ok_or(Error::msg("parsing error"))?
             .as_array()
             .ok_or(Error::msg("parsing error"))?
-            .iter()
-            .map(json::Value::as_u64)
-            .map(|value| value.ok_or(Error::msg("parsing error")));
+            .into_iter()
+            .map(|value| T::parse(Some(value)));
 
-        let output = convert(output);
-        let output: Vec<_> = output.collect()?;
-
-        Ok(Some(output))
-    } else {
-        Ok(None)
-    }
-}
-
-pub(crate) fn get_optional_list(
-    input: &json::Value,
-    key: &str,
-) -> anyhow::Result<Option<Vec<json::Value>>> {
-    if let Some(value) = input.get(key) {
-        let output = value.as_array().ok_or(Error::msg("parsing error"))?;
-        Ok(Some(output.clone()))
-    } else {
-        Ok(None)
-    }
-}
-
-pub(crate) fn get_optional_bool(input: &json::Value, key: &str) -> anyhow::Result<Option<bool>> {
-    if let Some(value) = input.get(key) {
-        let output = value.as_bool().ok_or(Error::msg("parsing error"))?;
-        Ok(Some(output))
-    } else {
-        Ok(None)
+        let output: Vec<_> = convert(iter).collect()?;
+        Ok(output)
     }
 }
 
@@ -173,6 +162,83 @@ pub(crate) fn parse_optional_string_vec(
             .map(|value| parse_string(Some(value)));
 
         let output: Vec<_> = convert(iter).collect()?;
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
+
+pub(crate) fn get_str<'a>(input: &'a json::Value, key: &str) -> anyhow::Result<&'a str> {
+    input
+        .get(key)
+        .map_or(None, json::Value::as_str)
+        .ok_or(Error::msg("parsing error"))
+}
+
+pub(crate) fn get_u64(input: &json::Value, key: &str) -> anyhow::Result<u64> {
+    input
+        .get(key)
+        .map_or(None, json::Value::as_u64)
+        .ok_or(Error::msg("parsing error"))
+}
+
+pub(crate) fn get_optional_str<'a>(
+    input: &'a json::Value,
+    key: &str,
+) -> anyhow::Result<Option<&'a str>> {
+    if let Some(value) = input.get(key) {
+        let output = value.as_str().ok_or(Error::msg("parsing error"))?;
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
+
+pub(crate) fn get_optional_u64(input: &json::Value, key: &str) -> anyhow::Result<Option<u64>> {
+    if let Some(value) = input.get(key) {
+        let output = value.as_u64().ok_or(Error::msg("parsing error"))?;
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
+
+pub(crate) fn get_optional_u64_vec(
+    input: &json::Value,
+    key: &str,
+) -> anyhow::Result<Option<Vec<u64>>> {
+    if let Some(value) = input.get(key) {
+        let output = value
+            .as_array()
+            .ok_or(Error::msg("parsing error"))?
+            .iter()
+            .map(json::Value::as_u64)
+            .map(|value| value.ok_or(Error::msg("parsing error")));
+
+        let output = convert(output);
+        let output: Vec<_> = output.collect()?;
+
+        Ok(Some(output))
+    } else {
+        Ok(None)
+    }
+}
+
+pub(crate) fn get_optional_list(
+    input: &json::Value,
+    key: &str,
+) -> anyhow::Result<Option<Vec<json::Value>>> {
+    if let Some(value) = input.get(key) {
+        let output = value.as_array().ok_or(Error::msg("parsing error"))?;
+        Ok(Some(output.clone()))
+    } else {
+        Ok(None)
+    }
+}
+
+pub(crate) fn get_optional_bool(input: &json::Value, key: &str) -> anyhow::Result<Option<bool>> {
+    if let Some(value) = input.get(key) {
+        let output = value.as_bool().ok_or(Error::msg("parsing error"))?;
         Ok(Some(output))
     } else {
         Ok(None)
