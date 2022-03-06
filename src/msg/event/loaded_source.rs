@@ -12,9 +12,9 @@ event!(
     LoadedSourceEvent {
         /// The reason for the event.
         /// Values: 'new', 'changed', 'removed', etc.
-        reason | "reason": LoadedSourceReason = LoadedSourceReason::parse,
+        reason | "reason": LoadedSourceReason,
 
         /// The new, changed, or removed source.
-        source_ | "source": Source = Source::parse,
+        source_ | "source": Source,
     }
 );

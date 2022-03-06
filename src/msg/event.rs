@@ -8,7 +8,7 @@ macro_rules! event {
         $event_name:ident {
             $(
                 $(#[$field_meta:meta])*
-                $field:ident | $field_wire_name:literal: $field_ty:ty = $field_parsing_fn:expr,
+                $field:ident | $field_wire_name:literal: $field_ty:ty,
             )*
         }
     ) => {
