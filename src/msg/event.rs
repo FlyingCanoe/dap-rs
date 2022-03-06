@@ -22,11 +22,12 @@ macro_rules! event {
 
         impl $event_name {
             pub(crate) fn parse(msg: serde_json::Value) -> anyhow::Result<$event_name> {
+                use crate::utils::Parse;
                 let args = msg.get("body").ok_or(anyhow::Error::msg("invalid event"))?;
 
                 $(
                     let value = msg.get($field_wire_name);
-                    let $field = $field_parsing_fn(value)?;
+                    let $field = <$field_ty>::parse(value)?;
                 )*
 
                 let event = $event_name {

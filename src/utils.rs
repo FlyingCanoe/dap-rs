@@ -39,6 +39,16 @@ impl Parse for String {
     }
 }
 
+impl Parse for json::Value {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<json::Value>
+    {
+                let output = input
+                .ok_or(Error::msg("parsing error"))?;
+                Ok(output.clone())
+
+    }
+}
+
 impl<T> Parse for Option<T>
 where T: Parse {
     fn parse(input: Option<&json::Value>) -> anyhow::Result<Option<T>>

@@ -24,12 +24,30 @@ macro_rules! dap_type_struct {
             )*
         }
 
-        impl $type_name {
-            pub(crate) fn parse(input: Option<&serde_json::Value>) -> anyhow::Result<$type_name> {
+        impl crate::utils::Parse for $type_name {
+            fn parse(input: Option<&serde_json::Value>) -> anyhow::Result<$type_name> {
                 let input = input.ok_or(Error::msg("parsing error"))?;
                 $(
                     let value = input.get($field_wire_name);
-                    let $field = $field_parsing_fn(value)?;
+                    let $field = <$field_ty>::parse(value)?;
+                )*
+
+                let output = $type_name {
+                    $(
+                        $field,
+                    )*
+                };
+                Ok(output)
+            }
+        }
+
+        impl $type_name {
+            pub(crate) fn parse(input: Option<&serde_json::Value>) -> anyhow::Result<$type_name> {
+                use crate::utils::Parse;
+                let input = input.ok_or(Error::msg("parsing error"))?;
+                $(
+                    let value = input.get($field_wire_name);
+                    let $field = <$field_ty>::parse(value)?;
                 )*
 
                 let output = $type_name {
@@ -91,6 +109,20 @@ macro_rules! dap_type_enum {
                 $(#[$field_meta])*
                 $field,
             )*
+        }
+
+        impl crate::utils::Parse for $type_name {
+            fn parse(input: Option<&serde_json::Value>) -> anyhow::Result<$type_name> {
+                let input = input
+                    .ok_or(anyhow::Error::msg("parsing error"))?
+                    .as_str()
+                    .ok_or(anyhow::Error::msg("parsing error"))?;
+                let output = match input {
+                    $($field_wire_name => $type_name::$field,)*
+                    _ => anyhow::bail!("parsing error"),
+                };
+                Ok(output)
+            }
         }
 
         impl $type_name {
