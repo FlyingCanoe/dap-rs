@@ -1,15 +1,14 @@
 use crate::msg::dap_type::*;
-use crate::utils::{parse_optional_u64, parse_u64};
 
 request!(
     GotoTargetsRequest {
         /// The source location for which the goto targets are determined.
-        source | "source": Source = Source::parse,
+        source | "source": Source,
 
         /// The line location for which the goto targets are determined.
-        line | "line": u64 = parse_u64,
+        line | "line": u64,
 
         /// An optional column location for which the goto targets are determined.
-        column | "column": Option<u64> = parse_optional_u64,
+        column | "column": Option<u64>,
     }
 );
