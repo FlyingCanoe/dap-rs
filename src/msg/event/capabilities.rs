@@ -1,4 +1,4 @@
-use crate::msg::dap_type::Capabilities;
+﻿use crate::msg::dap_type::capabilities::Capabilities;
 
 event!(
     /// The event indicates that one or more capabilities have changed.

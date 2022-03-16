@@ -1,4 +1,4 @@
-use crate::msg::dap_type::InvalidatedAreas;
+﻿use crate::msg::dap_type::invalidated_areas::InvalidatedAreas;
 
 event!(
     /// This event signals that some state in the debug adapter has changed and requires that the client needs to re-render the data snapshot previously requested.
