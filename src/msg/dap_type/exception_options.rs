@@ -1,6 +1,8 @@
-use super::{ExceptionBreakMode, ExceptionPathSegment};
+﻿use crate::msg::dap_type::exception_break_mode::ExceptionBreakMode;
+use crate::msg::dap_type::ExceptionPathSegment;
 
 dap_type_struct!(
+    /// An ExceptionOptions assigns configuration options to a set of exceptions.
     ExceptionOptions {
         /// A path that selects a single or multiple exceptions in a tree. If 'path' is
         /// missing, the whole tree is selected.

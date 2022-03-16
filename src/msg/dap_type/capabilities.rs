@@ -1,6 +1,7 @@
 use super::{ChecksumAlgorithm, ColumnDescriptor, ExceptionBreakpointsFilter};
 
 dap_type_struct!(
+    /// Information about the capabilities of a debug adapter.
     Capabilities {
         /// The debug adapter supports the 'configurationDone' request.
         supports_configuration_done_request | "supportsConfigurationDoneRequest": Option<bool>,
