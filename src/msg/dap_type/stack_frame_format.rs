@@ -1,5 +1,3 @@
-use crate::utils::parse_optional_bool;
-
 dap_type_struct!(
     StackFrameFormat {
         /// Displays parameters for the stack frame.

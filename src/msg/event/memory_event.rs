@@ -1,5 +1,3 @@
-use crate::utils::{parse_string, parse_u64};
-
 event!(
     MemoryEvent {
         /// Memory reference of a memory range that has been updated.

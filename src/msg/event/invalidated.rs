@@ -1,5 +1,4 @@
 use crate::msg::dap_type::InvalidatedAreas;
-use crate::utils::parse_optional_u64;
 
 event!(
     InvalidatedEvent {

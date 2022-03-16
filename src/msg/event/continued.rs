@@ -1,5 +1,3 @@
-use crate::utils::{parse_optional_bool, parse_u64};
-
 event!(
     ContinuedEvent {
         /// The thread which was continued.
