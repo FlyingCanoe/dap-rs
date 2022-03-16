@@ -5,10 +5,11 @@ use crate::utils::{get_str, get_u64};
 
 macro_rules! dap_type_struct {
     (
+        $(#[$type_meta:meta])*
         $type_name:ident {
             $(
                 $(#[$field_meta:meta])*
-                $field:ident | $field_wire_name:literal: $field_ty:ty = $field_parsing_fn:expr,
+                $field:ident | $field_wire_name:literal: $field_ty:ty,
             )*
         }
     ) => {
@@ -17,6 +18,7 @@ macro_rules! dap_type_struct {
 
 
         #[derive(Debug, Clone)]
+        $(#[$type_meta])*
         pub struct $type_name {
             $(
                 $(#[$field_meta])*

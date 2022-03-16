@@ -1,13 +1,11 @@
-use crate::utils::parse_string;
-
-use super::ChecksumAlgorithm;
+﻿use crate::msg::dap_type::checksum_algorithm::ChecksumAlgorithm;
 
 dap_type_struct!(
+    /// The checksum of an item calculated by the specified algorithm.
     Checksum {
         /// The algorithm used to calculate this checksum.
-        algorithm | "algorithm": ChecksumAlgorithm = ChecksumAlgorithm::parse,
-
+        algorithm | "algorithm": ChecksumAlgorithm,
         /// Value of the checksum.
-        checksum | "checksum": String = parse_string,
+        checksum | "checksum": String,
     }
 );
