@@ -5,6 +5,7 @@ use crate::utils::parse_string;
 
 macro_rules! event {
     (
+        $(#[$event_meta:meta])*
         $event_name:ident {
             $(
                 $(#[$field_meta:meta])*
@@ -13,6 +14,7 @@ macro_rules! event {
         }
     ) => {
         #[derive(Clone, Debug)]
+        $(#[$event_meta])*
         pub struct $event_name {
             $(
                 $(#[$field_meta])*

@@ -1,20 +1,20 @@
+﻿use crate::msg::dap_type::source::Source;
+
 dap_type_enum!(
-    LoadedSourceReason {
+    /// The reason for the event.
+    Reason {
         New | "new",
         Changed | "changed",
         Removed | "removed",
     }
 );
 
-use crate::msg::dap_type::Source;
-
 event!(
+    /// The event indicates that some source has been added, changed, or removed from the set of all loaded sources.
     LoadedSourceEvent {
         /// The reason for the event.
-        /// Values: 'new', 'changed', 'removed', etc.
-        reason | "reason": LoadedSourceReason,
-
+        reason | "reason": Reason,
         /// The new, changed, or removed source.
-        source_ | "source": Source,
+        source | "source": Source,
     }
 );
