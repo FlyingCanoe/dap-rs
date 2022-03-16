@@ -96,6 +96,7 @@ macro_rules! dap_type_struct {
 
 macro_rules! dap_type_enum {
     (
+        $(#[$type_meta:meta])*
         $type_name:ident {
             $(
                 $(#[$field_meta:meta])*
@@ -104,6 +105,7 @@ macro_rules! dap_type_enum {
         }
     ) => {
         #[derive(Clone, Debug)]
+        $(#[$type_meta])*
         pub enum $type_name {
             $(
                 $(#[$field_meta])*
@@ -120,6 +122,87 @@ macro_rules! dap_type_enum {
                 let output = match input {
                     $($field_wire_name => $type_name::$field,)*
                     _ => anyhow::bail!("parsing error"),
+                };
+                Ok(output)
+            }
+        }
+
+        impl $type_name {
+            pub(crate) fn parse(input: Option<&serde_json::Value>) -> anyhow::Result<$type_name> {
+                let input = input
+                    .ok_or(anyhow::Error::msg("parsing error"))?
+                    .as_str()
+                    .ok_or(anyhow::Error::msg("parsing error"))?;
+                let output = match input {
+                    $($field_wire_name => $type_name::$field,)*
+                    _ => anyhow::bail!("parsing error"),
+                };
+                Ok(output)
+            }
+
+            pub(crate) fn parse_optional(
+                input: Option<&serde_json::Value>,
+            ) -> anyhow::Result<Option<$type_name>> {
+                if input.is_some() {
+                    let output = $type_name::parse(input)?;
+                    Ok(Some(output))
+                } else {
+                    Ok(None)
+                }
+            }
+
+            pub(crate) fn parse_vec(
+                input: Option<&serde_json::Value>,
+            ) -> anyhow::Result<Vec<$type_name>> {
+                use fallible_iterator::FallibleIterator;
+
+                let iter = input.ok_or(anyhow::Error::msg("parsing error"))?.as_array().ok_or(anyhow::Error::msg("parsing error"))?.iter().map(|value| $type_name::parse(Some(value)));
+                let output: Vec<_> = fallible_iterator::convert(iter).collect()?;
+                Ok(output)
+            }
+
+            pub(crate) fn parse_optional_vec(
+                input: Option<&serde_json::Value>,
+            ) -> anyhow::Result<Option<Vec<$type_name>>> {
+                if input.is_some() {
+                    let output = $type_name::parse_vec(input)?;
+                    Ok(Some(output))
+                } else {
+                    Ok(None)
+                }
+            }
+        }
+    };
+
+    (
+        $(#[$type_meta:meta])*
+        $type_name:ident {
+            Other,
+            $(
+                $(#[$field_meta:meta])*
+                $field:ident | $field_wire_name:literal,
+            )*
+        }
+    ) => {
+        #[derive(Clone, Debug)]
+        $(#[$type_meta])*
+        pub enum $type_name {
+            Other,
+            $(
+                $(#[$field_meta])*
+                $field,
+            )*
+        }
+
+        impl crate::utils::Parse for $type_name {
+            fn parse(input: Option<&serde_json::Value>) -> anyhow::Result<$type_name> {
+                let input = input
+                    .ok_or(anyhow::Error::msg("parsing error"))?
+                    .as_str()
+                    .ok_or(anyhow::Error::msg("parsing error"))?;
+                let output = match input {
+                    $($field_wire_name => $type_name::$field,)*
+                    _ => $type_name::Other,
                 };
                 Ok(output)
             }

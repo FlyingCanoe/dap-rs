@@ -5,6 +5,7 @@ use crate::utils::get_str;
 
 macro_rules! request {
     (
+        $(#[$request_meta:meta])*
         $request_name:ident {
             $(
                 $(#[$field_meta:meta])*
@@ -13,6 +14,7 @@ macro_rules! request {
         }
     ) => {
         #[derive(Clone, Debug)]
+        $(#[$request_meta])*
         pub struct $request_name {
             $(
                 $(#[$field_meta])*
