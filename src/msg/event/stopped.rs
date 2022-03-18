@@ -9,9 +9,9 @@
         Pause | "pause",
         Entry | "entry",
         Goto | "goto",
-        Function breakpoint | "function breakpoint",
-        Data breakpoint | "data breakpoint",
-        Instruction breakpoint | "instruction breakpoint",
+        FunctionBreakpoint | "function breakpoint",
+        DataBreakpoint | "data breakpoint",
+        InstructionBreakpoint | "instruction breakpoint",
     }
 );
 

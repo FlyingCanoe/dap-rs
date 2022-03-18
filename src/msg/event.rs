@@ -16,49 +16,62 @@ macro_rules! event {
                 $field: $field_ty,
             )*
         }
-
-        impl $event_name {
-            pub(crate) fn parse(msg: serde_json::Value) -> anyhow::Result<$event_name> {
-                let args = msg.get("body").ok_or(anyhow::Error::msg("invalid event"))?;
-
-                $(
-                    let value = msg.get($field_wire_name);
-                    let $field = <$field_ty as crate::utils::Parse>::parse(value)?;
-                )*
-
-                let event = $event_name {
-                    $(
-                        $field,
-                    )*
-
-                };
-                Ok(event)
-            }
-        }
     };
 }
 
+mod breakpoint;
 mod capabilities;
 mod continued;
 mod exited;
+mod initialized;
 mod invalidated;
 mod loaded_source;
-mod memory_event;
+mod memory;
+mod module;
+mod output;
+mod process;
+mod progress_end;
+mod progress_start;
+mod progress_update;
+mod stopped;
+mod terminated;
+mod thread;
 
-pub use capabilities::CapabilitiesEvent;
-pub use continued::ContinuedEvent;
-pub use exited::ExitedEvent;
-pub use invalidated::InvalidatedEvent;
-pub use loaded_source::LoadedSourceEvent;
-pub use memory_event::MemoryEvent;
+use breakpoint::BreakpointEvent;
+use capabilities::CapabilitiesEvent;
+use continued::ContinuedEvent;
+use exited::ExitedEvent;
+use initialized::InitializedEvent;
+use invalidated::InvalidatedEvent;
+use loaded_source::LoadedSourceEvent;
+use memory::MemoryEvent;
+use module::ModuleEvent;
+use output::OutputEvent;
+use process::ProcessEvent;
+use progress_end::ProgressEndEvent;
+use progress_start::ProgressStartEvent;
+use progress_update::ProgressUpdateEvent;
+use stopped::StoppedEvent;
+use terminated::TerminatedEvent;
+use thread::ThreadEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
+    Breakpoint(BreakpointEvent),
     Continue(ContinuedEvent),
     Capabilities(CapabilitiesEvent),
     Exited(ExitedEvent),
-    Initialized,
+    Initialized(InitializedEvent),
     Invalidated(InvalidatedEvent),
     LoadedSource(LoadedSourceEvent),
     MemoryEvent(MemoryEvent),
+    Module(ModuleEvent),
+    Output(OutputEvent),
+    Process(ProcessEvent),
+    ProgressEnd(ProgressEndEvent),
+    ProgressStart(ProgressStartEvent),
+    ProgressUpdate(ProgressUpdateEvent),
+    Stopped(StoppedEvent),
+    Terminated(TerminatedEvent),
+    Thread(ThreadEvent),
 }
