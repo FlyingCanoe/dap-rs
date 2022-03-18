@@ -29,11 +29,11 @@ pub struct BreakpointLocationsRequest {
 impl BreakpointLocationsRequest {
     pub(crate) fn parse(msg: serde_json::Value) -> anyhow::Result<BreakpointLocationsRequest> {
         if let Some(args) = msg.get("arguments") {
-            let source = Source::parse(msg.get("source"))?;
-            let line = u64::parse(msg.get("line"))?;
-            let column = Option::<u64>::parse(msg.get("column"))?;
-            let end_line = Option::<u64>::parse(msg.get("endLine"))?;
-            let end_column = Option::<u64>::parse(msg.get("endColumn"))?;
+            let source = Source::parse(args.get("source"))?;
+            let line = u64::parse(args.get("line"))?;
+            let column = Option::<u64>::parse(args.get("column"))?;
+            let end_line = Option::<u64>::parse(args.get("endLine"))?;
+            let end_column = Option::<u64>::parse(args.get("endColumn"))?;
 
             let request = BreakpointLocationsRequest {
                 source: Some(source),
