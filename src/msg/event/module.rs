@@ -11,7 +11,7 @@ dap_type_enum!(
 
 event!(
     /// The event indicates that some information about a module has changed.
-    ModuleEvent {
+    ModuleEvent | "module" {
         /// The new, changed, or removed module. In case of 'removed' only the module id is used.
         module | "module": Module,
         /// The reason for the event.

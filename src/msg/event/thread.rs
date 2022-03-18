@@ -9,7 +9,7 @@
 
 event!(
     /// The event indicates that a thread has started or exited.
-    ThreadEvent {
+    ThreadEvent | "thread" {
         /// The identifier of the thread.
         thread_id | "threadId": u64,
         /// The reason for the event.

@@ -45,23 +45,45 @@ macro_rules! event {
     };
 }
 
+pub mod breakpoint;
 pub mod capabilities;
 pub mod continued;
 pub mod exited;
+pub mod initialized;
 pub mod invalidated;
 pub mod loaded_source;
-pub mod memory_event;
+pub mod memory;
+pub mod module;
+pub mod output;
+pub mod process;
+pub mod progress_end;
+pub mod progress_start;
+pub mod progress_update;
+pub mod stopped;
+pub mod terminated;
+pub mod thread;
 
+use breakpoint::BreakpointEvent;
 use capabilities::CapabilitiesEvent;
 use continued::ContinuedEvent;
 use exited::ExitedEvent;
 use invalidated::InvalidatedEvent;
 use loaded_source::LoadedSourceEvent;
-use memory_event::MemoryEvent;
+use memory::MemoryEvent;
+use module::ModuleEvent;
+use output::OutputEvent;
+use process::ProcessEvent;
+use progress_end::ProgressEndEvent;
+use progress_start::ProgressStartEvent;
+use progress_update::ProgressUpdateEvent;
+use stopped::StoppedEvent;
+use terminated::TerminatedEvent;
+use thread::ThreadEvent;
 
 #[derive(Clone, Debug)]
 pub enum Event {
     Capabilities(CapabilitiesEvent),
+    Breakpoint(BreakpointEvent),
     Continue(ContinuedEvent),
     Exited(ExitedEvent),
     /// This event indicates that the debug adapter is ready to accept configuration requests (e.g. SetBreakpointsRequest, SetExceptionBreakpointsRequest).
@@ -77,11 +99,21 @@ pub enum Event {
     Invalidated(InvalidatedEvent),
     LoadedSource(LoadedSourceEvent),
     MemoryEvent(MemoryEvent),
+    Module(ModuleEvent),
+    Output(OutputEvent),
+    Process(ProcessEvent),
+    ProgressEnd(ProgressEndEvent),
+    ProgressStart(ProgressStartEvent),
+    ProgressUpdate(ProgressUpdateEvent),
+    Stopped(StoppedEvent),
+    Terminated(TerminatedEvent),
+    Thread(ThreadEvent),
 }
 
 impl ToValue for Event {
     fn to_value(self) -> Option<serde_json::Value> {
         match self {
+            Event::Breakpoint(event) => event.to_value(),
             Event::Capabilities(event) => event.to_value(),
             Event::Continue(event) => event.to_value(),
             Event::Exited(event) => event.to_value(),
@@ -93,6 +125,15 @@ impl ToValue for Event {
             Event::Invalidated(event) => event.to_value(),
             Event::LoadedSource(event) => event.to_value(),
             Event::MemoryEvent(event) => event.to_value(),
+            Event::Module(event) => event.to_value(),
+            Event::Output(event) => event.to_value(),
+            Event::Process(event) => event.to_value(),
+            Event::ProgressEnd(event) => event.to_value(),
+            Event::ProgressStart(event) => event.to_value(),
+            Event::ProgressUpdate(event) => event.to_value(),
+            Event::Stopped(event) => event.to_value(),
+            Event::Terminated(event) => event.to_value(),
+            Event::Thread(event) => event.to_value(),
         }
     }
 }

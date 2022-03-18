@@ -35,7 +35,7 @@ dap_type_enum!(
 
 event!(
     /// The event indicates that the target has produced some output.
-    OutputEvent {
+    OutputEvent | "output" {
         /// An optional source location where the output was produced.
         source | "source": Option<Source>,
         /// Optional data to report. For the 'telemetry' category the data will be sent to telemetry, for the other categories the data is shown in JSON format.

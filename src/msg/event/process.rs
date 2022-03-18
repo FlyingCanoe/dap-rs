@@ -12,7 +12,7 @@
 
 event!(
     /// The event indicates that the debugger has begun debugging a new process. Either one that it has launched, or one that it has attached to.
-    ProcessEvent {
+    ProcessEvent | "process" {
         /// The size of a pointer or address for this process, in bits. This value may be used by clients when formatting addresses for display.
         pointer_size | "pointerSize": Option<u64>,
         /// The system process id of the debugged process. This property will be missing for non-system processes.

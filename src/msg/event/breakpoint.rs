@@ -12,7 +12,7 @@ dap_type_enum!(
 
 event!(
     /// The event indicates that some information about a breakpoint has changed.
-    BreakpointEvent {
+    BreakpointEvent | "breakpoint" {
         /// The 'id' attribute is used to find the target breakpoint and the other attributes are used as the new values.
         breakpoint | "breakpoint": Breakpoint,
         /// The reason for the event.
