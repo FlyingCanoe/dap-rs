@@ -10,3 +10,8 @@ request!(
         restart | "__restart": Option<json::Value>,
     }
 );
+
+response!(
+    /// Response to 'attach' request. This is just an acknowledgement, so no body field is required.
+    AttachResponse {}
+);

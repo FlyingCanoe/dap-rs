@@ -10,3 +10,17 @@
         count | "count": u64,
     }
 );
+
+response!(
+    /// Response to 'readMemory' request.
+    ReadMemoryResponse {
+        /// The bytes read from memory, encoded using base64.
+        data | "data": Option<String>,
+        /// The address of the first byte of data returned.
+        /// Treated as a hex value if prefixed with '0x', or as a decimal value otherwise.
+        address | "address": String,
+        /// The number of unreadable bytes encountered after the last successfully read byte.
+        /// This can be used to determine the number of bytes that must be skipped before a subsequent 'readMemory' request will succeed.
+        unreadable_bytes | "unreadableBytes": Option<u64>,
+    }
+);

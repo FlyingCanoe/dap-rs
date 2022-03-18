@@ -1,4 +1,4 @@
-﻿use crate::msg::dap_type::SteppingGranularity;
+﻿use crate::msg::dap_type::stepping_granularity::SteppingGranularity;
 
 request!(
     /// The request executes one step (in the given granularity) for the specified thread and allows all other threads to run freely by resuming them.
@@ -12,4 +12,9 @@ request!(
         /// If this optional flag is true, all other suspended threads are not resumed.
         single_thread | "singleThread": Option<bool>,
     }
+);
+
+response!(
+    /// Response to 'next' request. This is just an acknowledgement, so no body field is required.
+    NextResponse {}
 );

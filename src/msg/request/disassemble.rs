@@ -1,4 +1,6 @@
-﻿request!(
+﻿use crate::msg::dap_type::disassembled_instruction::DisassembledInstruction;
+
+request!(
     /// Disassembles code stored at the provided location.
     /// Clients should only call this request if the capability 'supportsDisassembleRequest' is true.
     DisassembleRequest {
@@ -13,5 +15,13 @@
         instruction_offset | "instructionOffset": Option<u64>,
         /// If true, the adapter should attempt to resolve memory addresses and other values to symbolic names.
         resolve_symbols | "resolveSymbols": Option<bool>,
+    }
+);
+
+response!(
+    /// Response to 'disassemble' request.
+    DisassembleResponse {
+        /// The list of disassembled instructions.
+        instructions | "instructions": Vec<DisassembledInstruction>,
     }
 );

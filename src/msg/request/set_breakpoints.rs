@@ -1,5 +1,6 @@
-﻿use crate::msg::dap_type::SourceBreakpoint;
-use crate::msg::dap_type::Source;
+﻿use crate::msg::dap_type::source_breakpoint::SourceBreakpoint;
+use crate::msg::dap_type::source::Source;
+use crate::msg::dap_type::breakpoint::Breakpoint;
 
 request!(
     /// Sets multiple breakpoints for a single source and clears all previous breakpoints in that source.
@@ -14,5 +15,18 @@ request!(
         source | "source": Source,
         /// The code locations of the breakpoints.
         breakpoints | "breakpoints": Option<Vec<SourceBreakpoint>>,
+    }
+);
+
+response!(
+    /// Response to 'setBreakpoints' request.
+    /// Returned is information about each breakpoint created by this request.
+    /// This includes the actual code location and whether the breakpoint could be verified.
+    /// The breakpoints returned are in the same order as the elements of the 'breakpoints'
+    /// (or the deprecated 'lines') array in the arguments.
+    SetBreakpointsResponse {
+        /// Information about the breakpoints.
+        /// The array elements are in the same order as the elements of the 'breakpoints' (or the deprecated 'lines') array in the arguments.
+        breakpoints | "breakpoints": Vec<Breakpoint>,
     }
 );

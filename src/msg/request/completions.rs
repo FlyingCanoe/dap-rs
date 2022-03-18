@@ -1,4 +1,6 @@
-﻿request!(
+﻿use crate::msg::dap_type::completion_item::CompletionItem;
+
+request!(
     /// Returns a list of possible completions for a given caret position and text.
     /// Clients should only call this request if the capability 'supportsCompletionsRequest' is true.
     CompletionsRequest {
@@ -10,5 +12,13 @@
         column | "column": u64,
         /// One or more source lines. Typically this is the text a user has typed into the debug console before he asked for completion.
         text | "text": String,
+    }
+);
+
+response!(
+    /// Response to 'completions' request.
+    CompletionsResponse {
+        /// The possible completions for .
+        targets | "targets": Vec<CompletionItem>,
     }
 );
