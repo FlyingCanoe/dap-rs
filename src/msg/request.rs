@@ -198,6 +198,7 @@ macro_rules! response {
 mod attach;
 mod breakpoint_locations;
 mod completions;
+mod configuration_done;
 mod continue_request;
 mod data_breakpoint_info;
 mod diassemble;
@@ -208,6 +209,7 @@ mod goto;
 mod goto_targets;
 mod initialize;
 mod launch;
+mod loaded_sources;
 mod modules;
 mod next;
 mod pause;
@@ -217,6 +219,7 @@ mod restart_frame;
 mod reverse_continue;
 mod scopes;
 mod set_breakpoint;
+mod set_breakpoints;
 mod set_data_breakpoints;
 mod set_exception_breakpoints;
 mod set_expression;
@@ -224,7 +227,7 @@ mod set_function_breakpoints;
 mod set_instruction_breakpoints;
 mod set_variable;
 mod source;
-mod stacktrace;
+mod stack_trace;
 mod step_back;
 mod step_in;
 mod step_in_targets;
@@ -264,7 +267,7 @@ use self::set_function_breakpoints::SetFunctionBreakpointsRequest;
 use self::set_instruction_breakpoints::SetInstructionBreakpointsRequest;
 use self::set_variable::SetVariableRequest;
 use self::source::SourceRequest;
-use self::stacktrace::StackTraceRequest;
+use self::stack_trace::StackTraceRequest;
 use self::step_back::StepBackRequest;
 use self::step_in::StepInRequest;
 use self::step_in_targets::StepInTargetsRequest;
@@ -367,7 +370,7 @@ impl Request {
             }
             "goto" => Request::Goto(goto::GotoRequest::parse(msg)?),
             "pause" => Request::Pause(pause::PauseRequest::parse(msg)?),
-            "stackTrace" => Request::StackTrace(stacktrace::StackTraceRequest::parse(msg)?),
+            "stackTrace" => Request::StackTrace(StackTraceRequest::parse(msg)?),
             "scopes" => Request::Scopes(scopes::ScopesRequest::parse(msg)?),
             "variables" => Request::Variables(variables::VariablesRequest::parse(msg)?),
             "setVariable" => Request::SetVariable(set_variable::SetVariableRequest::parse(msg)?),

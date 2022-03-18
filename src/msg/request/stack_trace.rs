@@ -1,4 +1,5 @@
-﻿use crate::msg::dap_type::StackFrameFormat;
+﻿use crate::msg::dap_type::stack_frame_format::StackFrameFormat;
+use crate::msg::dap_type::stack_frame::StackFrame;
 
 request!(
     /// The request returns a stacktrace from the current execution state of a given thread.
@@ -13,5 +14,16 @@ request!(
         levels | "levels": Option<u64>,
         /// The index of the first frame to return; if omitted frames start at 0.
         start_frame | "startFrame": Option<u64>,
+    }
+);
+
+response!(
+    /// Response to 'stackTrace' request.
+    StackTraceResponse {
+        /// The frames of the stackframe. If the array has length zero, there are no stackframes available.
+        /// This means that there is no location information available.
+        stack_frames | "stackFrames": Vec<StackFrame>,
+        /// The total number of frames available in the stack. If omitted or if totalFrames is larger than the available frames, a client is expected to request frames until a request returns less frames than requested (which indicates the end of the stack). Returning monotonically increasing totalFrames values for subsequent requests can be used to enforce paging in the client.
+        total_frames | "totalFrames": Option<u64>,
     }
 );

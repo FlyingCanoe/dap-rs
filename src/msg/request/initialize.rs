@@ -49,3 +49,8 @@ request!(
         client_name | "clientName": Option<String>,
     }
 );
+
+response!(
+    /// Response to 'initialize' request.
+    InitializeResponse {}
+);

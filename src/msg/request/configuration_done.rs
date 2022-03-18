@@ -4,3 +4,8 @@
     /// Clients should only call this request if the capability 'supportsConfigurationDoneRequest' is true.
     ConfigurationDoneRequest {}
 );
+
+response!(
+    /// Response to 'configurationDone' request. This is just an acknowledgement, so no body field is required.
+    ConfigurationDoneResponse {}
+);

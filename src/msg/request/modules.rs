@@ -6,3 +6,13 @@ request!(
         module_count | "moduleCount": Option<u64>,
     }
 );
+
+response!(
+    /// Response to 'modules' request.
+    ModulesResponse {
+        /// The total number of modules available.
+        total_modules | "totalModules": Option<u64>,
+        /// All modules or range of modules.
+        modules | "modules": Vec<Module>,
+    }
+);

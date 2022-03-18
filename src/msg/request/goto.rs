@@ -7,3 +7,8 @@ request!(
         target_id | "targetId": u64 ,
     }
 );
+
+response!(
+    /// Response to 'goto' request. This is just an acknowledgement, so no body field is required.
+    GotoResponse {}
+);

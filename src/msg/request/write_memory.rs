@@ -13,3 +13,13 @@
         data | "data": String,
     }
 );
+
+response!(
+    /// Response to 'writeMemory' request.
+    WriteMemoryResponse {
+        /// Optional property that should be returned when 'allowPartial' is true to indicate the offset of the first byte of data successfully written. Can be negative.
+        offset | "offset": Option<u64>,
+        /// Optional property that should be returned when 'allowPartial' is true to indicate the number of bytes starting from address that were successfully written.
+        bytes_written | "bytesWritten": Option<u64>,
+    }
+);

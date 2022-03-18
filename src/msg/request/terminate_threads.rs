@@ -6,3 +6,8 @@
         thread_ids | "threadIds": Option<Vec<u64>>,
     }
 );
+
+response!(
+    /// Response to 'terminateThreads' request. This is just an acknowledgement, so no body field is required.
+    TerminateThreadsResponse {}
+);

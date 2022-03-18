@@ -1,4 +1,5 @@
-﻿use crate::msg::dap_type::DataBreakpoint;
+﻿use crate::msg::dap_type::data_breakpoint::DataBreakpoint;
+use crate::msg::dap_type::breakpoint::Breakpoint;
 
 request!(
     /// Replaces all existing data breakpoints with new data breakpoints.
@@ -8,5 +9,14 @@ request!(
     SetDataBreakpointsRequest {
         /// The contents of this array replaces all existing data breakpoints. An empty array clears all data breakpoints.
         breakpoints | "breakpoints": Vec<DataBreakpoint>,
+    }
+);
+
+response!(
+    /// Response to 'setDataBreakpoints' request.
+    /// Returned is information about each breakpoint created by this request.
+    SetDataBreakpointsResponse {
+        /// Information about the data breakpoints. The array elements correspond to the elements of the input argument 'breakpoints' array.
+        breakpoints | "breakpoints": Vec<Breakpoint>,
     }
 );

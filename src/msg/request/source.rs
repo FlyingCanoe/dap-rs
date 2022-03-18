@@ -1,4 +1,4 @@
-﻿use crate::msg::dap_type::Source;
+﻿use crate::msg::dap_type::source::Source;
 
 request!(
     /// The request retrieves the source code for a given source reference.
@@ -8,5 +8,15 @@ request!(
         source_reference | "sourceReference": u64,
         /// Specifies the source content to load. Either source.path or source.sourceReference must be specified.
         source | "source": Option<Source>,
+    }
+);
+
+response!(
+    /// Response to 'source' request.
+    SourceResponse {
+        /// Content of the source reference.
+        content | "content": String,
+        /// Optional content type (mime type) of the source.
+        mime_type | "mimeType": Option<String>,
     }
 );

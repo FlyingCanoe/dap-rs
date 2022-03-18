@@ -1,4 +1,5 @@
-﻿use crate::msg::dap_type::ValueFormat;
+﻿use crate::msg::dap_type::value_format::ValueFormat;
+use crate::msg::dap_type::variable::Variable;
 
 dap_type_enum!(
     /// Optional filter to limit the child variables to either named or indexed. If omitted, both types are fetched.
@@ -23,5 +24,13 @@ request!(
         count | "count": Option<u64>,
         /// The Variable reference.
         variables_reference | "variablesReference": u64,
+    }
+);
+
+response!(
+    /// Response to 'variables' request.
+    VariablesResponse {
+        /// All (or a range) of variables for the given variable reference.
+        variables | "variables": Vec<Variable>,
     }
 );

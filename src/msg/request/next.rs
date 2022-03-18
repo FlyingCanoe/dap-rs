@@ -1,4 +1,4 @@
-﻿use crate::msg::dap_type::SteppingGranularity;
+﻿use crate::msg::dap_type::stepping_granularity::SteppingGranularity;
 
 request!(
     NextRequest | "next" {
@@ -10,4 +10,9 @@ request!(
         /// If this optional flag is true, all other suspended threads are not resumed.
         single_thread | "singleThread": Option<bool>,
     }
+);
+
+response!(
+    /// Response to 'next' request. This is just an acknowledgement, so no body field is required.
+    NextResponse {}
 );
