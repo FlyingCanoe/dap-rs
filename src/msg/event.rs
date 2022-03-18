@@ -1,8 +1,3 @@
-use anyhow::bail;
-use serde_json as json;
-
-use crate::utils::parse_string;
-
 macro_rules! event {
     (
         $(#[$event_meta:meta])*
