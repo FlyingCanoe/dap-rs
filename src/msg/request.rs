@@ -24,12 +24,11 @@ macro_rules! request {
 
         impl $request_name {
             pub(crate) fn parse(msg: serde_json::Value) -> anyhow::Result<$request_name> {
-                use crate::utils::Parse;
                 let args = msg.get("arguments").ok_or(anyhow::Error::msg("invalid request"))?;
 
                 $(
-                    let value = msg.get($field_wire_name);
-                    let $field = <$field_ty>::parse(value)?;
+                    let value = args.get($field_wire_name);
+                    let $field = <$field_ty as crate::utils::Parse>::parse(value)?;
                 )*
 
                 let request = $request_name {
