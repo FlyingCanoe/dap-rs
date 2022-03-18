@@ -1,6 +1,6 @@
 use crate::msg::dap_type::breakpoint_location::BreakpointLocation;
 use crate::msg::dap_type::Source;
-use crate::utils::{parse_optional_u64, parse_u64};
+use crate::utils::Parse;
 
 #[derive(Clone, Debug)]
 pub struct BreakpointLocationsRequest {
@@ -30,10 +30,10 @@ impl BreakpointLocationsRequest {
     pub(crate) fn parse(msg: serde_json::Value) -> anyhow::Result<BreakpointLocationsRequest> {
         if let Some(args) = msg.get("arguments") {
             let source = Source::parse(msg.get("source"))?;
-            let line = parse_u64(msg.get("line"))?;
-            let column = parse_optional_u64(msg.get("column"))?;
-            let end_line = parse_optional_u64(msg.get("endLine"))?;
-            let end_column = parse_optional_u64(msg.get("endColumn"))?;
+            let line = u64::parse(msg.get("line"))?;
+            let column = Option::<u64>::parse(msg.get("column"))?;
+            let end_line = Option::<u64>::parse(msg.get("endLine"))?;
+            let end_column = Option::<u64>::parse(msg.get("endColumn"))?;
 
             let request = BreakpointLocationsRequest {
                 source: Some(source),

@@ -1,7 +1,7 @@
-use anyhow::{bail, Context};
+use anyhow::bail;
 use serde_json as json;
 
-use crate::utils::get_str;
+use crate::utils::Parse;
 
 macro_rules! request {
     (
@@ -198,9 +198,9 @@ pub enum Request {
 
 impl Request {
     pub(crate) fn parse(msg: json::Value) -> anyhow::Result<Request> {
-        let request_type = get_str(&msg, "command").context("invalid request")?;
+        let request_type = String::parse(msg.get("command"))?;
 
-        let request = match request_type {
+        let request = match request_type.as_str() {
             "attach" => Request::Attach(AttachRequest::parse(msg)?),
             "breakpointLocations" => {
                 Request::BreakpointLocations(BreakpointLocationsRequest::parse(msg)?)
