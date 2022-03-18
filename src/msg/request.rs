@@ -71,7 +71,7 @@ mod completions;
 mod configuration_done;
 mod continue_request;
 mod data_breakpoint_info;
-mod diassemble;
+mod disassemble;
 mod disconnect;
 mod evaluate;
 mod exception_info;
@@ -88,7 +88,6 @@ mod restart;
 mod restart_frame;
 mod reverse_continue;
 mod scopes;
-mod set_breakpoint;
 mod set_breakpoints;
 mod set_data_breakpoints;
 mod set_exception_breakpoints;
@@ -104,53 +103,56 @@ mod step_in_targets;
 mod step_out;
 mod terminate;
 mod terminate_threads;
+mod threads;
 mod variables;
 mod write_memory;
 
+use attach::AttachRequest;
+use breakpoint_locations::BreakpointLocationsRequest;
+use completions::CompletionsRequest;
+use configuration_done::ConfigurationDoneRequest;
+use continue_request::ContinueRequest;
+use data_breakpoint_info::DataBreakpointInfoRequest;
+use disassemble::DisassembleRequest;
+use disconnect::DisconnectRequest;
+use evaluate::EvaluateRequest;
+use exception_info::ExceptionInfoRequest;
+use goto::GotoRequest;
+use goto_targets::GotoTargetsRequest;
 use initialize::InitializeRequest;
-
-use self::attach::AttachRequest;
-use self::breakpoint_locations::BreakpointLocationsRequest;
-use self::completions::CompletionsRequest;
-use self::continue_request::ContinueRequest;
-use self::data_breakpoint_info::DataBreakpointInfoRequest;
-use self::diassemble::DiassambleRequest;
-use self::disconnect::DisconnectRequest;
-use self::evaluate::EvaluateRequest;
-use self::exception_info::ExceptionInfoRequest;
-use self::goto::GotoRequest;
-use self::goto_targets::GotoTargetsRequest;
-use self::launch::LaunchRequest;
-use self::modules::ModulesRequest;
-use self::next::NextRequest;
-use self::pause::PauseRequest;
-use self::read_memory::ReadMemoryRequest;
-use self::restart::RestartRequest;
-use self::restart_frame::RestartFrameRequest;
-use self::reverse_continue::ReverseContinueRequest;
-use self::scopes::ScopesRequest;
-use self::set_breakpoint::SetBreakpointsRequest;
-use self::set_data_breakpoints::SetDataBreakpointsRequest;
-use self::set_exception_breakpoints::SetExceptionBreakpointsRequest;
-use self::set_expression::SetExpressionRequest;
-use self::set_function_breakpoints::SetFunctionBreakpointsRequest;
-use self::set_instruction_breakpoints::SetInstructionBreakpointsRequest;
-use self::set_variable::SetVariableRequest;
-use self::source::SourceRequest;
-use self::stack_trace::StackTraceRequest;
-use self::step_back::StepBackRequest;
-use self::step_in::StepInRequest;
-use self::step_in_targets::StepInTargetsRequest;
-use self::step_out::StepOutRequest;
-use self::terminate::TerminateRequest;
-use self::terminate_threads::TerminateThreadsRequest;
-use self::variables::VariablesRequest;
-use self::write_memory::WriteMemoryRequest;
+use launch::LaunchRequest;
+use loaded_sources::LoadedSourcesRequest;
+use modules::ModulesRequest;
+use next::NextRequest;
+use pause::PauseRequest;
+use read_memory::ReadMemoryRequest;
+use restart::RestartRequest;
+use restart_frame::RestartFrameRequest;
+use reverse_continue::ReverseContinueRequest;
+use scopes::ScopesRequest;
+use set_breakpoints::SetBreakpointsRequest;
+use set_data_breakpoints::SetDataBreakpointsRequest;
+use set_exception_breakpoints::SetExceptionBreakpointsRequest;
+use set_expression::SetExpressionRequest;
+use set_function_breakpoints::SetFunctionBreakpointsRequest;
+use set_instruction_breakpoints::SetInstructionBreakpointsRequest;
+use set_variable::SetVariableRequest;
+use source::SourceRequest;
+use stack_trace::StackTraceRequest;
+use step_back::StepBackRequest;
+use step_in::StepInRequest;
+use step_in_targets::StepInTargetsRequest;
+use step_out::StepOutRequest;
+use terminate::TerminateRequest;
+use terminate_threads::TerminateThreadsRequest;
+use threads::ThreadsRequest;
+use variables::VariablesRequest;
+use write_memory::WriteMemoryRequest;
 
 #[derive(Clone, Debug)]
 pub enum Request {
     Initialize(InitializeRequest),
-    ConfigurationDone,
+    ConfigurationDone(ConfigurationDoneRequest),
     Completions(CompletionsRequest),
     Launch(LaunchRequest),
     Attach(AttachRequest),
@@ -178,10 +180,11 @@ pub enum Request {
     Variables(VariablesRequest),
     SetVariable(SetVariableRequest),
     Source(SourceRequest),
-    Threads,
+    Continue(ContinueRequest),
+    Threads(ThreadsRequest),
     TerminateThreads(TerminateThreadsRequest),
     Modules(ModulesRequest),
-    LoadedSources,
+    LoadedSources(LoadedSourcesRequest),
     Evaluate(EvaluateRequest),
     SetExpression(SetExpressionRequest),
     StepInTargets(StepInTargetsRequest),
@@ -189,7 +192,7 @@ pub enum Request {
     ExceptionInfo(ExceptionInfoRequest),
     ReadMemory(ReadMemoryRequest),
     WriteMemory(WriteMemoryRequest),
-    Disassemble(DiassambleRequest),
+    Disassemble(DisassembleRequest),
 }
 
 impl Request {
@@ -197,74 +200,62 @@ impl Request {
         let request_type = get_str(&msg, "command").context("invalid request")?;
 
         let request = match request_type {
+            "attach" => Request::Attach(AttachRequest::parse(msg)?),
+            "breakpointLocations" => {
+                Request::BreakpointLocations(BreakpointLocationsRequest::parse(msg)?)
+            }
+            "completions" => Request::Completions(CompletionsRequest::parse(msg)?),
+            "configurationDone" => {
+                Request::ConfigurationDone(ConfigurationDoneRequest::parse(msg)?)
+            }
+            "continue" => Request::Continue(ContinueRequest::parse(msg)?),
+            "dataBreakpointInfo" => {
+                Request::DataBreakpointInfo(DataBreakpointInfoRequest::parse(msg)?)
+            }
+            "disassemble" => Request::Disassemble(DisassembleRequest::parse(msg)?),
+            "disconnect" => Request::Disconnect(DisconnectRequest::parse(msg)?),
+            "evaluate" => Request::Evaluate(EvaluateRequest::parse(msg)?),
+            "exceptionInfo" => Request::ExceptionInfo(ExceptionInfoRequest::parse(msg)?),
+            "goto" => Request::Goto(GotoRequest::parse(msg)?),
+            "gotoTargets" => Request::GotoTargets(GotoTargetsRequest::parse(msg)?),
             "initialize" => Request::Initialize(InitializeRequest::parse(msg)?),
-            "configurationDone" => Request::ConfigurationDone,
-            "completions" => Request::Completions(completions::CompletionsRequest::parse(msg)?),
-            "launch" => Request::Launch(launch::LaunchRequest::parse(msg)?),
-            "attach" => Request::Attach(attach::AttachRequest::parse(msg)?),
-            "restart" => Request::Restart(restart::RestartRequest::parse(msg)?),
-            "disconnect" => Request::Disconnect(disconnect::DisconnectRequest::parse(msg)?),
-            "terminate" => Request::Terminate(terminate::TerminateRequest::parse(msg)?),
-            "breakpointLocations" => Request::BreakpointLocations(
-                breakpoint_locations::BreakpointLocationsRequest::parse(msg)?,
-            ),
-            "setBreakpoints" => {
-                Request::SetBreakpoints(set_breakpoint::SetBreakpointsRequest::parse(msg)?)
+            "launch" => Request::Launch(LaunchRequest::parse(msg)?),
+            "loadedSources" => Request::LoadedSources(LoadedSourcesRequest::parse(msg)?),
+            "modules" => Request::Modules(ModulesRequest::parse(msg)?),
+            "next" => Request::Next(NextRequest::parse(msg)?),
+            "pause" => Request::Pause(PauseRequest::parse(msg)?),
+            "readMemory" => Request::ReadMemory(ReadMemoryRequest::parse(msg)?),
+            "restartFrame" => Request::RestartFrame(RestartFrameRequest::parse(msg)?),
+            "restart" => Request::Restart(RestartRequest::parse(msg)?),
+            "reverseContinue" => Request::ReverseContinue(ReverseContinueRequest::parse(msg)?),
+            "scopes" => Request::Scopes(ScopesRequest::parse(msg)?),
+            "setBreakpoints" => Request::SetBreakpoints(SetBreakpointsRequest::parse(msg)?),
+            "setDataBreakpoints" => {
+                Request::SetDataBreakpoints(SetDataBreakpointsRequest::parse(msg)?)
             }
-            "setFunctionBreakpoints" => Request::SetFunctionBreakpoints(
-                set_function_breakpoints::SetFunctionBreakpointsRequest::parse(msg)?,
-            ),
-            "setExceptionBreakpoints" => Request::SetExceptionBreakpoints(
-                set_exception_breakpoints::SetExceptionBreakpointsRequest::parse(msg)?,
-            ),
-            "dataBreakpointInfo" => Request::DataBreakpointInfo(
-                data_breakpoint_info::DataBreakpointInfoRequest::parse(msg)?,
-            ),
-            "setDataBreakpoints" => Request::SetDataBreakpoints(
-                set_data_breakpoints::SetDataBreakpointsRequest::parse(msg)?,
-            ),
-            "setInstructionBreakpoints" => Request::SetInstructionBreakpoints(
-                set_instruction_breakpoints::SetInstructionBreakpointsRequest::parse(msg)?,
-            ),
-
-            "continue" => Request::ContinueRequest(continue_request::ContinueRequest::parse(msg)?),
-            "next" => Request::Next(next::NextRequest::parse(msg)?),
-            "stepIn" => Request::StepIn(step_in::StepInRequest::parse(msg)?),
-            "stepOut" => Request::StepOut(step_out::StepOutRequest::parse(msg)?),
-            "stepBack" => Request::StepBack(step_back::StepBackRequest::parse(msg)?),
-            "reverseContinue" => {
-                Request::ReverseContinue(reverse_continue::ReverseContinueRequest::parse(msg)?)
+            "setExceptionBreakpoints" => {
+                Request::SetExceptionBreakpoints(SetExceptionBreakpointsRequest::parse(msg)?)
             }
-            "restartFrame" => {
-                Request::RestartFrame(restart_frame::RestartFrameRequest::parse(msg)?)
+            "setExpression" => Request::SetExpression(SetExpressionRequest::parse(msg)?),
+            "setFunctionBreakpoints" => {
+                Request::SetFunctionBreakpoints(SetFunctionBreakpointsRequest::parse(msg)?)
             }
-            "goto" => Request::Goto(goto::GotoRequest::parse(msg)?),
-            "pause" => Request::Pause(pause::PauseRequest::parse(msg)?),
+            "setInstructionBreakpoints" => {
+                Request::SetInstructionBreakpoints(SetInstructionBreakpointsRequest::parse(msg)?)
+            }
+            "setVariable" => Request::SetVariable(SetVariableRequest::parse(msg)?),
+            "source" => Request::Source(SourceRequest::parse(msg)?),
             "stackTrace" => Request::StackTrace(StackTraceRequest::parse(msg)?),
-            "scopes" => Request::Scopes(scopes::ScopesRequest::parse(msg)?),
-            "variables" => Request::Variables(variables::VariablesRequest::parse(msg)?),
-            "setVariable" => Request::SetVariable(set_variable::SetVariableRequest::parse(msg)?),
-            "source" => Request::Source(source::SourceRequest::parse(msg)?),
-            "threads" => Request::Threads,
-            "terminateThreads" => {
-                Request::TerminateThreads(terminate_threads::TerminateThreadsRequest::parse(msg)?)
-            }
-            "modules" => Request::Modules(modules::ModulesRequest::parse(msg)?),
-            "loadedSources" => Request::LoadedSources,
-            "evaluate" => Request::Evaluate(evaluate::EvaluateRequest::parse(msg)?),
-            "setExpression" => {
-                Request::SetExpression(set_expression::SetExpressionRequest::parse(msg)?)
-            }
-            "stepInTargets" => {
-                Request::StepInTargets(step_in_targets::StepInTargetsRequest::parse(msg)?)
-            }
-            "gotoTargets" => Request::GotoTargets(goto_targets::GotoTargetsRequest::parse(msg)?),
-            "exceptionInfo" => {
-                Request::ExceptionInfo(exception_info::ExceptionInfoRequest::parse(msg)?)
-            }
-            "readMemory" => Request::ReadMemory(read_memory::ReadMemoryRequest::parse(msg)?),
-            "writeMemory" => Request::WriteMemory(write_memory::WriteMemoryRequest::parse(msg)?),
-            "disassemble" => Request::Disassemble(diassemble::DiassambleRequest::parse(msg)?),
+            "stepBack" => Request::StepBack(StepBackRequest::parse(msg)?),
+            "stepIn" => Request::StepIn(StepInRequest::parse(msg)?),
+            "stepInTargets" => Request::StepInTargets(StepInTargetsRequest::parse(msg)?),
+            "stepOut" => Request::StepOut(StepOutRequest::parse(msg)?),
+            "terminate" => Request::Terminate(TerminateRequest::parse(msg)?),
+            "terminateThreads" => Request::TerminateThreads(TerminateThreadsRequest::parse(msg)?),
+            "threads" => Request::Threads(ThreadsRequest::parse(msg)?),
+            "variables" => Request::Variables(VariablesRequest::parse(msg)?),
+            "writeMemory" => Request::WriteMemory(WriteMemoryRequest::parse(msg)?),
+
             _ => bail!("invalid request"),
         };
         Ok(request)
