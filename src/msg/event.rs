@@ -67,21 +67,3 @@ pub enum Event {
     LoadedSource(LoadedSourceEvent),
     MemoryEvent(MemoryEvent),
 }
-
-impl Event {
-    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<Event> {
-        let event_type = parse_string(msg.get("event"))?;
-
-        let event = match event_type.as_str() {
-            "continued" => Event::Continue(ContinuedEvent::parse(msg)?),
-            "capabilities" => Event::Capabilities(CapabilitiesEvent::parse(msg)?),
-            "exited" => Event::Exited(ExitedEvent::parse(msg)?),
-            "initialized" => Event::Initialized,
-            "invalidated" => Event::Invalidated(InvalidatedEvent::parse(msg)?),
-            "loaded_source" => Event::LoadedSource(LoadedSourceEvent::parse(msg)?),
-            "memory_event" => Event::MemoryEvent(MemoryEvent::parse(msg)?),
-            _ => bail!("invalid event"),
-        };
-        Ok(event)
-    }
-}

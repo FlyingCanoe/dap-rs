@@ -107,47 +107,49 @@ mod threads;
 mod variables;
 mod write_memory;
 
-use attach::AttachRequest;
-use breakpoint_locations::BreakpointLocationsRequest;
-use completions::CompletionsRequest;
-use configuration_done::ConfigurationDoneRequest;
-use continue_request::ContinueRequest;
-use data_breakpoint_info::DataBreakpointInfoRequest;
-use disassemble::DisassembleRequest;
-use disconnect::DisconnectRequest;
-use evaluate::EvaluateRequest;
-use exception_info::ExceptionInfoRequest;
-use goto::GotoRequest;
-use goto_targets::GotoTargetsRequest;
-use initialize::InitializeRequest;
-use launch::LaunchRequest;
-use loaded_sources::LoadedSourcesRequest;
-use modules::ModulesRequest;
-use next::NextRequest;
-use pause::PauseRequest;
-use read_memory::ReadMemoryRequest;
-use restart::RestartRequest;
-use restart_frame::RestartFrameRequest;
-use reverse_continue::ReverseContinueRequest;
-use scopes::ScopesRequest;
-use set_breakpoints::SetBreakpointsRequest;
-use set_data_breakpoints::SetDataBreakpointsRequest;
-use set_exception_breakpoints::SetExceptionBreakpointsRequest;
-use set_expression::SetExpressionRequest;
-use set_function_breakpoints::SetFunctionBreakpointsRequest;
-use set_instruction_breakpoints::SetInstructionBreakpointsRequest;
-use set_variable::SetVariableRequest;
-use source::SourceRequest;
-use stack_trace::StackTraceRequest;
-use step_back::StepBackRequest;
-use step_in::StepInRequest;
-use step_in_targets::StepInTargetsRequest;
-use step_out::StepOutRequest;
-use terminate::TerminateRequest;
-use terminate_threads::TerminateThreadsRequest;
-use threads::ThreadsRequest;
-use variables::VariablesRequest;
-use write_memory::WriteMemoryRequest;
+use attach::{AttachRequest, AttachResponse};
+use breakpoint_locations::{BreakpointLocationsRequest, BreakpointLocationsResponse};
+use completions::{CompletionsRequest, CompletionsResponse};
+use configuration_done::{ConfigurationDoneRequest, ConfigurationDoneResponse};
+use continue_request::{ContinueRequest, ContinueResponse};
+use data_breakpoint_info::{DataBreakpointInfoRequest, DataBreakpointInfoResponse};
+use disassemble::{DisassembleRequest, DisassembleResponse};
+use disconnect::{DisconnectRequest, DisconnectResponse};
+use evaluate::{EvaluateRequest, EvaluateResponse};
+use exception_info::{ExceptionInfoRequest, ExceptionInfoResponse};
+use goto::{GotoRequest, GotoResponse};
+use goto_targets::{GotoTargetsRequest, GotoTargetsResponse};
+use initialize::{InitializeRequest, InitializeResponse};
+use launch::{LaunchRequest, LaunchResponse};
+use loaded_sources::{LoadedSourcesRequest, LoadedSourcesResponse};
+use modules::{ModulesRequest, ModulesResponse};
+use next::{NextRequest, NextResponse};
+use pause::{PauseRequest, PauseResponse};
+use read_memory::{ReadMemoryRequest, ReadMemoryResponse};
+use restart::{RestartRequest, RestartResponse};
+use restart_frame::{RestartFrameRequest, RestartFrameResponse};
+use reverse_continue::{ReverseContinueRequest, ReverseContinueResponse};
+use scopes::{ScopesRequest, ScopesResponse};
+use set_breakpoints::{SetBreakpointsRequest, SetBreakpointsResponse};
+use set_data_breakpoints::{SetDataBreakpointsRequest, SetDataBreakpointsResponse};
+use set_exception_breakpoints::{SetExceptionBreakpointsRequest, SetExceptionBreakpointsResponse};
+use set_expression::{SetExpressionRequest, SetExpressionResponse};
+use set_function_breakpoints::{SetFunctionBreakpointsRequest, SetFunctionBreakpointsResponse};
+use set_instruction_breakpoints::{
+    SetInstructionBreakpointsRequest, SetInstructionBreakpointsResponse,
+};
+use set_variable::{SetVariableRequest, SetVariableResponse};
+use source::{SourceRequest, SourceResponse};
+use stack_trace::{StackTraceRequest, StackTraceResponse};
+use step_back::{StepBackRequest, StepBackResponse};
+use step_in::{StepInRequest, StepInResponse};
+use step_in_targets::{StepInTargetsRequest, StepInTargetsResponse};
+use step_out::{StepOutRequest, StepOutResponse};
+use terminate::{TerminateRequest, TerminateResponse};
+use terminate_threads::{TerminateThreadsRequest, TerminateThreadsResponse};
+use threads::{ThreadsRequest, ThreadsResponse};
+use variables::{VariablesRequest, VariablesResponse};
+use write_memory::{WriteMemoryRequest, WriteMemoryResponse};
 
 #[derive(Clone, Debug)]
 pub enum Request {
@@ -260,4 +262,50 @@ impl Request {
         };
         Ok(request)
     }
+}
+
+#[derive(Clone, Debug)]
+pub enum Response {
+    Initialize(InitializeResponse),
+    ConfigurationDone(ConfigurationDoneResponse),
+    Completions(CompletionsResponse),
+    Launch(LaunchResponse),
+    Attach(AttachResponse),
+    Restart(RestartResponse),
+    Disconnect(DisconnectResponse),
+    Terminate(TerminateResponse),
+    BreakpointLocations(BreakpointLocationsResponse),
+    SetBreakpoints(SetBreakpointsResponse),
+    SetFunctionBreakpoints(SetFunctionBreakpointsResponse),
+    SetExceptionBreakpoints(SetExceptionBreakpointsResponse),
+    DataBreakpointInfo(DataBreakpointInfoResponse),
+    SetDataBreakpoints(SetDataBreakpointsResponse),
+    SetInstructionBreakpoints(SetInstructionBreakpointsResponse),
+    ContinueResponse(ContinueResponse),
+    Next(NextResponse),
+    StepIn(StepInResponse),
+    StepOut(StepOutResponse),
+    StepBack(StepBackResponse),
+    ReverseContinue(ReverseContinueResponse),
+    RestartFrame(RestartFrameResponse),
+    Goto(GotoResponse),
+    Pause(PauseResponse),
+    StackTrace(StackTraceResponse),
+    Scopes(ScopesResponse),
+    Variables(VariablesResponse),
+    SetVariable(SetVariableResponse),
+    Source(SourceResponse),
+    Continue(ContinueResponse),
+    Threads(ThreadsResponse),
+    TerminateThreads(TerminateThreadsResponse),
+    Modules(ModulesResponse),
+    LoadedSources(LoadedSourcesResponse),
+    Evaluate(EvaluateResponse),
+    SetExpression(SetExpressionResponse),
+    StepInTargets(StepInTargetsResponse),
+    GotoTargets(GotoTargetsResponse),
+    ExceptionInfo(ExceptionInfoResponse),
+    ReadMemory(ReadMemoryResponse),
+    WriteMemory(WriteMemoryResponse),
+    Disassemble(DisassembleResponse),
 }

@@ -1,4 +1,7 @@
-﻿request!(
+﻿use crate::msg::dap_type::data_breakpoint_access_type::DataBreakpointAccessType;
+use either::Either;
+
+request!(
     /// Obtains information on a possible data breakpoint that could be set on an expression or variable.
     /// Clients should only call this request if the capability 'supportsDataBreakpoints' is true.
     DataBreakpointInfoRequest {
@@ -7,5 +10,19 @@
         /// The name of the Variable's child to obtain data breakpoint information for.
         /// If variablesReference isn't provided, this can be an expression.
         name | "name": String,
+    }
+);
+
+response!(
+    /// Response to 'dataBreakpointInfo' request.
+    DataBreakpointInfoResponse {
+        /// An identifier for the data on which a data breakpoint can be registered with the setDataBreakpoints request or null if no data breakpoint is available.
+        data_id | "dataId": Either<u64, String>,
+        /// UI string that describes on what data the breakpoint is set on or why a data breakpoint is not available.
+        description | "description": String,
+        /// Optional attribute listing the available access types for a potential data breakpoint. A UI frontend could surface this information.
+        access_types | "accessTypes": Option<Vec<DataBreakpointAccessType>>,
+        /// Optional attribute indicating that a potential data breakpoint could be persisted across sessions.
+        can_persist | "canPersist": Option<bool>,
     }
 );

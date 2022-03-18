@@ -1,3 +1,4 @@
+use crate::msg::dap_type::breakpoint_location::BreakpointLocation;
 use crate::msg::dap_type::Source;
 use crate::utils::{parse_optional_u64, parse_u64};
 
@@ -54,3 +55,12 @@ impl BreakpointLocationsRequest {
         }
     }
 }
+
+response!(
+    /// Response to 'breakpointLocations' request.
+    /// Contains possible locations for source breakpoints.
+    BreakpointLocationsResponse {
+        /// Sorted set of possible breakpoint locations.
+        breakpoints | "breakpoints": Vec<BreakpointLocation>,
+    }
+);
