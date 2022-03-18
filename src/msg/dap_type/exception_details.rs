@@ -1,6 +1,4 @@
-﻿use crate::msg::dap_type::exception_details::ExceptionDetails;
-
-dap_type_struct!(
+﻿dap_type_struct!(
     /// Detailed information about an exception that has occurred.
     ExceptionDetails {
         /// Message contained in the exception.

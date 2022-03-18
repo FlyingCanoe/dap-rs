@@ -11,7 +11,7 @@ dap_type_struct!(
         /// If variable name starts with an underscore character, the variable does not contain user data (PII) and can be safely used for telemetry purposes.
         format | "format": String,
         /// An object used as a dictionary for looking up the variables in the format string.
-        variables | "variables": Option<HashMap<String, String>,
+        variables | "variables": Option<HashMap<String, String>>,
         /// If true show user.
         show_user | "showUser": Option<bool>,
         /// An optional label that is presented to the user as the UI for opening the url.
