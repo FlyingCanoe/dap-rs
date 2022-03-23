@@ -1,9 +1,10 @@
-use std::io;
 use std::io::Read;
+use std::io::{self, Write};
 use std::net::TcpStream;
 
 use anyhow::{bail, Error};
 use bstr::{BString, ByteSlice, B};
+use serde_json as Json;
 
 pub struct SocketConnection {
     inner_connection: TcpStream,

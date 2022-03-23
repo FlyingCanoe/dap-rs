@@ -20,5 +20,5 @@ request!(
 
 response!(
     /// Response to 'disconnect' request. This is just an acknowledgement, so no body field is required.
-    DisconnectResponse {}
+    DisconnectResponse | "disconnect" {}
 );

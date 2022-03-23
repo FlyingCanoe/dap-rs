@@ -14,5 +14,5 @@ request!(
 
 response!(
     /// Response to 'next' request. This is just an acknowledgement, so no body field is required.
-    NextResponse {}
+    NextResponse | "next" {}
 );

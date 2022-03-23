@@ -1,7 +1,7 @@
 use serde_json as json;
 
 request!(
-    RestartRequest {
+    RestartRequest | "restart" {
         no_debug | "noDebug": Option<bool>,
         restart | "__restart": Option<json::Value>,
     }
@@ -9,5 +9,5 @@ request!(
 
 response!(
     /// Response to 'restart' request. This is just an acknowledgement, so no body field is required.
-    RestartResponse {}
+    RestartResponse | "restart" {}
 );

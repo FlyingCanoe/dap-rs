@@ -9,7 +9,7 @@ request!(
 
 response!(
     /// Response to 'readMemory' request.
-    ReadMemoryResponse {
+    ReadMemoryResponse | "readMemory" {
         /// The bytes read from memory, encoded using base64.
         data | "data": Option<String>,
         /// The address of the first byte of data returned.

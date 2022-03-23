@@ -4,7 +4,7 @@ use crate::msg::dap_type::stack_frame::StackFrame;
 request!(
     /// The request returns a stacktrace from the current execution state of a given thread.
     /// A client can request all stack frames by omitting the startFrame and levels arguments. For performance conscious clients and if the debug adapter's 'supportsDelayedStackTraceLoading' capability is true, stack frames can be retrieved in a piecemeal way with the startFrame and levels arguments. The response of the stackTrace request may contain a totalFrames property that hints at the total number of frames in the stack. If a client needs this total number upfront, it can issue a request for a single (first) frame and depending on the value of totalFrames decide how to proceed. In any case a client should be prepared to receive less frames than requested, which is an indication that the end of the stack has been reached.
-    StackTraceRequest {
+    StackTraceRequest | "stackTrace" {
         /// Retrieve the stacktrace for this thread.
         thread_id | "threadId": u64,
         /// Specifies details on how to format the stack frames.
@@ -19,7 +19,7 @@ request!(
 
 response!(
     /// Response to 'stackTrace' request.
-    StackTraceResponse {
+    StackTraceResponse | "stackTrace" {
         /// The frames of the stackframe. If the array has length zero, there are no stackframes available.
         /// This means that there is no location information available.
         stack_frames | "stackFrames": Vec<StackFrame>,

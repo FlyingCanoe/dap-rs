@@ -37,7 +37,7 @@ request!(
 
 response!(
     /// Response to 'evaluate' request.
-    EvaluateResponse {
+    EvaluateResponse | "evaluate" {
         /// The number of indexed child variables.
         /// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
         /// The value should be less than or equal to 2147483647 (2^31-1).

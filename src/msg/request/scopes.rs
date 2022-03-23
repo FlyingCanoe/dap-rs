@@ -2,7 +2,7 @@
 
 request!(
     /// The request returns the variable scopes for a given stackframe ID.
-    ScopesRequest {
+    ScopesRequest | "scopes" {
         /// Retrieve the scopes for this stackframe.
         frame_id | "frameId": u64,
     }
@@ -10,7 +10,7 @@ request!(
 
 response!(
     /// Response to 'scopes' request.
-    ScopesResponse {
+    ScopesResponse | "scopes" {
         /// The scopes of the stackframe. If the array has length zero, there are no scopes available.
         scopes | "scopes": Vec<Scope>,
     }

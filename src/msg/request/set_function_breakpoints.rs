@@ -6,7 +6,7 @@ request!(
     /// To clear all function breakpoints, specify an empty array.
     /// When a function breakpoint is hit, a 'stopped' event (with reason 'function breakpoint') is generated.
     /// Clients should only call this request if the capability 'supportsFunctionBreakpoints' is true.
-    SetFunctionBreakpointsRequest {
+    SetFunctionBreakpointsRequest | "setFunctionBreakpoints" {
         /// The function names of the breakpoints.
         breakpoints | "breakpoints": Vec<FunctionBreakpoint>,
     }
@@ -15,7 +15,7 @@ request!(
 response!(
     /// Response to 'setFunctionBreakpoints' request.
     /// Returned is information about each breakpoint created by this request.
-    SetFunctionBreakpointsResponse {
+    SetFunctionBreakpointsResponse | "setFunctionBreakpoints" {
         /// Information about the breakpoints. The array elements correspond to the elements of the 'breakpoints' array.
         breakpoints | "breakpoints": Vec<Breakpoint>,
     }

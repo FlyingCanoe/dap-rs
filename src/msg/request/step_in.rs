@@ -8,7 +8,7 @@ request!(
     /// If there are multiple function/method calls (or other targets) on the source line,
     /// the optional argument 'targetId' can be used to control into which target the 'stepIn' should occur.
     /// The list of possible targets for a given source line can be retrieved via the 'stepInTargets' request.
-    StepInRequest {
+    StepInRequest | "stepIn" {
         /// Specifies the thread for which to resume execution for one step-into (of the given granularity).
         thread_id | "threadId": u64,
         /// Optional id of the target to step into.
@@ -22,5 +22,5 @@ request!(
 
 response!(
     /// Response to 'stepIn' request. This is just an acknowledgement, so no body field is required.
-    StepInResponse {}
+    StepInResponse | "stepIn" {}
 );

@@ -3,7 +3,7 @@
 request!(
     /// Disassembles code stored at the provided location.
     /// Clients should only call this request if the capability 'supportsDisassembleRequest' is true.
-    DisassembleRequest {
+    DisassembleRequest | "disassemble" {
         /// Optional offset (in bytes) to be applied to the reference location before disassembling. Can be negative.
         offset | "offset": Option<u64>,
         /// Memory reference to the base location containing the instructions to disassemble.
@@ -20,7 +20,7 @@ request!(
 
 response!(
     /// Response to 'disassemble' request.
-    DisassembleResponse {
+    DisassembleResponse | "disassemble" {
         /// The list of disassembled instructions.
         instructions | "instructions": Vec<DisassembledInstruction>,
     }

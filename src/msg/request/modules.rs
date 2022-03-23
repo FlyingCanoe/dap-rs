@@ -9,7 +9,7 @@ request!(
 
 response!(
     /// Response to 'modules' request.
-    ModulesResponse {
+    ModulesResponse | "modules" {
         /// The total number of modules available.
         total_modules | "totalModules": Option<u64>,
         /// All modules or range of modules.

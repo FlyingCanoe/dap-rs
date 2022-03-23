@@ -6,7 +6,7 @@ request!(
     /// The expressions have access to any variables and arguments that are in scope of the specified frame.
     /// Clients should only call this request if the capability 'supportsSetExpression' is true.
     /// If a debug adapter implements both setExpression and setVariable, a client will only use setExpression if the variable has an evaluateName property.
-    SetExpressionRequest {
+    SetExpressionRequest | "setExpression" {
         /// Evaluate the expressions in the scope of this stack frame. If not specified, the expressions are evaluated in the global scope.
         frame_id | "frameId": Option<u64>,
         /// Specifies how the resulting value should be formatted.
@@ -20,7 +20,7 @@ request!(
 
 response!(
     /// Response to 'setExpression' request.
-    SetExpressionResponse {
+    SetExpressionResponse | "setExpression" {
         /// The number of indexed child variables.
         /// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
         /// The value should be less than or equal to 2147483647 (2^31-1).

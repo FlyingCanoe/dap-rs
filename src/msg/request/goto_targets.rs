@@ -1,5 +1,5 @@
-﻿use crate::msg::dap_type::source::Source;
-use crate::msg::dap_type::goto_target::GotoTarget;
+﻿use crate::msg::dap_type::goto_target::GotoTarget;
+use crate::msg::dap_type::source::Source;
 
 request!(
     GotoTargetsRequest | "gotoTargets" {
@@ -12,7 +12,7 @@ request!(
 
 response!(
     /// Response to 'gotoTargets' request.
-    GotoTargetsResponse {
+    GotoTargetsResponse | "gotoTargets" {
         /// The possible goto targets of the specified location.
         targets | "targets": Vec<GotoTarget>,
     }

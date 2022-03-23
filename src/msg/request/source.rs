@@ -2,7 +2,7 @@
 
 request!(
     /// The request retrieves the source code for a given source reference.
-    SourceRequest {
+    SourceRequest | "source" {
         /// The reference to the source. This is the same as source.sourceReference.
         /// This is provided for backward compatibility since old backends do not understand the 'source' attribute.
         source_reference | "sourceReference": u64,
@@ -13,7 +13,7 @@ request!(
 
 response!(
     /// Response to 'source' request.
-    SourceResponse {
+    SourceResponse | "source" {
         /// Content of the source reference.
         content | "content": String,
         /// Optional content type (mime type) of the source.

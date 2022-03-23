@@ -12,7 +12,7 @@ dap_type_enum!(
 request!(
     /// Retrieves all child variables for the given variable reference.
     /// An optional filter can be used to limit the fetched children to either named or indexed children.
-    VariablesRequest {
+    VariablesRequest | "variables" {
         /// Optional filter to limit the child variables to either named or indexed. If omitted, both types are fetched.
         filter | "filter": Option<Filter>,
         /// The index of the first variable to return; if omitted children start at 0.
@@ -29,7 +29,7 @@ request!(
 
 response!(
     /// Response to 'variables' request.
-    VariablesResponse {
+    VariablesResponse | "variables" {
         /// All (or a range) of variables for the given variable reference.
         variables | "variables": Vec<Variable>,
     }

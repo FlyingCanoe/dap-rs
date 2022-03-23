@@ -12,7 +12,7 @@ request!(
 
 response!(
     /// Response to 'exceptionInfo' request.
-    ExceptionInfoResponse {
+    ExceptionInfoResponse | "exceptionInfo" {
         /// Mode that caused the exception notification to be raised.
         break_mode | "breakMode": ExceptionBreakMode,
         /// Descriptive text for the exception provided by the debug adapter.

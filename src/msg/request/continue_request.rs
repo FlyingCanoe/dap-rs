@@ -10,7 +10,7 @@ request!(
 
 response!(
     /// Response to 'continue' request.
-    ContinueResponse {
+    ContinueResponse | "continue" {
         /// The value true (or a missing property) signals to the client that all threads have been resumed. The value false must be returned if not all threads were resumed.
         all_threads_continued | "allThreadsContinued": Option<bool>,
     }

@@ -1,4 +1,7 @@
-﻿dap_type_enum!(
+﻿use crate::msg::dap_type::Capabilities;
+use crate::utils::ToValue;
+
+dap_type_enum!(
     /// Determines in what format paths are specified. The default is 'path', which is the native format.
     PathFormat {
         Other,
@@ -50,7 +53,23 @@ request!(
     }
 );
 
-response!(
-    /// Response to 'initialize' request.
-    InitializeResponse {}
-);
+/// Response to 'initialize' request.
+#[derive(Debug, Clone)]
+pub struct InitializeResponse {
+    pub capabilities: Option<Capabilities>,
+}
+
+impl ToValue for InitializeResponse {
+    fn to_value(self) -> Option<serde_json::Value> {
+        let mut msg = serde_json::Map::new();
+
+        msg.insert("type".to_string(), "response".into());
+        msg.insert("success".to_string(), true.into());
+        msg.insert("command".to_string(), "initialize".into());
+
+        if let Some(cap) = self.capabilities.to_value() {
+            msg.insert("body".to_string(), cap);
+        }
+        Some(msg.into())
+    }
+}

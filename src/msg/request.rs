@@ -1,7 +1,7 @@
 use anyhow::{bail, Error};
 use serde_json as json;
 
-use crate::utils::Parse;
+use crate::utils::{Parse, ToValue};
 
 macro_rules! request {
     (
@@ -237,49 +237,51 @@ mod threads;
 mod variables;
 mod write_memory;
 
-use attach::AttachRequest;
-use breakpoint_locations::{BreakpointLocationsRequest, BreakpointLocationsResponse};
-use completions::{CompletionsRequest, CompletionsResponse};
-use configuration_done::{ConfigurationDoneRequest, ConfigurationDoneResponse};
-use continue_request::{ContinueRequest, ContinueResponse};
-use data_breakpoint_info::{DataBreakpointInfoRequest, DataBreakpointInfoResponse};
-use disassemble::{DisassembleRequest, DisassembleResponse};
-use disconnect::{DisconnectRequest, DisconnectResponse};
-use evaluate::{EvaluateRequest, EvaluateResponse};
-use exception_info::{ExceptionInfoRequest, ExceptionInfoResponse};
-use goto::{GotoRequest, GotoResponse};
-use goto_targets::{GotoTargetsRequest, GotoTargetsResponse};
-use initialize::{InitializeRequest, InitializeResponse};
-use launch::{LaunchRequest, LaunchResponse};
-use loaded_sources::{LoadedSourcesRequest, LoadedSourcesResponse};
-use modules::{ModulesRequest, ModulesResponse};
-use next::{NextRequest, NextResponse};
-use pause::{PauseRequest, PauseResponse};
-use read_memory::{ReadMemoryRequest, ReadMemoryResponse};
-use restart::{RestartRequest, RestartResponse};
-use restart_frame::{RestartFrameRequest, RestartFrameResponse};
-use reverse_continue::{ReverseContinueRequest, ReverseContinueResponse};
-use scopes::{ScopesRequest, ScopesResponse};
-use set_breakpoints::{SetBreakpointsRequest, SetBreakpointsResponse};
-use set_data_breakpoints::{SetDataBreakpointsRequest, SetDataBreakpointsResponse};
-use set_exception_breakpoints::{SetExceptionBreakpointsRequest, SetExceptionBreakpointsResponse};
-use set_expression::{SetExpressionRequest, SetExpressionResponse};
-use set_function_breakpoints::{SetFunctionBreakpointsRequest, SetFunctionBreakpointsResponse};
-use set_instruction_breakpoints::{
+pub use attach::AttachRequest;
+pub use breakpoint_locations::{BreakpointLocationsRequest, BreakpointLocationsResponse};
+pub use completions::{CompletionsRequest, CompletionsResponse};
+pub use configuration_done::{ConfigurationDoneRequest, ConfigurationDoneResponse};
+pub use continue_request::{ContinueRequest, ContinueResponse};
+pub use data_breakpoint_info::{DataBreakpointInfoRequest, DataBreakpointInfoResponse};
+pub use disassemble::{DisassembleRequest, DisassembleResponse};
+pub use disconnect::{DisconnectRequest, DisconnectResponse};
+pub use evaluate::{EvaluateRequest, EvaluateResponse};
+pub use exception_info::{ExceptionInfoRequest, ExceptionInfoResponse};
+pub use goto::{GotoRequest, GotoResponse};
+pub use goto_targets::{GotoTargetsRequest, GotoTargetsResponse};
+pub use initialize::{InitializeRequest, InitializeResponse};
+pub use launch::LaunchRequest;
+pub use loaded_sources::{LoadedSourcesRequest, LoadedSourcesResponse};
+pub use modules::{ModulesRequest, ModulesResponse};
+pub use next::{NextRequest, NextResponse};
+pub use pause::{PauseRequest, PauseResponse};
+pub use read_memory::{ReadMemoryRequest, ReadMemoryResponse};
+pub use restart::{RestartRequest, RestartResponse};
+pub use restart_frame::{RestartFrameRequest, RestartFrameResponse};
+pub use reverse_continue::{ReverseContinueRequest, ReverseContinueResponse};
+pub use scopes::{ScopesRequest, ScopesResponse};
+pub use set_breakpoints::{SetBreakpointsRequest, SetBreakpointsResponse};
+pub use set_data_breakpoints::{SetDataBreakpointsRequest, SetDataBreakpointsResponse};
+pub use set_exception_breakpoints::{
+    SetExceptionBreakpointsRequest, SetExceptionBreakpointsResponse,
+};
+pub use set_expression::{SetExpressionRequest, SetExpressionResponse};
+pub use set_function_breakpoints::{SetFunctionBreakpointsRequest, SetFunctionBreakpointsResponse};
+pub use set_instruction_breakpoints::{
     SetInstructionBreakpointsRequest, SetInstructionBreakpointsResponse,
 };
-use set_variable::{SetVariableRequest, SetVariableResponse};
-use source::{SourceRequest, SourceResponse};
-use stack_trace::{StackTraceRequest, StackTraceResponse};
-use step_back::{StepBackRequest, StepBackResponse};
-use step_in::{StepInRequest, StepInResponse};
-use step_in_targets::{StepInTargetsRequest, StepInTargetsResponse};
-use step_out::{StepOutRequest, StepOutResponse};
-use terminate::{TerminateRequest, TerminateResponse};
-use terminate_threads::{TerminateThreadsRequest, TerminateThreadsResponse};
-use threads::{ThreadsRequest, ThreadsResponse};
-use variables::{VariablesRequest, VariablesResponse};
-use write_memory::{WriteMemoryRequest, WriteMemoryResponse};
+pub use set_variable::{SetVariableRequest, SetVariableResponse};
+pub use source::{SourceRequest, SourceResponse};
+pub use stack_trace::{StackTraceRequest, StackTraceResponse};
+pub use step_back::{StepBackRequest, StepBackResponse};
+pub use step_in::{StepInRequest, StepInResponse};
+pub use step_in_targets::{StepInTargetsRequest, StepInTargetsResponse};
+pub use step_out::{StepOutRequest, StepOutResponse};
+pub use terminate::{TerminateRequest, TerminateResponse};
+pub use terminate_threads::{TerminateThreadsRequest, TerminateThreadsResponse};
+pub use threads::{ThreadsRequest, ThreadsResponse};
+pub use variables::{VariablesRequest, VariablesResponse};
+pub use write_memory::{WriteMemoryRequest, WriteMemoryResponse};
 
 #[derive(Debug)]
 pub enum Request {
@@ -393,13 +395,17 @@ impl Request {
         Ok(request)
     }
 }
+#[derive(Debug)]
+pub struct Response {
+    pub(crate) request_seq: u64,
+    pub(crate) response_type: ResponseType,
+}
 
 #[derive(Debug)]
-pub enum Response {
+pub enum ResponseType {
     Initialize(InitializeResponse),
     ConfigurationDone(ConfigurationDoneResponse),
     Completions(CompletionsResponse),
-    Launch(LaunchResponse),
     Restart(RestartResponse),
     Disconnect(DisconnectResponse),
     Terminate(TerminateResponse),
@@ -437,4 +443,56 @@ pub enum Response {
     ReadMemory(ReadMemoryResponse),
     WriteMemory(WriteMemoryResponse),
     Disassemble(DisassembleResponse),
+}
+
+impl ToValue for Response {
+    fn to_value(self) -> Option<json::Value> {
+        let mut value = match self.response_type {
+            ResponseType::Initialize(response) => response.to_value(),
+            ResponseType::ConfigurationDone(response) => response.to_value(),
+            ResponseType::Completions(response) => response.to_value(),
+            ResponseType::Restart(response) => response.to_value(),
+            ResponseType::Disconnect(response) => response.to_value(),
+            ResponseType::Terminate(response) => response.to_value(),
+            ResponseType::BreakpointLocations(response) => response.to_value(),
+            ResponseType::SetBreakpoints(response) => response.to_value(),
+            ResponseType::SetFunctionBreakpoints(response) => response.to_value(),
+            ResponseType::SetExceptionBreakpoints(response) => response.to_value(),
+            ResponseType::DataBreakpointInfo(response) => response.to_value(),
+            ResponseType::SetDataBreakpoints(response) => response.to_value(),
+            ResponseType::SetInstructionBreakpoints(response) => response.to_value(),
+            ResponseType::ContinueResponse(response) => response.to_value(),
+            ResponseType::Next(response) => response.to_value(),
+            ResponseType::StepIn(response) => response.to_value(),
+            ResponseType::StepOut(response) => response.to_value(),
+            ResponseType::StepBack(response) => response.to_value(),
+            ResponseType::ReverseContinue(response) => response.to_value(),
+            ResponseType::RestartFrame(response) => response.to_value(),
+            ResponseType::Goto(response) => response.to_value(),
+            ResponseType::Pause(response) => response.to_value(),
+            ResponseType::StackTrace(response) => response.to_value(),
+            ResponseType::Scopes(response) => response.to_value(),
+            ResponseType::Variables(response) => response.to_value(),
+            ResponseType::SetVariable(response) => response.to_value(),
+            ResponseType::Source(response) => response.to_value(),
+            ResponseType::Continue(response) => response.to_value(),
+            ResponseType::Threads(response) => response.to_value(),
+            ResponseType::TerminateThreads(response) => response.to_value(),
+            ResponseType::Modules(response) => response.to_value(),
+            ResponseType::LoadedSources(response) => response.to_value(),
+            ResponseType::Evaluate(response) => response.to_value(),
+            ResponseType::SetExpression(response) => response.to_value(),
+            ResponseType::StepInTargets(response) => response.to_value(),
+            ResponseType::GotoTargets(response) => response.to_value(),
+            ResponseType::ExceptionInfo(response) => response.to_value(),
+            ResponseType::ReadMemory(response) => response.to_value(),
+            ResponseType::WriteMemory(response) => response.to_value(),
+            ResponseType::Disassemble(response) => response.to_value(),
+        };
+
+        let map = value.as_mut()?.as_object_mut().unwrap();
+        map.insert("request_seq".to_string(), self.request_seq.into());
+
+        value
+    }
 }

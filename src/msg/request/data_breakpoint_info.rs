@@ -11,7 +11,7 @@ request!(
 
 response!(
     /// Response to 'dataBreakpointInfo' request.
-    DataBreakpointInfoResponse {
+    DataBreakpointInfoResponse | "dataBreakpointInfo" {
         /// An identifier for the data on which a data breakpoint can be registered with the setDataBreakpoints request or null if no data breakpoint is available.
         data_id | "dataId": Either<u64, String>,
         /// UI string that describes on what data the breakpoint is set on or why a data breakpoint is not available.

@@ -6,7 +6,7 @@ request!(
     /// To clear all data breakpoints, specify an empty array.
     /// When a data breakpoint is hit, a 'stopped' event (with reason 'data breakpoint') is generated.
     /// Clients should only call this request if the capability 'supportsDataBreakpoints' is true.
-    SetDataBreakpointsRequest {
+    SetDataBreakpointsRequest | "setDataBreakpoints" {
         /// The contents of this array replaces all existing data breakpoints. An empty array clears all data breakpoints.
         breakpoints | "breakpoints": Vec<DataBreakpoint>,
     }
@@ -15,7 +15,7 @@ request!(
 response!(
     /// Response to 'setDataBreakpoints' request.
     /// Returned is information about each breakpoint created by this request.
-    SetDataBreakpointsResponse {
+    SetDataBreakpointsResponse | "setDataBreakpoints" {
         /// Information about the data breakpoints. The array elements correspond to the elements of the input argument 'breakpoints' array.
         breakpoints | "breakpoints": Vec<Breakpoint>,
     }
