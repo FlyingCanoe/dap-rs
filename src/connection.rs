@@ -1,12 +1,15 @@
-use std::io;
 use std::io::Read;
+use std::io::{self, Write};
 use std::net::TcpStream;
 
 use anyhow::{bail, Error};
 use bstr::{BString, ByteSlice, B};
+use serde_json as Json;
 
 use crate::msg::{parse_msg, Msg};
+use crate::utils::ToValue;
 
+#[derive(Debug)]
 pub struct SocketConnection {
     inner_connection: TcpStream,
     buf: BString,
@@ -96,6 +99,7 @@ impl SocketConnection {
         }
     }
 
+    #[allow(dead_code)]
     pub fn try_read_msg(&mut self) -> anyhow::Result<Option<Msg>> {
         if let Some(raw_msg) = self.try_read_raw_msg()? {
             let msg = parse_msg(&raw_msg)?;
@@ -103,5 +107,22 @@ impl SocketConnection {
         } else {
             Ok(None)
         }
+    }
+
+    pub fn read_msg(&mut self) -> anyhow::Result<Msg> {
+        self.inner_connection.set_nonblocking(false)?;
+        let raw_msg = self.try_read_raw_msg()?.unwrap();
+        let msg = parse_msg(&raw_msg)?;
+        self.inner_connection.set_nonblocking(true)?;
+        Ok(msg)
+    }
+
+    pub fn send_msg(&mut self, msg: Msg) -> anyhow::Result<()> {
+        let msg = Json::to_string(&msg.to_value())?;
+        let msg_header = format!("Content-Length: {}\r\n\r\n", msg.len());
+
+        self.inner_connection.write_all(msg_header.as_bytes())?;
+        self.inner_connection.write_all(msg.as_bytes())?;
+        Ok(())
     }
 }

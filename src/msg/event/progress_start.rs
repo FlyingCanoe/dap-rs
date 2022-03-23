@@ -3,7 +3,7 @@
     /// provides additional information for the client to set up a corresponding progress and cancellation UI.
     /// The client is free to delay the showing of the UI in order to reduce flicker.
     /// This event should only be sent if the client has passed the value true for the 'supportsProgressReporting' capability of the 'initialize' request.
-    ProgressStartEvent {
+    ProgressStartEvent | "progressStart" {
         /// Optional, more detailed progress message.
         message | "message": Option<String>,
         /// An ID that must be used in subsequent 'progressUpdate' and 'progressEnd' events to make them refer to the same progress reporting.

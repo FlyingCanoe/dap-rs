@@ -6,7 +6,7 @@ request!(
     /// Sets multiple breakpoints for a single source and clears all previous breakpoints in that source.
     /// To clear all breakpoint for a source, specify an empty array.
     /// When a breakpoint is hit, a 'stopped' event (with reason 'breakpoint') is generated.
-    SetBreakpointsRequest {
+    SetBreakpointsRequest | "setBreakpoints" {
         /// A value of true indicates that the underlying source has been modified which results in new breakpoint locations.
         source_modified | "sourceModified": Option<bool>,
         /// Deprecated: The code locations of the breakpoints.
@@ -24,7 +24,7 @@ response!(
     /// This includes the actual code location and whether the breakpoint could be verified.
     /// The breakpoints returned are in the same order as the elements of the 'breakpoints'
     /// (or the deprecated 'lines') array in the arguments.
-    SetBreakpointsResponse {
+    SetBreakpointsResponse | "setBreakpoints" {
         /// Information about the breakpoints.
         /// The array elements are in the same order as the elements of the 'breakpoints' (or the deprecated 'lines') array in the arguments.
         breakpoints | "breakpoints": Vec<Breakpoint>,

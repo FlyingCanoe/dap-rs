@@ -20,7 +20,7 @@ dap_type_enum!(
 request!(
     /// Evaluates the given expression in the context of the top most stack frame.
     /// The expression has access to any variables and arguments that are in scope.
-    EvaluateRequest {
+    EvaluateRequest | "evaluate" {
         /// Evaluate the expression in the scope of this stack frame. If not specified, the expression is evaluated in the global scope.
         frame_id | "frameId": Option<u64>,
         /// Specifies details on how to format the Evaluate result.
@@ -35,7 +35,7 @@ request!(
 
 response!(
     /// Response to 'evaluate' request.
-    EvaluateResponse {
+    EvaluateResponse | "evaluate" {
         /// The number of indexed child variables.
         /// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
         /// The value should be less than or equal to 2147483647 (2^31-1).

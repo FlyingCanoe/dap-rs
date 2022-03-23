@@ -3,7 +3,7 @@
 request!(
     /// Returns a list of possible completions for a given caret position and text.
     /// Clients should only call this request if the capability 'supportsCompletionsRequest' is true.
-    CompletionsRequest {
+    CompletionsRequest | "completions" {
         /// An optional line for which to determine the completion proposals. If missing the first line of the text is assumed.
         line | "line": Option<u64>,
         /// Returns completions in the scope of this stack frame. If not specified, the completions are returned for the global scope.
@@ -17,7 +17,7 @@ request!(
 
 response!(
     /// Response to 'completions' request.
-    CompletionsResponse {
+    CompletionsResponse | "completions" {
         /// The possible completions for .
         targets | "targets": Vec<CompletionItem>,
     }

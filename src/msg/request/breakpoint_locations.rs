@@ -1,6 +1,8 @@
 use crate::msg::dap_type::breakpoint_location::BreakpointLocation;
 use crate::msg::dap_type::Source;
-use crate::utils::Parse;
+use crate::utils::{Parse, ToValue};
+
+use serde_json as json;
 
 #[derive(Clone, Debug)]
 pub struct BreakpointLocationsRequest {
@@ -56,10 +58,32 @@ impl BreakpointLocationsRequest {
     }
 }
 
+impl ToValue for BreakpointLocationsRequest {
+    fn to_value(self) -> serde_json::Value {
+        let mut msg = serde_json::Map::new();
+        let mut arguments = serde_json::Map::new();
+
+        msg.insert(
+            "type".to_string(),
+            json::Value::String("response".to_string()),
+        );
+        msg.insert("command".to_string(), "breakpointLocations".to_value());
+
+        arguments.insert("source".to_string(), self.source.to_value());
+        arguments.insert("line".to_string(), self.line.to_value());
+        arguments.insert("column".to_string(), self.column.to_value());
+        arguments.insert("endLine".to_string(), self.end_line.to_value());
+        arguments.insert("endColumn".to_string(), self.end_column.to_value());
+
+        msg.insert("arguments".to_string(), json::Value::Object(arguments));
+        json::Value::Object(msg)
+    }
+}
+
 response!(
     /// Response to 'breakpointLocations' request.
     /// Contains possible locations for source breakpoints.
-    BreakpointLocationsResponse {
+    BreakpointLocationsResponse | "breakpointLocations" {
         /// Sorted set of possible breakpoint locations.
         breakpoints | "breakpoints": Vec<BreakpointLocation>,
     }

@@ -5,7 +5,7 @@ request!(
     /// If the debug adapter supports single thread execution (see capability 'supportsSingleThreadExecutionRequests') setting the 'singleThread' argument to true prevents other suspended threads from resuming.
     /// The debug adapter first sends the response and then a 'stopped' event (with reason 'step') after the step has completed.
     /// Clients should only call this request if the capability 'supportsStepBack' is true.
-    StepBackRequest {
+    StepBackRequest | "stepBack" {
         /// Specifies the thread for which to resume execution for one step backwards (of the given granularity).
         thread_id | "threadId": u64,
         /// Optional granularity to step. If no granularity is specified, a granularity of 'statement' is assumed.
@@ -17,5 +17,5 @@ request!(
 
 response!(
     /// Response to 'stepBack' request. This is just an acknowledgement, so no body field is required.
-    StepBackResponse {}
+    StepBackResponse | "stepBack" {}
 );

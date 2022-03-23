@@ -1,3 +1,5 @@
-pub mod connection;
+#[allow(non_snake_case)]
+pub mod adapter;
+mod connection;
 pub mod msg;
-pub(crate) mod utils;
+mod utils;

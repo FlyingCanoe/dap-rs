@@ -4,7 +4,7 @@
     /// If the debuggee has been started with the 'launch' request, the 'disconnect' request terminates the debuggee.
     /// If the 'attach' request was used to connect to the debuggee, 'disconnect' does not terminate the debuggee.
     /// This behavior can be controlled with the 'terminateDebuggee' argument (if supported by the debug adapter).
-    DisconnectRequest {
+    DisconnectRequest | "disconnect" {
         /// Indicates whether the debuggee should be terminated when the debugger is disconnected.
         /// If unspecified, the debug adapter is free to do whatever it thinks is best.
         /// The attribute is only honored by a debug adapter if the capability 'supportTerminateDebuggee' is true.
@@ -20,5 +20,5 @@
 
 response!(
     /// Response to 'disconnect' request. This is just an acknowledgement, so no body field is required.
-    DisconnectResponse {}
+    DisconnectResponse | "disconnect" {}
 );

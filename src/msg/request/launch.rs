@@ -3,7 +3,7 @@
 request!(
     /// This launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if 'noDebug' is true).
     /// Since launching is debugger/runtime specific, the arguments for this request are not part of this specification.
-    LaunchRequest {
+    LaunchRequest | "launch" {
         /// If noDebug is true the launch request should launch the program without enabling debugging.
         no_debug | "noDebug": Option<bool>,
         /// Optional data from the previous, restarted session.
@@ -15,5 +15,5 @@ request!(
 
 response!(
     /// Response to 'launch' request. This is just an acknowledgement, so no body field is required.
-    LaunchResponse {}
+    LaunchResponse | "launch" {}
 );

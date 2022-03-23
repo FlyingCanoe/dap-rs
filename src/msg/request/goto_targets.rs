@@ -5,7 +5,7 @@ request!(
     /// This request retrieves the possible goto targets for the specified source location.
     /// These targets can be used in the 'goto' request.
     /// Clients should only call this request if the capability 'supportsGotoTargetsRequest' is true.
-    GotoTargetsRequest {
+    GotoTargetsRequest | "gotoTargets" {
         /// An optional column location for which the goto targets are determined.
         column | "column": Option<u64>,
         /// The source location for which the goto targets are determined.
@@ -17,7 +17,7 @@ request!(
 
 response!(
     /// Response to 'gotoTargets' request.
-    GotoTargetsResponse {
+    GotoTargetsResponse | "gotoTargets" {
         /// The possible goto targets of the specified location.
         targets | "targets": Vec<GotoTarget>,
     }

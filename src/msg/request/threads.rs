@@ -2,12 +2,12 @@
 
 request!(
     /// The request retrieves a list of all threads.
-    ThreadsRequest {}
+    ThreadsRequest | "threads" {}
 );
 
 response!(
     /// Response to 'threads' request.
-    ThreadsResponse {
+    ThreadsResponse | "threads" {
         /// All threads.
         threads | "threads": Vec<Thread>,
     }

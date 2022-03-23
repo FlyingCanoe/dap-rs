@@ -18,7 +18,7 @@
 event!(
     /// The event indicates that the execution of the debuggee has stopped due to some condition.
     /// This can be caused by a break point previously set, a stepping request has completed, by executing a debugger statement etc.
-    StoppedEvent {
+    StoppedEvent | "stopped" {
         /// Ids of the breakpoints that triggered the event. In most cases there will be only a single breakpoint but here are some examples for multiple breakpoints:
         /// - Different types of breakpoints map to the same location.
         /// - Multiple source breakpoints get collapsed to the same instruction by the compiler/runtime.

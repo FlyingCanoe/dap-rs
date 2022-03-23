@@ -1,7 +1,7 @@
 ﻿request!(
     /// Reads bytes from memory at the provided location.
     /// Clients should only call this request if the capability 'supportsReadMemoryRequest' is true.
-    ReadMemoryRequest {
+    ReadMemoryRequest | "readMemory" {
         /// Optional offset (in bytes) to be applied to the reference location before reading data. Can be negative.
         offset | "offset": Option<u64>,
         /// Memory reference to the base location from which data should be read.
@@ -13,7 +13,7 @@
 
 response!(
     /// Response to 'readMemory' request.
-    ReadMemoryResponse {
+    ReadMemoryResponse | "readMemory" {
         /// The bytes read from memory, encoded using base64.
         data | "data": Option<String>,
         /// The address of the first byte of data returned.

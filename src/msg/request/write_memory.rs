@@ -1,7 +1,7 @@
 ﻿request!(
     /// Writes bytes to memory at the provided location.
     /// Clients should only call this request if the capability 'supportsWriteMemoryRequest' is true.
-    WriteMemoryRequest {
+    WriteMemoryRequest | "writeMemory" {
         /// Optional offset (in bytes) to be applied to the reference location before writing data. Can be negative.
         offset | "offset": Option<u64>,
         /// Memory reference to the base location to which data should be written.
@@ -16,7 +16,7 @@
 
 response!(
     /// Response to 'writeMemory' request.
-    WriteMemoryResponse {
+    WriteMemoryResponse | "writeMemory" {
         /// Optional property that should be returned when 'allowPartial' is true to indicate the offset of the first byte of data successfully written. Can be negative.
         offset | "offset": Option<u64>,
         /// Optional property that should be returned when 'allowPartial' is true to indicate the number of bytes starting from address that were successfully written.

@@ -1,9 +1,10 @@
-﻿use crate::msg::dap_type::exception_breakpoints_filter::ExceptionBreakpointsFilter;
-use crate::msg::dap_type::checksum_algorithm::ChecksumAlgorithm;
+﻿use crate::msg::dap_type::checksum_algorithm::ChecksumAlgorithm;
 use crate::msg::dap_type::column_descriptor::ColumnDescriptor;
+use crate::msg::dap_type::exception_breakpoints_filter::ExceptionBreakpointsFilter;
 
 dap_type_struct!(
     /// Information about the capabilities of a debug adapter.
+    #[derive(Default)]
     Capabilities {
         /// The debug adapter supports restarting a frame.
         supports_restart_frame | "supportsRestartFrame": Option<bool>,

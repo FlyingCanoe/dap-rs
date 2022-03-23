@@ -11,7 +11,7 @@ dap_type_enum!(
 
 event!(
     /// The event indicates that some source has been added, changed, or removed from the set of all loaded sources.
-    LoadedSourceEvent {
+    LoadedSourceEvent | "loadedSource" {
         /// The reason for the event.
         reason | "reason": Reason,
         /// The new, changed, or removed source.

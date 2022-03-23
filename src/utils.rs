@@ -112,3 +112,83 @@ where
         Ok(output)
     }
 }
+
+pub(crate) trait ToValue {
+    fn to_value(self) -> json::Value
+    where
+        Self: Sized;
+}
+
+impl ToValue for json::Value {
+    fn to_value(self) -> json::Value {
+        self
+    }
+}
+
+impl ToValue for u64 {
+    fn to_value(self) -> json::Value {
+        self.into()
+    }
+}
+
+impl ToValue for f64 {
+    fn to_value(self) -> json::Value {
+        self.into()
+    }
+}
+
+impl ToValue for bool {
+    fn to_value(self) -> json::Value {
+        json::Value::Bool(self)
+    }
+}
+
+impl ToValue for &str {
+    fn to_value(self) -> json::Value {
+        json::Value::String(self.to_string())
+    }
+}
+
+impl ToValue for String {
+    fn to_value(self) -> json::Value {
+        json::Value::String(self)
+    }
+}
+
+impl<T: ToValue> ToValue for Option<T> {
+    fn to_value(self) -> json::Value {
+        if let Some(value) = self {
+            value.to_value()
+        } else {
+            json::Value::Null
+        }
+    }
+}
+
+impl<T: ToValue> ToValue for Vec<T> {
+    fn to_value(self) -> json::Value {
+        json::Value::Array(self.into_iter().map(T::to_value).collect())
+    }
+}
+
+impl<V: ToValue> ToValue for HashMap<String, V> {
+    fn to_value(self) -> json::Value {
+        use json::Value;
+
+        let map: json::Map<String, Value> = self
+            .into_iter()
+            .map(|(key, value)| (key, value.to_value()))
+            .collect();
+
+        Value::Object(map)
+    }
+}
+
+impl<L: ToValue, R: ToValue> ToValue for either::Either<L, R> {
+    fn to_value(self) -> json::Value {
+        match self {
+            either::Either::Left(left) => left.to_value(),
+            either::Either::Right(right) => right.to_value(),
+        }
+    }
+}
