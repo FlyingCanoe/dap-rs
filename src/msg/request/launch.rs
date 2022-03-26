@@ -1,17 +1,77 @@
-﻿use serde_json as json;
+﻿use std::collections::HashMap;
 
-request!(
-    /// This launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if 'noDebug' is true).
+use anyhow::Error;
+use serde_json as json;
+
+use crate::utils::Parse;
+
+#[derive(Debug, Clone)]
+/// This launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if 'noDebug' is true).
+/// Since launching is debugger/runtime specific, the arguments for this request are not part of this specification.
+pub struct LaunchRequest {
+    /// If noDebug is true the launch request should launch the program without enabling debugging.
+    pub no_debug: Option<bool>,
+
+    /// Optional data from the previous, restarted session.
+    /// The data is sent as the 'restart' attribute of the 'terminated' event.
+    /// The client should leave the data intact.
+    pub restart: Option<json::Value>,
+
     /// Since launching is debugger/runtime specific, the arguments for this request are not part of this specification.
-    LaunchRequest | "launch" {
-        /// If noDebug is true the launch request should launch the program without enabling debugging.
-        no_debug | "noDebug": Option<bool>,
-        /// Optional data from the previous, restarted session.
-        /// The data is sent as the 'restart' attribute of the 'terminated' event.
-        /// The client should leave the data intact.
-        restart | "__restart": Option<json::Value>,
+    pub additional_data: HashMap<String, json::Value>,
+}
+
+impl LaunchRequest {
+    pub(crate) fn parse(msg: json::Value) -> anyhow::Result<LaunchRequest> {
+        let args = msg
+            .get("arguments")
+            .ok_or(anyhow::Error::msg("invalid request"))?;
+
+        let no_debug = Option::<bool>::parse(args.get("noDebug"))?;
+        let restart = Option::<json::Value>::parse(args.get("__restart"))?;
+
+        let additional_data: HashMap<_, _> = args
+            .as_object()
+            .cloned()
+            .ok_or(Error::msg("parsing error"))?
+            .into_iter()
+            .filter(|(key, _)| key != "noDebug" && key != "__restart")
+            .collect();
+
+        let request = LaunchRequest {
+            no_debug,
+            restart,
+            additional_data,
+        };
+        Ok(request)
     }
-);
+}
+
+impl crate::utils::ToValue for LaunchRequest {
+    fn to_value(self) -> Option<json::Value> {
+        let mut msg = json::Map::new();
+        let mut arguments = json::Map::new();
+
+        msg.insert("type".to_string(), "response".into());
+        msg.insert("success".to_string(), true.into());
+        msg.insert("command".to_string(), "launch".into());
+
+        self.no_debug
+            .to_value()
+            .map(|value| arguments.insert("noDebug".to_string(), value));
+
+        self.restart
+            .to_value()
+            .map(|value| arguments.insert("__restart".to_string(), value));
+
+        for (key, value) in self.additional_data {
+            arguments.insert(key, value);
+        }
+
+        msg.insert("arguments".to_string(), arguments.into());
+        Some(msg.into())
+    }
+}
 
 response!(
     /// Response to 'launch' request. This is just an acknowledgement, so no body field is required.
