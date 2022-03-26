@@ -40,24 +40,28 @@ macro_rules! request {
         }
 
         impl crate::utils::ToValue for $request_name {
-            fn to_value(self) -> serde_json::Value {
+            fn to_value(self) -> Option<serde_json::Value> {
                 let mut msg = serde_json::Map::new();
                 #[allow(unused_mut)]
                 let mut arguments = serde_json::Map::new();
 
-                msg.insert(
-                    "type".to_string(),
-                    serde_json::Value::String("response".to_string()),
-                );
-
-                msg.insert("command".to_string(), $command.to_value());
+                msg.insert("type".to_string(), "response".into());
+                msg.insert("success".to_string(), true.into());
+                msg.insert("command".to_string(), $command.into());
 
                 $(
-                    arguments.insert($field_wire_name.to_string(), <$field_ty as crate::utils::ToValue>::to_value(self.$($field).+));
+                    <$field_ty as crate::utils::ToValue>::to_value(self.$($field).+)
+                    .map(|value| {
+                            arguments.insert(
+                                $field_wire_name.to_string(),
+                                value
+                            )
+                        }
+                    );
                 )*
 
-                msg.insert("arguments".to_string(), serde_json::Value::Object(arguments));
-                serde_json::Value::Object(msg)
+                msg.insert("arguments".to_string(), arguments.into());
+                Some(msg.into())
             }
         }
     };
@@ -83,22 +87,28 @@ macro_rules! response {
         }
 
         impl crate::utils::ToValue for $response_name {
-            fn to_value(self) -> serde_json::Value {
-                let mut msg = serde_json::Map::new();
+            fn to_value(self) -> Option<serde_json::Value> {
                 #[allow(unused_mut)]
                 let mut body = serde_json::Map::new();
+                let mut msg = serde_json::Map::new();
 
-                msg.insert(
-                    "type".to_string(),
-                    serde_json::Value::String("response".to_string()),
-                );
+                msg.insert("type".to_string(), "response".into());
+                msg.insert("success".to_string(), true.into());
+                msg.insert("command".to_string(), $command.into());
 
                 $(
-                    body.insert($field_wire_name.to_string(), <$field_ty as crate::utils::ToValue>::to_value(self.$($field).+));
+                    <$field_ty as crate::utils::ToValue>::to_value(self.$($field).+)
+                    .map(|value| {
+                            body.insert(
+                                $field_wire_name.to_string(),
+                                value
+                            )
+                        }
+                    );
                 )*
 
-                msg.insert("body".to_string(), serde_json::Value::Object(body));
-                serde_json::Value::Object(msg)
+                msg.insert("body".to_string(), body.into());
+                Some(msg.into())
             }
         }
     };
@@ -306,7 +316,7 @@ impl Request {
 }
 
 impl ToValue for Request {
-    fn to_value(self) -> json::Value {
+    fn to_value(self) -> Option<json::Value> {
         match self {
             Request::Initialize(request) => request.to_value(),
             Request::ConfigurationDone(request) => request.to_value(),
@@ -407,7 +417,7 @@ pub enum ResponseType {
 }
 
 impl ToValue for Response {
-    fn to_value(self) -> json::Value {
+    fn to_value(self) -> Option<json::Value> {
         let mut value = match self.response_type {
             ResponseType::Initialize(response) => response.to_value(),
             ResponseType::ConfigurationDone(response) => response.to_value(),
@@ -451,11 +461,11 @@ impl ToValue for Response {
             ResponseType::ReadMemory(response) => response.to_value(),
             ResponseType::WriteMemory(response) => response.to_value(),
             ResponseType::Disassemble(response) => response.to_value(),
-        };
+        }?;
 
         let map = value.as_object_mut().unwrap();
         map.insert("request_seq".to_string(), self.request_seq.into());
 
-        value
+        Some(value)
     }
 }

@@ -40,12 +40,19 @@ macro_rules! dap_type_struct {
         }
 
         impl crate::utils::ToValue for $type_name {
-            fn to_value(self) -> serde_json::Value {
+            fn to_value(self) -> Option<serde_json::Value> {
                 let mut map = serde_json::Map::new();
                 $(
-                    map.insert($field_wire_name.to_string(), self.$($field).+.to_value());
+                    <$field_ty as crate::utils::ToValue>::to_value(self.$($field).+)
+                    .map(|value| {
+                            map.insert(
+                                $field_wire_name.to_string(),
+                                value
+                            )
+                        }
+                    );
                 )*
-                serde_json::Value::Object(map)
+                Some(map.into())
             }
         }
     };
@@ -87,13 +94,12 @@ macro_rules! dap_type_enum {
         }
 
         impl crate::utils::ToValue for $type_name {
-            fn to_value(self) -> serde_json::Value {
-                match self {
-                    $(
-                        Self::$field => serde_json::Value::String($field_wire_name.to_string()),
-                    )*
+            fn to_value(self) -> Option<serde_json::Value> {
+                let value = match self {
+                    $(Self::$field => serde_json::Value::String($field_wire_name.to_string()),)*
                     Self::Other(value) =>serde_json::Value::String(value),
-                }
+                };
+                Some(value)
             }
         }
     };
@@ -130,12 +136,11 @@ macro_rules! dap_type_enum {
         }
 
         impl crate::utils::ToValue for $type_name {
-            fn to_value(self) -> serde_json::Value {
-                match self {
-                    $(
-                        Self::$field => serde_json::Value::String($field_wire_name.to_string()),
-                    )*
-                }
+            fn to_value(self) -> Option<serde_json::Value> {
+                let value = match self {
+                    $(Self::$field => serde_json::Value::String($field_wire_name.to_string())),*
+                };
+                Some(value)
             }
         }
     };
@@ -179,16 +184,16 @@ pub(crate) fn parse_msg(raw_msg: &str) -> anyhow::Result<Msg> {
 }
 
 impl ToValue for Msg {
-    fn to_value(self) -> json::Value {
+    fn to_value(self) -> Option<json::Value> {
         let mut value = match self.msg_type {
             MsgType::Request(request) => request.to_value(),
             MsgType::Response(response) => response.to_value(),
             MsgType::Event(event) => event.to_value(),
-        };
+        }?;
 
         let map = value.as_object_mut().unwrap();
         map.insert("seq".to_string(), self.seq.into());
 
-        value
+        Some(value)
     }
 }

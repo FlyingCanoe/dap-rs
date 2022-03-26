@@ -55,17 +55,16 @@ pub struct InitializeResponse {
 }
 
 impl ToValue for InitializeResponse {
-    fn to_value(self) -> serde_json::Value {
+    fn to_value(self) -> Option<serde_json::Value> {
         let mut msg = serde_json::Map::new();
 
-        msg.insert(
-            "type".to_string(),
-            serde_json::Value::String("response".to_string()),
-        );
+        msg.insert("type".to_string(), "response".into());
+        msg.insert("success".to_string(), true.into());
+        msg.insert("command".to_string(), "initialize".into());
 
-        if let Some(cap) = self.capabilities {
-            msg.insert("body".to_string(), cap.to_value());
+        if let Some(cap) = self.capabilities.to_value() {
+            msg.insert("body".to_string(), cap);
         }
-        serde_json::Value::Object(msg)
+        Some(msg.into())
     }
 }

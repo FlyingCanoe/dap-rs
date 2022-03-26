@@ -59,24 +59,32 @@ impl BreakpointLocationsRequest {
 }
 
 impl ToValue for BreakpointLocationsRequest {
-    fn to_value(self) -> serde_json::Value {
-        let mut msg = serde_json::Map::new();
-        let mut arguments = serde_json::Map::new();
+    fn to_value(self) -> Option<json::Value> {
+        let mut msg = json::Map::new();
+        let mut arguments = json::Map::new();
 
-        msg.insert(
-            "type".to_string(),
-            json::Value::String("response".to_string()),
-        );
-        msg.insert("command".to_string(), "breakpointLocations".to_value());
+        msg.insert("type".to_string(), "response".into());
+        msg.insert("command".to_string(), "breakpointLocations".into());
+        msg.insert("success".to_string(), true.into());
 
-        arguments.insert("source".to_string(), self.source.to_value());
-        arguments.insert("line".to_string(), self.line.to_value());
-        arguments.insert("column".to_string(), self.column.to_value());
-        arguments.insert("endLine".to_string(), self.end_line.to_value());
-        arguments.insert("endColumn".to_string(), self.end_column.to_value());
+        if let Some(value) = self.source.to_value() {
+            arguments.insert("source".to_string(), value);
+        }
+        if let Some(value) = self.line.to_value() {
+            arguments.insert("line".to_string(), value);
+        }
+        if let Some(value) = self.column.to_value() {
+            arguments.insert("column".to_string(), value);
+        }
+        if let Some(value) = self.end_line.to_value() {
+            arguments.insert("endLine".to_string(), value);
+        }
+        if let Some(value) = self.end_column.to_value() {
+            arguments.insert("endColumn".to_string(), value);
+        }
 
-        msg.insert("arguments".to_string(), json::Value::Object(arguments));
-        json::Value::Object(msg)
+        msg.insert("arguments".to_string(), arguments.into());
+        Some(msg.into())
     }
 }
 

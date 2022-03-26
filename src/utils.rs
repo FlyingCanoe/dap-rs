@@ -114,78 +114,90 @@ where
 }
 
 pub(crate) trait ToValue {
-    fn to_value(self) -> json::Value
+    fn to_value(self) -> Option<json::Value>
     where
         Self: Sized;
 }
 
 impl ToValue for json::Value {
-    fn to_value(self) -> json::Value {
-        self
+    fn to_value(self) -> Option<json::Value> {
+        Some(self)
     }
 }
 
 impl ToValue for u64 {
-    fn to_value(self) -> json::Value {
-        self.into()
+    fn to_value(self) -> Option<json::Value> {
+        Some(self.into())
     }
 }
 
 impl ToValue for f64 {
-    fn to_value(self) -> json::Value {
-        self.into()
+    fn to_value(self) -> Option<json::Value> {
+        Some(self.into())
     }
 }
 
 impl ToValue for bool {
-    fn to_value(self) -> json::Value {
-        json::Value::Bool(self)
+    fn to_value(self) -> Option<json::Value> {
+        Some(self.into())
     }
 }
 
 impl ToValue for &str {
-    fn to_value(self) -> json::Value {
-        json::Value::String(self.to_string())
+    fn to_value(self) -> Option<json::Value> {
+        Some(self.into())
     }
 }
 
 impl ToValue for String {
-    fn to_value(self) -> json::Value {
-        json::Value::String(self)
+    fn to_value(self) -> Option<json::Value> {
+        Some(self.into())
     }
 }
 
 impl<T: ToValue> ToValue for Option<T> {
-    fn to_value(self) -> json::Value {
+    fn to_value(self) -> Option<json::Value> {
         if let Some(value) = self {
             value.to_value()
         } else {
-            json::Value::Null
+            None
         }
     }
 }
 
 impl<T: ToValue> ToValue for Vec<T> {
-    fn to_value(self) -> json::Value {
-        json::Value::Array(self.into_iter().map(T::to_value).collect())
+    fn to_value(self) -> Option<json::Value> {
+        Some(
+            self.into_iter()
+                .map(T::to_value)
+                .filter(Option::is_some)
+                .map(Option::unwrap)
+                .collect(),
+        )
     }
 }
 
 impl<V: ToValue> ToValue for HashMap<String, V> {
-    fn to_value(self) -> json::Value {
+    fn to_value(self) -> Option<json::Value> {
         use json::Value;
 
         let map: json::Map<String, Value> = self
             .into_iter()
-            .map(|(key, value)| (key, value.to_value()))
+            .filter_map(|(key, value)| {
+                if let Some(value) = value.to_value() {
+                    Some((key, value))
+                } else {
+                    None
+                }
+            })
             .collect();
 
-        Value::Object(map)
+        Some(map.into())
     }
 }
 
 impl<L: ToValue, R: ToValue> ToValue for either::Either<L, R> {
-    fn to_value(self) -> json::Value {
+    fn to_value(self) -> Option<json::Value> {
         match self {
             either::Either::Left(left) => left.to_value(),
             either::Either::Right(right) => right.to_value(),

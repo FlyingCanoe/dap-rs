@@ -18,19 +18,26 @@ macro_rules! event {
         }
 
         impl crate::utils::ToValue for $event_name {
-            fn to_value(self) -> serde_json::Value {
+            fn to_value(self) -> Option<serde_json::Value> {
                 let mut msg = serde_json::Map::new();
                 #[allow(unused_mut)]
                 let mut body = serde_json::Map::new();
 
-                msg.insert("event".to_string(), $event.to_value());
+                msg.insert("event".to_string(), $event.into());
 
                 $(
-                    body.insert($field_wire_name.to_string(), self.$($field).+.to_value());
+                    <$field_ty as crate::utils::ToValue>::to_value(self.$($field).+)
+                    .map(|value| {
+                            body.insert(
+                                $field_wire_name.to_string(),
+                                value
+                            )
+                        }
+                    );
                 )*
 
                 msg.insert("body".to_string(), serde_json::Value::Object(body));
-                serde_json::Value::Object(msg)
+                Some(msg.into())
             }
         }
     };
@@ -96,7 +103,7 @@ pub enum Event {
 }
 
 impl ToValue for Event {
-    fn to_value(self) -> serde_json::Value {
+    fn to_value(self) -> Option<serde_json::Value> {
         match self {
             Event::Breakpoint(event) => event.to_value(),
             Event::Continue(event) => event.to_value(),
