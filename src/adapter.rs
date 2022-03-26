@@ -1,10 +1,11 @@
+use std::collections::VecDeque;
 use std::net::{TcpListener, TcpStream};
 
 use crate::connection::SocketConnection;
 use crate::msg::dap_type::Capabilities;
-use crate::msg::request::InitializeResponse;
-use crate::msg::request::Response;
-use crate::msg::{request, Msg, MsgType};
+use crate::msg::request::{ErrorResponse, InitializeResponse, Request};
+use crate::msg::request::{Response, ResponseType};
+use crate::msg::{Msg, MsgType};
 
 #[derive(Debug)]
 pub struct Adapter {
@@ -47,26 +48,49 @@ impl Session {
         output
     }
 
-    fn start(mut self, _adapter: &mut Adapter) -> anyhow::Result<()> {
-        let msg = self.connection.read_msg()?;
-
-        let cap = Capabilities::default();
-
-        let response = Msg {
+    fn handle_unknown_request(&mut self, outgoing_msg_queue: &mut VecDeque<Msg>, request: &Msg) {
+        outgoing_msg_queue.push_back(Msg {
             seq: self.next_seq(),
             msg_type: MsgType::Response(Response {
-                request_seq: msg.seq,
-                response_type: request::ResponseType::Initialize(InitializeResponse {
-                    capabilities: Some(cap),
+                request_seq: request.seq,
+                response_type: ResponseType::Error(
+                    ErrorResponse::new(Some("unsupported operation".to_string()), None)
+                        .with_command(request.msg_type.as_request().unwrap().command().to_string()),
+                ),
+            }),
+        })
+    }
+
+    fn handle_init_request(&mut self, outgoing_msg_queue: &mut VecDeque<Msg>, request: &Msg) {
+        outgoing_msg_queue.push_back(Msg {
+            seq: self.next_seq(),
+            msg_type: MsgType::Response(Response {
+                request_seq: request.seq,
+                response_type: ResponseType::Initialize(InitializeResponse {
+                    capabilities: Some(Capabilities::default()),
                 }),
             }),
-        };
+        })
+    }
 
-        self.connection.send_msg(response)?;
+    fn start(mut self, _adapter: &mut Adapter) -> anyhow::Result<()> {
+        let mut outgoing_msg_queue = VecDeque::new();
 
         loop {
-            let msg = self.connection.read_msg()?;
-            println!("{msg:?}")
+            let incoming_msg = self.connection.read_msg()?;
+            match &incoming_msg.msg_type {
+                MsgType::Request(request) => match request {
+                    Request::Initialize(_) => {
+                        self.handle_init_request(&mut outgoing_msg_queue, &incoming_msg)
+                    }
+                    _ => self.handle_unknown_request(&mut outgoing_msg_queue, &incoming_msg),
+                },
+                _ => {}
+            }
+
+            for msg in outgoing_msg_queue.drain(..) {
+                self.connection.send_msg(msg)?;
+            }
         }
     }
 }

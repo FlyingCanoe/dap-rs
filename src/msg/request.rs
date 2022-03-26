@@ -37,6 +37,10 @@ macro_rules! request {
                 };
                 Ok(request)
             }
+
+            pub (crate) const fn command(&self) -> &'static str {
+                $command
+            }
         }
 
         impl crate::utils::ToValue for $request_name {
@@ -122,6 +126,7 @@ mod continue_request;
 mod data_breakpoint_info;
 mod disassemble;
 mod disconnect;
+mod error;
 mod evaluate;
 mod exception_info;
 mod goto;
@@ -164,6 +169,7 @@ pub use continue_request::{ContinueRequest, ContinueResponse};
 pub use data_breakpoint_info::{DataBreakpointInfoRequest, DataBreakpointInfoResponse};
 pub use disassemble::{DisassembleRequest, DisassembleResponse};
 pub use disconnect::{DisconnectRequest, DisconnectResponse};
+pub use error::ErrorResponse;
 pub use evaluate::{EvaluateRequest, EvaluateResponse};
 pub use exception_info::{ExceptionInfoRequest, ExceptionInfoResponse};
 pub use goto::{GotoRequest, GotoResponse};
@@ -313,6 +319,53 @@ impl Request {
         };
         Ok(request)
     }
+
+    pub(crate) fn command(&self) -> &'static str {
+        match self {
+            Request::Initialize(request) => request.command(),
+            Request::ConfigurationDone(request) => request.command(),
+            Request::Completions(request) => request.command(),
+            Request::Launch(request) => request.command(),
+            Request::Attach(request) => request.command(),
+            Request::Restart(request) => request.command(),
+            Request::Disconnect(request) => request.command(),
+            Request::Terminate(request) => request.command(),
+            Request::BreakpointLocations(request) => request.command(),
+            Request::SetBreakpoints(request) => request.command(),
+            Request::SetFunctionBreakpoints(request) => request.command(),
+            Request::SetExceptionBreakpoints(request) => request.command(),
+            Request::DataBreakpointInfo(request) => request.command(),
+            Request::SetDataBreakpoints(request) => request.command(),
+            Request::SetInstructionBreakpoints(request) => request.command(),
+            Request::ContinueRequest(request) => request.command(),
+            Request::Next(request) => request.command(),
+            Request::StepIn(request) => request.command(),
+            Request::StepOut(request) => request.command(),
+            Request::StepBack(request) => request.command(),
+            Request::ReverseContinue(request) => request.command(),
+            Request::RestartFrame(request) => request.command(),
+            Request::Goto(request) => request.command(),
+            Request::Pause(request) => request.command(),
+            Request::StackTrace(request) => request.command(),
+            Request::Scopes(request) => request.command(),
+            Request::Variables(request) => request.command(),
+            Request::SetVariable(request) => request.command(),
+            Request::Source(request) => request.command(),
+            Request::Continue(request) => request.command(),
+            Request::Threads(request) => request.command(),
+            Request::TerminateThreads(request) => request.command(),
+            Request::Modules(request) => request.command(),
+            Request::LoadedSources(request) => request.command(),
+            Request::Evaluate(request) => request.command(),
+            Request::SetExpression(request) => request.command(),
+            Request::StepInTargets(request) => request.command(),
+            Request::GotoTargets(request) => request.command(),
+            Request::ExceptionInfo(request) => request.command(),
+            Request::ReadMemory(request) => request.command(),
+            Request::WriteMemory(request) => request.command(),
+            Request::Disassemble(request) => request.command(),
+        }
+    }
 }
 
 impl ToValue for Request {
@@ -372,6 +425,7 @@ pub struct Response {
 
 #[derive(Clone, Debug)]
 pub enum ResponseType {
+    Error(ErrorResponse),
     Initialize(InitializeResponse),
     ConfigurationDone(ConfigurationDoneResponse),
     Completions(CompletionsResponse),
@@ -461,6 +515,7 @@ impl ToValue for Response {
             ResponseType::ReadMemory(response) => response.to_value(),
             ResponseType::WriteMemory(response) => response.to_value(),
             ResponseType::Disassemble(response) => response.to_value(),
+            ResponseType::Error(error) => error.to_value(),
         }?;
 
         let map = value.as_object_mut().unwrap();

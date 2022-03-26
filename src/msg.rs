@@ -166,6 +166,16 @@ pub enum MsgType {
     Event(Event),
 }
 
+impl MsgType {
+    pub fn as_request(&self) -> Option<&Request> {
+        if let Self::Request(request) = self {
+            Some(request)
+        } else {
+            None
+        }
+    }
+}
+
 pub(crate) fn parse_msg(raw_msg: &str) -> anyhow::Result<Msg> {
     let msg: json::Value = json::from_str(raw_msg)?;
 

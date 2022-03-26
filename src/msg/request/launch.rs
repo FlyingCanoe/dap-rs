@@ -45,6 +45,10 @@ impl LaunchRequest {
         };
         Ok(request)
     }
+
+    pub(crate) const fn command(&self) -> &'static str {
+        "launch"
+    }
 }
 
 impl crate::utils::ToValue for LaunchRequest {
@@ -54,7 +58,7 @@ impl crate::utils::ToValue for LaunchRequest {
 
         msg.insert("type".to_string(), "response".into());
         msg.insert("success".to_string(), true.into());
-        msg.insert("command".to_string(), "launch".into());
+        msg.insert("command".to_string(), self.command().into());
 
         self.no_debug
             .to_value()

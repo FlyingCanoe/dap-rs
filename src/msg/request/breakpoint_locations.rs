@@ -56,6 +56,10 @@ impl BreakpointLocationsRequest {
             Ok(request)
         }
     }
+
+    pub(crate) const fn command(&self) -> &'static str {
+        "breakpointLocations"
+    }
 }
 
 impl ToValue for BreakpointLocationsRequest {
@@ -64,7 +68,7 @@ impl ToValue for BreakpointLocationsRequest {
         let mut arguments = json::Map::new();
 
         msg.insert("type".to_string(), "response".into());
-        msg.insert("command".to_string(), "breakpointLocations".into());
+        msg.insert("command".to_string(), self.command().into());
         msg.insert("success".to_string(), true.into());
 
         if let Some(value) = self.source.to_value() {

@@ -38,6 +38,10 @@ impl AttachRequest {
         };
         Ok(request)
     }
+
+    pub(crate) const fn command(&self) -> &'static str {
+        "attach"
+    }
 }
 
 impl crate::utils::ToValue for AttachRequest {
@@ -47,7 +51,7 @@ impl crate::utils::ToValue for AttachRequest {
 
         msg.insert("type".to_string(), "response".into());
         msg.insert("success".to_string(), true.into());
-        msg.insert("command".to_string(), "attach".into());
+        msg.insert("command".to_string(), self.command().into());
 
         self.restart
             .to_value()
