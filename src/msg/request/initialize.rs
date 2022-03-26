@@ -51,7 +51,7 @@ request!(
 /// Response to 'initialize' request.
 #[derive(Debug, Clone)]
 pub struct InitializeResponse {
-    pub(crate) capabilities: Option<Capabilities>,
+    pub capabilities: Option<Capabilities>,
 }
 
 impl ToValue for InitializeResponse {
