@@ -118,6 +118,7 @@ macro_rules! response {
     };
 }
 
+mod acknowledgement;
 mod attach;
 mod breakpoint_locations;
 mod completions;
@@ -161,6 +162,7 @@ mod threads;
 mod variables;
 mod write_memory;
 
+pub(crate) use self::acknowledgement::AcknowledgementResponse;
 pub use attach::{AttachRequest, AttachResponse};
 pub use breakpoint_locations::{BreakpointLocationsRequest, BreakpointLocationsResponse};
 pub use completions::{CompletionsRequest, CompletionsResponse};
@@ -175,7 +177,7 @@ pub use exception_info::{ExceptionInfoRequest, ExceptionInfoResponse};
 pub use goto::{GotoRequest, GotoResponse};
 pub use goto_targets::{GotoTargetsRequest, GotoTargetsResponse};
 pub use initialize::{InitializeRequest, InitializeResponse};
-pub use launch::{LaunchRequest, LaunchResponse};
+pub use launch::LaunchRequest;
 pub use loaded_sources::{LoadedSourcesRequest, LoadedSourcesResponse};
 pub use modules::{ModulesRequest, ModulesResponse};
 pub use next::{NextRequest, NextResponse};
@@ -424,12 +426,13 @@ pub struct Response {
 }
 
 #[derive(Clone, Debug)]
-pub enum ResponseType {
+#[allow(dead_code)]
+pub(crate) enum ResponseType {
+    Acknowledgement(AcknowledgementResponse),
     Error(ErrorResponse),
     Initialize(InitializeResponse),
     ConfigurationDone(ConfigurationDoneResponse),
     Completions(CompletionsResponse),
-    Launch(LaunchResponse),
     Attach(AttachResponse),
     Restart(RestartResponse),
     Disconnect(DisconnectResponse),
@@ -476,7 +479,6 @@ impl ToValue for Response {
             ResponseType::Initialize(response) => response.to_value(),
             ResponseType::ConfigurationDone(response) => response.to_value(),
             ResponseType::Completions(response) => response.to_value(),
-            ResponseType::Launch(response) => response.to_value(),
             ResponseType::Attach(response) => response.to_value(),
             ResponseType::Restart(response) => response.to_value(),
             ResponseType::Disconnect(response) => response.to_value(),
@@ -515,6 +517,7 @@ impl ToValue for Response {
             ResponseType::ReadMemory(response) => response.to_value(),
             ResponseType::WriteMemory(response) => response.to_value(),
             ResponseType::Disassemble(response) => response.to_value(),
+            ResponseType::Acknowledgement(response) => response.to_value(),
             ResponseType::Error(error) => error.to_value(),
         }?;
 

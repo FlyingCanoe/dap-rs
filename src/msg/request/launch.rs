@@ -76,8 +76,3 @@ impl crate::utils::ToValue for LaunchRequest {
         Some(msg.into())
     }
 }
-
-response!(
-    /// Response to 'launch' request. This is just an acknowledgement, so no body field is required.
-    LaunchResponse | "launch" {}
-);
