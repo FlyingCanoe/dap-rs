@@ -1,6 +1,8 @@
 ﻿use crate::msg::dap_type::thread::Thread;
 
 request!(
+    type Response = ThreadsResponse;
+
     /// The request retrieves a list of all threads.
     ThreadsRequest | "threads" {}
 );

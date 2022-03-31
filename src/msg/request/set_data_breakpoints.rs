@@ -1,7 +1,9 @@
-﻿use crate::msg::dap_type::data_breakpoint::DataBreakpoint;
-use crate::msg::dap_type::breakpoint::Breakpoint;
+﻿use crate::msg::dap_type::breakpoint::Breakpoint;
+use crate::msg::dap_type::data_breakpoint::DataBreakpoint;
 
 request!(
+    type Response = SetDataBreakpointsResponse;
+
     /// Replaces all existing data breakpoints with new data breakpoints.
     /// To clear all data breakpoints, specify an empty array.
     /// When a data breakpoint is hit, a 'stopped' event (with reason 'data breakpoint') is generated.

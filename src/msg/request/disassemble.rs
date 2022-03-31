@@ -1,6 +1,10 @@
 ﻿use crate::msg::dap_type::disassembled_instruction::DisassembledInstruction;
 
+use super::ContinueResponse;
+
 request!(
+    type Response = ContinueResponse;
+
     /// Disassembles code stored at the provided location.
     /// Clients should only call this request if the capability 'supportsDisassembleRequest' is true.
     DisassembleRequest | "disassemble" {

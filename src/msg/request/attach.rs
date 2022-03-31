@@ -4,10 +4,14 @@ use anyhow::Error;
 use serde_json as json;
 
 use crate::utils::Parse;
+
+use super::{AcknowledgementResponse, ErrorResponse, RequestExt, Response, ResponseType};
+
 /// The attach request is sent from the client to the debug adapter to attach to a debuggee that is already running.
 /// Since attaching is debugger/runtime specific, the arguments for this request are not part of this specification.
 #[derive(Debug, Clone)]
 pub struct AttachRequest {
+    pub(crate) seq: u64,
     /// Optional data from the previous, restarted session.
     /// The data is sent as the 'restart' attribute of the 'terminated' event.
     /// The client should leave the data intact.
@@ -22,6 +26,11 @@ impl AttachRequest {
             .get("arguments")
             .ok_or(anyhow::Error::msg("invalid request"))?;
 
+        let seq = msg
+            .get("seq")
+            .ok_or(Error::msg("parsing error"))?
+            .as_u64()
+            .ok_or(Error::msg("parsing error"))?;
         let restart = Option::<json::Value>::parse(args.get("__restart"))?;
 
         let additional_data: HashMap<_, _> = args
@@ -35,6 +44,7 @@ impl AttachRequest {
         let request = AttachRequest {
             restart,
             additional_data,
+            seq,
         };
         Ok(request)
     }
@@ -66,7 +76,25 @@ impl crate::utils::ToValue for AttachRequest {
     }
 }
 
-response!(
-    /// Response to 'attach' request. This is just an acknowledgement, so no body field is required.
-    AttachResponse | "attach" {}
-);
+impl RequestExt for AttachRequest {
+    type Response = ();
+
+    fn respond(
+        self,
+        response: Result<(), ErrorResponse>,
+        session: &mut crate::codec::Session,
+    ) -> Result<(), anyhow::Error> {
+        let response_type = match response {
+            Ok(_) => ResponseType::from(AcknowledgementResponse::new("attach".to_string())),
+            Err(err) => ResponseType::from(err),
+        };
+
+        let seq = session.next_seq();
+        session.connection.send_response(Response {
+            seq,
+            request_seq: self.seq,
+            response_type,
+        })?;
+        Ok(())
+    }
+}

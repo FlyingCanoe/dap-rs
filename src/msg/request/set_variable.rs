@@ -1,6 +1,8 @@
 ﻿use crate::msg::dap_type::value_format::ValueFormat;
 
 request!(
+    type Response = SetVariableResponse;
+
     /// Set the variable with the given name in the variable container to a new value. Clients should only call this request if the capability 'supportsSetVariable' is true.
     /// If a debug adapter implements both setVariable and setExpression, a client will only use setExpression if the variable has an evaluateName property.
     SetVariableRequest | "setVariable" {

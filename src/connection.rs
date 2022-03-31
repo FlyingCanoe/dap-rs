@@ -6,7 +6,7 @@ use anyhow::{bail, Error};
 use bstr::{BString, ByteSlice, B};
 use serde_json as Json;
 
-use crate::msg::{parse_msg, Msg};
+use crate::msg::request::{Request, Response};
 use crate::utils::ToValue;
 
 #[derive(Debug)]
@@ -100,26 +100,28 @@ impl SocketConnection {
     }
 
     #[allow(dead_code)]
-    pub fn try_read_msg(&mut self) -> anyhow::Result<Option<Msg>> {
+    pub(crate) fn try_read_request(&mut self) -> anyhow::Result<Option<Request>> {
         if let Some(raw_msg) = self.try_read_raw_msg()? {
-            let msg = parse_msg(&raw_msg)?;
+            let msg = Request::parse(&raw_msg)?;
             Ok(Some(msg))
         } else {
             Ok(None)
         }
     }
 
-    pub fn read_msg(&mut self) -> anyhow::Result<Msg> {
+    pub(crate) fn read_request(&mut self) -> anyhow::Result<Request> {
         self.inner_connection.set_nonblocking(false)?;
-        let raw_msg = self.try_read_raw_msg()?.unwrap();
-        let msg = parse_msg(&raw_msg)?;
+        let raw_request = self.try_read_raw_msg()?.unwrap();
+        let request = Request::parse(&raw_request)?;
         self.inner_connection.set_nonblocking(true)?;
-        Ok(msg)
+        Ok(request)
     }
 
-    pub fn send_msg(&mut self, msg: Msg) -> anyhow::Result<()> {
-        let msg = Json::to_string(&msg.to_value())?;
+    pub(crate) fn send_response(&mut self, response: Response) -> anyhow::Result<()> {
+        let msg = Json::to_string_pretty(&response.to_value())?;
         let msg_header = format!("Content-Length: {}\r\n\r\n", msg.len());
+
+        println!("send:{msg}");
 
         self.inner_connection.write_all(msg_header.as_bytes())?;
         self.inner_connection.write_all(msg.as_bytes())?;

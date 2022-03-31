@@ -1,8 +1,10 @@
-﻿use crate::msg::dap_type::exception_filter_options::ExceptionFilterOptions;
+﻿use crate::msg::dap_type::breakpoint::Breakpoint;
+use crate::msg::dap_type::exception_filter_options::ExceptionFilterOptions;
 use crate::msg::dap_type::exception_options::ExceptionOptions;
-use crate::msg::dap_type::breakpoint::Breakpoint;
 
 request!(
+    type Response = SetExceptionBreakpointsResponse;
+
     /// The request configures the debuggers response to thrown exceptions.
     /// If an exception is configured to break, a 'stopped' event is fired (with reason 'exception').
     /// Clients should only call this request if the capability 'exceptionBreakpointFilters' returns one or more filters.

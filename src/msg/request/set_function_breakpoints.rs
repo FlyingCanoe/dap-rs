@@ -1,7 +1,9 @@
-﻿use crate::msg::dap_type::function_breakpoint::FunctionBreakpoint;
-use crate::msg::dap_type::breakpoint::Breakpoint;
+﻿use crate::msg::dap_type::breakpoint::Breakpoint;
+use crate::msg::dap_type::function_breakpoint::FunctionBreakpoint;
 
 request!(
+    type Response = SetFunctionBreakpointsResponse;
+
     /// Replaces all existing function breakpoints with new function breakpoints.
     /// To clear all function breakpoints, specify an empty array.
     /// When a function breakpoint is hit, a 'stopped' event (with reason 'function breakpoint') is generated.

@@ -18,6 +18,8 @@ dap_type_enum!(
 );
 
 request!(
+    type Response = EvaluateResponse;
+
     /// Evaluates the given expression in the context of the top most stack frame.
     /// The expression has access to any variables and arguments that are in scope.
     EvaluateRequest | "evaluate" {

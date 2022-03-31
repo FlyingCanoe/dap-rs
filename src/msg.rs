@@ -1,8 +1,3 @@
-use anyhow::bail;
-use serde_json as json;
-
-use crate::utils::{Parse, ToValue};
-
 macro_rules! dap_type_struct {
     (
         $(#[$type_meta:meta])*
@@ -149,61 +144,3 @@ macro_rules! dap_type_enum {
 pub mod dap_type;
 pub mod event;
 pub mod request;
-
-use event::Event;
-use request::{Request, Response};
-
-#[derive(Clone, Debug)]
-pub struct Msg {
-    pub(crate) seq: u64,
-    pub(crate) msg_type: MsgType,
-}
-
-#[derive(Clone, Debug)]
-pub enum MsgType {
-    Request(Request),
-    Response(Response),
-    Event(Event),
-}
-
-impl MsgType {
-    pub fn as_request(&self) -> Option<&Request> {
-        if let Self::Request(request) = self {
-            Some(request)
-        } else {
-            None
-        }
-    }
-}
-
-pub(crate) fn parse_msg(raw_msg: &str) -> anyhow::Result<Msg> {
-    let msg: json::Value = json::from_str(raw_msg)?;
-
-    let seq = u64::parse(msg.get("seq"))?;
-    let msg_type = String::parse(msg.get("type"))?;
-
-    let msg_type = match msg_type.as_str() {
-        "request" => MsgType::Request(Request::parse(msg)?),
-        _ => {
-            bail!("invalid msg")
-        }
-    };
-
-    let msg = Msg { seq, msg_type };
-    Ok(msg)
-}
-
-impl ToValue for Msg {
-    fn to_value(self) -> Option<json::Value> {
-        let mut value = match self.msg_type {
-            MsgType::Request(request) => request.to_value(),
-            MsgType::Response(response) => response.to_value(),
-            MsgType::Event(event) => event.to_value(),
-        }?;
-
-        let map = value.as_object_mut().unwrap();
-        map.insert("seq".to_string(), self.seq.into());
-
-        Some(value)
-    }
-}

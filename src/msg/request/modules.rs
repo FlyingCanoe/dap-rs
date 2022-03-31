@@ -1,6 +1,8 @@
 ﻿use crate::msg::dap_type::module::Module;
 
 request!(
+    type Response = ModulesResponse;
+
     /// Modules can be retrieved from the debug adapter with this request which can either return all modules or a range of modules to support paging.
     /// Clients should only call this request if the capability 'supportsModulesRequest' is true.
     ModulesRequest | "modules" {

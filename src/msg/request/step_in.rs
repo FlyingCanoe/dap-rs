@@ -1,6 +1,8 @@
 ﻿use crate::msg::dap_type::stepping_granularity::SteppingGranularity;
 
 request!(
+    type Response = ();
+
     /// The request resumes the given thread to step into a function/method and allows all other threads to run freely by resuming them.
     /// If the debug adapter supports single thread execution (see capability 'supportsSingleThreadExecutionRequests') setting the 'singleThread' argument to true prevents other suspended threads from resuming.
     /// If the request cannot step into a target, 'stepIn' behaves like the 'next' request.
@@ -18,9 +20,4 @@ request!(
         /// If this optional flag is true, all other suspended threads are not resumed.
         single_thread | "singleThread": Option<bool>,
     }
-);
-
-response!(
-    /// Response to 'stepIn' request. This is just an acknowledgement, so no body field is required.
-    StepInResponse | "stepIn" {}
 );

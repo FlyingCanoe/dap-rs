@@ -10,6 +10,8 @@ dap_type_enum!(
 );
 
 request!(
+    type Response = VariablesResponse;
+
     /// Retrieves all child variables for the given variable reference.
     /// An optional filter can be used to limit the fetched children to either named or indexed children.
     VariablesRequest | "variables" {

@@ -1,6 +1,8 @@
 ﻿use crate::msg::dap_type::completion_item::CompletionItem;
 
 request!(
+    type Response = CompletionsResponse;
+
     /// Returns a list of possible completions for a given caret position and text.
     /// Clients should only call this request if the capability 'supportsCompletionsRequest' is true.
     CompletionsRequest | "completions" {

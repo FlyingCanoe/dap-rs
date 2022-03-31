@@ -1,4 +1,6 @@
 request!(
+    type Response = ();
+
     DiassambleRequest {
         /// Memory reference to the base location containing the instructions to
         /// disassemble.

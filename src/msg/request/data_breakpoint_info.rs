@@ -2,6 +2,8 @@
 use either::Either;
 
 request!(
+    type Response = DataBreakpointInfoResponse;
+
     /// Obtains information on a possible data breakpoint that could be set on an expression or variable.
     /// Clients should only call this request if the capability 'supportsDataBreakpoints' is true.
     DataBreakpointInfoRequest | "dataBreakpointInfo" {

@@ -2,6 +2,8 @@
 use crate::msg::dap_type::exception_details::ExceptionDetails;
 
 request!(
+    type Response = ExceptionInfoResponse;
+
     /// Retrieves the details of the exception that caused this event to be raised.
     /// Clients should only call this request if the capability 'supportsExceptionInfoRequest' is true.
     ExceptionInfoRequest | "exceptionInfo" {

@@ -1,4 +1,6 @@
 ﻿request!(
+    type Response = ();
+
     /// The request sets the location where the debuggee will continue to run.
     /// This makes it possible to skip the execution of code or to executed code again.
     /// The code between the current location and the goto target is not executed but skipped.
@@ -10,9 +12,4 @@
         /// Set the goto target for this thread.
         thread_id | "threadId": u64,
     }
-);
-
-response!(
-    /// Response to 'goto' request. This is just an acknowledgement, so no body field is required.
-    GotoResponse | "goto" {}
 );
