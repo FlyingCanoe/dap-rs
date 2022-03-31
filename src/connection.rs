@@ -6,6 +6,10 @@ use anyhow::{bail, Error};
 use bstr::{BString, ByteSlice, B};
 use serde_json as Json;
 
+use crate::msg::request::{Request, Response};
+use crate::utils::ToValue;
+
+#[derive(Debug)]
 pub struct SocketConnection {
     inner_connection: TcpStream,
     buf: BString,
@@ -93,5 +97,32 @@ impl SocketConnection {
         } else {
             Ok(None)
         }
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn try_read_request(&mut self) -> anyhow::Result<Option<Request>> {
+        if let Some(raw_msg) = self.try_read_raw_msg()? {
+            let msg = Request::parse(&raw_msg)?;
+            Ok(Some(msg))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub(crate) fn read_request(&mut self) -> anyhow::Result<Request> {
+        self.inner_connection.set_nonblocking(false)?;
+        let raw_request = self.try_read_raw_msg()?.unwrap();
+        let request = Request::parse(&raw_request)?;
+        self.inner_connection.set_nonblocking(true)?;
+        Ok(request)
+    }
+
+    pub(crate) fn send_response(&mut self, response: Response) -> anyhow::Result<()> {
+        let msg = Json::to_string_pretty(&response.to_value())?;
+        let msg_header = format!("Content-Length: {}\r\n\r\n", msg.len());
+
+        self.inner_connection.write_all(msg_header.as_bytes())?;
+        self.inner_connection.write_all(msg.as_bytes())?;
+        Ok(())
     }
 }

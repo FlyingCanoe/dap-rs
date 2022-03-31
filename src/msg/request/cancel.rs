@@ -1,4 +1,6 @@
 ﻿request!(
+    type Response = ();
+
     /// The 'cancel' request is used by the frontend in two situations:
     /// - to indicate that it is no longer interested in the result produced by a specific request issued earlier
     /// - to cancel a progress sequence. Clients should only call this request if the capability 'supportsCancelRequest' is true.
@@ -18,9 +20,4 @@
         /// Both a 'requestId' and a 'progressId' can be specified in one request.
         request_id | "requestId": Option<u64>,
     }
-);
-
-response!(
-    /// Response to 'cancel' request. This is just an acknowledgement, so no body field is required.
-    CancelResponse | "cancel" {}
 );

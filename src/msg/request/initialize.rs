@@ -1,5 +1,8 @@
-﻿use crate::msg::dap_type::Capabilities;
+﻿use crate::msg::request::ResponseType;
 use crate::utils::ToValue;
+use crate::{codec::Session, msg::dap_type::Capabilities};
+
+use super::{ErrorResponse, RequestExt, Response};
 
 dap_type_enum!(
     /// Determines in what format paths are specified. The default is 'path', which is the native format.
@@ -71,5 +74,27 @@ impl ToValue for InitializeResponse {
             msg.insert("body".to_string(), cap);
         }
         Some(msg.into())
+    }
+}
+
+impl RequestExt for InitializeRequest {
+    type Response = InitializeResponse;
+    fn respond(
+        self,
+        response: Result<InitializeResponse, ErrorResponse>,
+        session: &mut Session,
+    ) -> Result<(), anyhow::Error> {
+        let response_type = match response {
+            Ok(response) => ResponseType::Initialize(response),
+            Err(err) => ResponseType::Error(err),
+        };
+
+        let seq = session.next_seq();
+        session.connection.send_response(Response {
+            seq,
+            request_seq: self.seq,
+            response_type,
+        })?;
+        Ok(())
     }
 }

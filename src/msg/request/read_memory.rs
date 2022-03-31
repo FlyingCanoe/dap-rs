@@ -1,4 +1,8 @@
 request!(
+    type Response = ReadMemoryResponse;
+
+    /// Reads bytes from memory at the provided location.
+    /// Clients should only call this request if the capability 'supportsReadMemoryRequest' is true.
     ReadMemoryRequest | "readMemory" {
         /// Memory reference to the base location from which data should be read.
         memory_reference | "memoryReference": String,

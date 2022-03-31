@@ -1,6 +1,8 @@
 ﻿use crate::msg::dap_type::scope::Scope;
 
 request!(
+    type Response = ScopesResponse;
+
     /// The request returns the variable scopes for a given stackframe ID.
     ScopesRequest | "scopes" {
         /// Retrieve the scopes for this stackframe.

@@ -1,4 +1,6 @@
 ﻿request!(
+    type Response = WriteMemoryResponse;
+
     /// Writes bytes to memory at the provided location.
     /// Clients should only call this request if the capability 'supportsWriteMemoryRequest' is true.
     WriteMemoryRequest | "writeMemory" {

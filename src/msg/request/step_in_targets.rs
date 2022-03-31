@@ -1,6 +1,8 @@
 ﻿use crate::msg::dap_type::step_in_target::StepInTarget;
 
 request!(
+    type Response = StepInTargetsResponse;
+
     /// This request retrieves the possible stepIn targets for the specified stack frame.
     /// These targets can be used in the 'stepIn' request.
     /// The StepInTargets may only be called if the 'supportsStepInTargetsRequest' capability exists and is true.

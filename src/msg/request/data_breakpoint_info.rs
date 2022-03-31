@@ -1,4 +1,8 @@
 request!(
+    type Response = DataBreakpointInfoResponse;
+
+    /// Obtains information on a possible data breakpoint that could be set on an expression or variable.
+    /// Clients should only call this request if the capability 'supportsDataBreakpoints' is true.
     DataBreakpointInfoRequest | "dataBreakpointInfo" {
         /// Reference to the Variable container if the data breakpoint is requested for
         /// a child of the container.

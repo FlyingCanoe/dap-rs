@@ -5,10 +5,14 @@ use serde_json as json;
 
 use crate::utils::Parse;
 
+use super::{AcknowledgementResponse, RequestExt, Response, ResponseType};
+
 #[derive(Debug, Clone)]
 /// This launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if 'noDebug' is true).
 /// Since launching is debugger/runtime specific, the arguments for this request are not part of this specification.
 pub struct LaunchRequest {
+    seq: u64,
+
     /// If noDebug is true the launch request should launch the program without enabling debugging.
     pub no_debug: Option<bool>,
 
@@ -27,6 +31,12 @@ impl LaunchRequest {
             .get("arguments")
             .ok_or(anyhow::Error::msg("invalid request"))?;
 
+        let seq = msg
+            .get("seq")
+            .ok_or(Error::msg("parsing error"))?
+            .as_u64()
+            .ok_or(Error::msg("parsing error"))?;
+
         let no_debug = Option::<bool>::parse(args.get("noDebug"))?;
         let restart = Option::<json::Value>::parse(args.get("__restart"))?;
 
@@ -39,11 +49,35 @@ impl LaunchRequest {
             .collect();
 
         let request = LaunchRequest {
+            seq,
             no_debug,
             restart,
             additional_data,
         };
         Ok(request)
+    }
+}
+
+impl RequestExt for LaunchRequest {
+    type Response = ();
+
+    fn respond(
+        self,
+        response: Result<Self::Response, super::ErrorResponse>,
+        session: &mut crate::codec::Session,
+    ) -> Result<(), anyhow::Error> {
+        let response_type = match response {
+            Ok(_) => ResponseType::from(AcknowledgementResponse::new("launch".to_string())),
+            Err(err) => ResponseType::from(err),
+        };
+
+        let seq = session.next_seq();
+        session.connection.send_response(Response {
+            seq,
+            request_seq: self.seq,
+            response_type,
+        })?;
+        Ok(())
     }
 }
 

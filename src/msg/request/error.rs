@@ -27,11 +27,6 @@ impl ErrorResponse {
             command: None,
         }
     }
-
-    pub(crate) fn with_command(mut self, command: String) -> ErrorResponse {
-        self.command = Some(command);
-        self
-    }
 }
 
 impl ToValue for ErrorResponse {

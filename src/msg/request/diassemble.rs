@@ -1,5 +1,7 @@
 request!(
-    DiassambleRequest | "disassemble" {
+    type Response = ();
+
+    DiassambleRequest {
         /// Memory reference to the base location containing the instructions to
         /// disassemble.
         memory_reference | "memoryReference": String,
