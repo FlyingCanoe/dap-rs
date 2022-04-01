@@ -56,6 +56,9 @@ fn main() {
                     .respond(Ok(SetBreakpointsResponse { breakpoints }), &mut session)
                     .unwrap();
             }
+            Request::ConfigurationDone(config_done_request) => {
+                config_done_request.respond(Ok(()), &mut session).unwrap()
+            }
             _ => println!("{request:#?}"),
         }
     }
