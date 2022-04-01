@@ -13,7 +13,7 @@ macro_rules! event {
         pub struct $event_name {
             $(
                 $(#[$field_meta])*
-                $($field).+: $field_ty,
+                pub $($field).+: $field_ty,
             )*
         }
 
@@ -43,23 +43,23 @@ macro_rules! event {
     };
 }
 
-mod breakpoint;
-mod capabilities;
-mod continued;
-mod exited;
-mod initialized;
-mod invalidated;
-mod loaded_source;
-mod memory;
-mod module;
-mod output;
-mod process;
-mod progress_end;
-mod progress_start;
-mod progress_update;
-mod stopped;
-mod terminated;
-mod thread;
+pub mod breakpoint;
+pub mod capabilities;
+pub mod continued;
+pub mod exited;
+pub mod initialized;
+pub mod invalidated;
+pub mod loaded_source;
+pub mod memory;
+pub mod module;
+pub mod output;
+pub mod process;
+pub mod progress_end;
+pub mod progress_start;
+pub mod progress_update;
+pub mod stopped;
+pub mod terminated;
+pub mod thread;
 
 use breakpoint::BreakpointEvent;
 use capabilities::CapabilitiesEvent;

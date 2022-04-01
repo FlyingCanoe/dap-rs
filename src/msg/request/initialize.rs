@@ -1,6 +1,6 @@
-﻿use crate::msg::request::ResponseType;
+﻿use crate::codec::Session;
+use crate::msg::dap_type::capabilities::Capabilities;
 use crate::utils::ToValue;
-use crate::{codec::Session, msg::dap_type::Capabilities};
 
 use super::{ErrorResponse, RequestExt, Response};
 
@@ -79,17 +79,11 @@ impl RequestExt for InitializeRequest {
         response: Result<InitializeResponse, ErrorResponse>,
         session: &mut Session,
     ) -> Result<(), anyhow::Error> {
-        let response_type = match response {
-            Ok(response) => ResponseType::Initialize(response),
-            Err(err) => ResponseType::Error(err),
+        let response = match response {
+            Ok(response) => Response::Initialize(response),
+            Err(err) => Response::Error(err),
         };
 
-        let seq = session.next_seq();
-        session.connection.send_response(Response {
-            seq,
-            request_seq: self.seq,
-            response_type,
-        })?;
-        Ok(())
+        session.send_response(response, self.seq)
     }
 }

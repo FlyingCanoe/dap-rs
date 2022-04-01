@@ -94,21 +94,14 @@ macro_rules!  request {
                 response: Result<(), crate::msg::request::ErrorResponse>,
                 session: &mut crate::msg::request::Session,
             ) -> Result<(), anyhow::Error> {
-                use crate::msg::request::ResponseType;
                 use crate::msg::request::{Response, AcknowledgementResponse};
 
-                let response_type = match response {
-                    Ok(_) => ResponseType::from(AcknowledgementResponse::new("attach".to_string())),
-                    Err(err) => ResponseType::from(err),
+                let response = match response {
+                    Ok(_) => Response::from(AcknowledgementResponse::new("$command".to_string())),
+                    Err(err) => Response::from(err),
                 };
 
-                let seq = session.next_seq();
-                session.connection.send_response(Response {
-                    seq,
-                    request_seq: self.seq,
-                    response_type,
-                })?;
-                Ok(())
+                session.send_response(response, self.seq)
             }
         }
     };
@@ -161,21 +154,14 @@ macro_rules!  request {
                 response: Result<$response, crate::msg::request::ErrorResponse>,
                 session: &mut crate::msg::request::Session,
             ) -> Result<(), anyhow::Error> {
-                use crate::msg::request::ResponseType;
                 use crate::msg::request::Response;
 
-                let response_type = match response {
-                    Ok(response) => ResponseType::from(response),
-                    Err(err) => ResponseType::from(err),
+                let response = match response {
+                    Ok(response) => Response::from(response),
+                    Err(err) => Response::from(err),
                 };
 
-                let seq = session.next_seq();
-                session.connection.send_response(Response {
-                    seq,
-                    request_seq: self.seq,
-                    response_type,
-                })?;
-                Ok(())
+                session.send_response(response, self.seq)
             }
         }
     };
@@ -448,15 +434,8 @@ impl Request {
 }
 
 #[derive(Clone, Debug)]
-pub(crate) struct Response {
-    pub(crate) seq: u64,
-    pub(crate) request_seq: u64,
-    pub(crate) response_type: ResponseType,
-}
-
-#[derive(Clone, Debug)]
 #[allow(dead_code)]
-pub(crate) enum ResponseType {
+pub(crate) enum Response {
     Acknowledgement(AcknowledgementResponse),
     Error(ErrorResponse),
     Initialize(InitializeResponse),
@@ -490,209 +469,203 @@ pub(crate) enum ResponseType {
 
 impl ToValue for Response {
     fn to_value(self) -> Option<json::Value> {
-        let mut value = match self.response_type {
-            ResponseType::Initialize(response) => response.to_value(),
-            ResponseType::Completions(response) => response.to_value(),
-            ResponseType::BreakpointLocations(response) => response.to_value(),
-            ResponseType::SetBreakpoints(response) => response.to_value(),
-            ResponseType::SetFunctionBreakpoints(response) => response.to_value(),
-            ResponseType::SetExceptionBreakpoints(response) => response.to_value(),
-            ResponseType::DataBreakpointInfo(response) => response.to_value(),
-            ResponseType::SetDataBreakpoints(response) => response.to_value(),
-            ResponseType::SetInstructionBreakpoints(response) => response.to_value(),
-            ResponseType::ContinueResponse(response) => response.to_value(),
-            ResponseType::StackTrace(response) => response.to_value(),
-            ResponseType::Scopes(response) => response.to_value(),
-            ResponseType::Variables(response) => response.to_value(),
-            ResponseType::SetVariable(response) => response.to_value(),
-            ResponseType::Source(response) => response.to_value(),
-            ResponseType::Continue(response) => response.to_value(),
-            ResponseType::Threads(response) => response.to_value(),
-            ResponseType::Modules(response) => response.to_value(),
-            ResponseType::LoadedSources(response) => response.to_value(),
-            ResponseType::Evaluate(response) => response.to_value(),
-            ResponseType::SetExpression(response) => response.to_value(),
-            ResponseType::StepInTargets(response) => response.to_value(),
-            ResponseType::GotoTargets(response) => response.to_value(),
-            ResponseType::ExceptionInfo(response) => response.to_value(),
-            ResponseType::ReadMemory(response) => response.to_value(),
-            ResponseType::WriteMemory(response) => response.to_value(),
-            ResponseType::Disassemble(response) => response.to_value(),
-            ResponseType::Acknowledgement(response) => response.to_value(),
-            ResponseType::Error(error) => error.to_value(),
-        }?;
-
-        let map = value.as_object_mut().unwrap();
-        map.insert("request_seq".to_string(), self.request_seq.into());
-        map.insert("seq".to_string(), self.seq.into());
-
-        Some(value)
+        match self {
+            Response::Initialize(response) => response.to_value(),
+            Response::Completions(response) => response.to_value(),
+            Response::BreakpointLocations(response) => response.to_value(),
+            Response::SetBreakpoints(response) => response.to_value(),
+            Response::SetFunctionBreakpoints(response) => response.to_value(),
+            Response::SetExceptionBreakpoints(response) => response.to_value(),
+            Response::DataBreakpointInfo(response) => response.to_value(),
+            Response::SetDataBreakpoints(response) => response.to_value(),
+            Response::SetInstructionBreakpoints(response) => response.to_value(),
+            Response::ContinueResponse(response) => response.to_value(),
+            Response::StackTrace(response) => response.to_value(),
+            Response::Scopes(response) => response.to_value(),
+            Response::Variables(response) => response.to_value(),
+            Response::SetVariable(response) => response.to_value(),
+            Response::Source(response) => response.to_value(),
+            Response::Continue(response) => response.to_value(),
+            Response::Threads(response) => response.to_value(),
+            Response::Modules(response) => response.to_value(),
+            Response::LoadedSources(response) => response.to_value(),
+            Response::Evaluate(response) => response.to_value(),
+            Response::SetExpression(response) => response.to_value(),
+            Response::StepInTargets(response) => response.to_value(),
+            Response::GotoTargets(response) => response.to_value(),
+            Response::ExceptionInfo(response) => response.to_value(),
+            Response::ReadMemory(response) => response.to_value(),
+            Response::WriteMemory(response) => response.to_value(),
+            Response::Disassemble(response) => response.to_value(),
+            Response::Acknowledgement(response) => response.to_value(),
+            Response::Error(error) => error.to_value(),
+        }
     }
 }
 
-impl From<ModulesResponse> for ResponseType {
+impl From<ModulesResponse> for Response {
     fn from(v: ModulesResponse) -> Self {
         Self::Modules(v)
     }
 }
 
-impl From<DisassembleResponse> for ResponseType {
+impl From<DisassembleResponse> for Response {
     fn from(v: DisassembleResponse) -> Self {
         Self::Disassemble(v)
     }
 }
 
-impl From<WriteMemoryResponse> for ResponseType {
+impl From<WriteMemoryResponse> for Response {
     fn from(v: WriteMemoryResponse) -> Self {
         Self::WriteMemory(v)
     }
 }
 
-impl From<ReadMemoryResponse> for ResponseType {
+impl From<ReadMemoryResponse> for Response {
     fn from(v: ReadMemoryResponse) -> Self {
         Self::ReadMemory(v)
     }
 }
 
-impl From<ExceptionInfoResponse> for ResponseType {
+impl From<ExceptionInfoResponse> for Response {
     fn from(v: ExceptionInfoResponse) -> Self {
         Self::ExceptionInfo(v)
     }
 }
 
-impl From<GotoTargetsResponse> for ResponseType {
+impl From<GotoTargetsResponse> for Response {
     fn from(v: GotoTargetsResponse) -> Self {
         Self::GotoTargets(v)
     }
 }
 
-impl From<StepInTargetsResponse> for ResponseType {
+impl From<StepInTargetsResponse> for Response {
     fn from(v: StepInTargetsResponse) -> Self {
         Self::StepInTargets(v)
     }
 }
 
-impl From<SetExpressionResponse> for ResponseType {
+impl From<SetExpressionResponse> for Response {
     fn from(v: SetExpressionResponse) -> Self {
         Self::SetExpression(v)
     }
 }
 
-impl From<EvaluateResponse> for ResponseType {
+impl From<EvaluateResponse> for Response {
     fn from(v: EvaluateResponse) -> Self {
         Self::Evaluate(v)
     }
 }
 
-impl From<LoadedSourcesResponse> for ResponseType {
+impl From<LoadedSourcesResponse> for Response {
     fn from(v: LoadedSourcesResponse) -> Self {
         Self::LoadedSources(v)
     }
 }
 
-impl From<ThreadsResponse> for ResponseType {
+impl From<ThreadsResponse> for Response {
     fn from(v: ThreadsResponse) -> Self {
         Self::Threads(v)
     }
 }
 
-impl From<SourceResponse> for ResponseType {
+impl From<SourceResponse> for Response {
     fn from(v: SourceResponse) -> Self {
         Self::Source(v)
     }
 }
 
-impl From<SetVariableResponse> for ResponseType {
+impl From<SetVariableResponse> for Response {
     fn from(v: SetVariableResponse) -> Self {
         Self::SetVariable(v)
     }
 }
 
-impl From<VariablesResponse> for ResponseType {
+impl From<VariablesResponse> for Response {
     fn from(v: VariablesResponse) -> Self {
         Self::Variables(v)
     }
 }
 
-impl From<ScopesResponse> for ResponseType {
+impl From<ScopesResponse> for Response {
     fn from(v: ScopesResponse) -> Self {
         Self::Scopes(v)
     }
 }
 
-impl From<StackTraceResponse> for ResponseType {
+impl From<StackTraceResponse> for Response {
     fn from(v: StackTraceResponse) -> Self {
         Self::StackTrace(v)
     }
 }
 
-impl From<ContinueResponse> for ResponseType {
+impl From<ContinueResponse> for Response {
     fn from(v: ContinueResponse) -> Self {
         Self::ContinueResponse(v)
     }
 }
 
-impl From<SetInstructionBreakpointsResponse> for ResponseType {
+impl From<SetInstructionBreakpointsResponse> for Response {
     fn from(v: SetInstructionBreakpointsResponse) -> Self {
         Self::SetInstructionBreakpoints(v)
     }
 }
 
-impl From<SetDataBreakpointsResponse> for ResponseType {
+impl From<SetDataBreakpointsResponse> for Response {
     fn from(v: SetDataBreakpointsResponse) -> Self {
         Self::SetDataBreakpoints(v)
     }
 }
 
-impl From<DataBreakpointInfoResponse> for ResponseType {
+impl From<DataBreakpointInfoResponse> for Response {
     fn from(v: DataBreakpointInfoResponse) -> Self {
         Self::DataBreakpointInfo(v)
     }
 }
 
-impl From<SetExceptionBreakpointsResponse> for ResponseType {
+impl From<SetExceptionBreakpointsResponse> for Response {
     fn from(v: SetExceptionBreakpointsResponse) -> Self {
         Self::SetExceptionBreakpoints(v)
     }
 }
 
-impl From<SetFunctionBreakpointsResponse> for ResponseType {
+impl From<SetFunctionBreakpointsResponse> for Response {
     fn from(v: SetFunctionBreakpointsResponse) -> Self {
         Self::SetFunctionBreakpoints(v)
     }
 }
 
-impl From<SetBreakpointsResponse> for ResponseType {
+impl From<SetBreakpointsResponse> for Response {
     fn from(v: SetBreakpointsResponse) -> Self {
         Self::SetBreakpoints(v)
     }
 }
 
-impl From<BreakpointLocationsResponse> for ResponseType {
+impl From<BreakpointLocationsResponse> for Response {
     fn from(v: BreakpointLocationsResponse) -> Self {
         Self::BreakpointLocations(v)
     }
 }
 
-impl From<CompletionsResponse> for ResponseType {
+impl From<CompletionsResponse> for Response {
     fn from(v: CompletionsResponse) -> Self {
         Self::Completions(v)
     }
 }
 
-impl From<InitializeResponse> for ResponseType {
+impl From<InitializeResponse> for Response {
     fn from(v: InitializeResponse) -> Self {
         Self::Initialize(v)
     }
 }
 
-impl From<ErrorResponse> for ResponseType {
+impl From<ErrorResponse> for Response {
     fn from(v: ErrorResponse) -> Self {
         Self::Error(v)
     }
 }
 
-impl From<AcknowledgementResponse> for ResponseType {
+impl From<AcknowledgementResponse> for Response {
     fn from(v: AcknowledgementResponse) -> Self {
         Self::Acknowledgement(v)
     }

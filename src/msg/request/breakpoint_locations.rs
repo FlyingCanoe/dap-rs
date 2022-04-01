@@ -1,5 +1,5 @@
 use crate::msg::dap_type::breakpoint_location::BreakpointLocation;
-use crate::msg::dap_type::Source;
+use crate::msg::dap_type::source::Source;
 use crate::utils::{Parse, ToValue};
 
 use serde_json as json;

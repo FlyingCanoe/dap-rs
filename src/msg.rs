@@ -13,7 +13,7 @@ macro_rules! dap_type_struct {
         pub struct $type_name {
             $(
                 $(#[$field_meta])*
-                pub(crate) $($field)+: $field_ty,
+                pub $($field)+: $field_ty,
             )*
         }
 

@@ -1,7 +1,12 @@
 use std::net::{TcpListener, TcpStream};
 
+use serde_json::to_string_pretty;
+
 use crate::connection::SocketConnection;
+use crate::msg::event::Event;
 use crate::msg::request::Request;
+use crate::msg::request::Response;
+use crate::utils::ToValue;
 
 pub struct DapCodec {
     listener: TcpListener,
@@ -41,5 +46,32 @@ impl Session {
 
     pub fn recv_request(&mut self) -> anyhow::Result<Request> {
         self.connection.read_request()
+    }
+
+    pub fn send_event(&mut self, event: Event) -> anyhow::Result<()> {
+        let mut value = event.to_value().unwrap();
+        let map = value.as_object_mut().unwrap();
+
+        map.insert("seq".to_string(), self.next_seq().into());
+        map.insert("type".to_string(), "event".into());
+
+        let msg = to_string_pretty(&value)?;
+        self.connection.send_msg(&msg)
+    }
+
+    pub(crate) fn send_response(
+        &mut self,
+        response: Response,
+        request_seq: u64,
+    ) -> anyhow::Result<()> {
+        let mut value = response.to_value().unwrap();
+        let map = value.as_object_mut().unwrap();
+
+        map.insert("seq".to_string(), self.next_seq().into());
+        map.insert("type".to_string(), "response".into());
+        map.insert("request_seq".to_string(), request_seq.into());
+
+        let msg = to_string_pretty(&value)?;
+        self.connection.send_msg(&msg)
     }
 }
