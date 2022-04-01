@@ -97,7 +97,7 @@ macro_rules!  request {
                 use crate::msg::request::{Response, AcknowledgementResponse};
 
                 let response = match response {
-                    Ok(_) => Response::from(AcknowledgementResponse::new("$command".to_string())),
+                    Ok(_) => Response::from(AcknowledgementResponse::new($command.to_string())),
                     Err(err) => Response::from(err),
                 };
 
