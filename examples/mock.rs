@@ -4,7 +4,6 @@ use dap::codec::DapCodec;
 use dap::msg::dap_type::breakpoint::Breakpoint;
 use dap::msg::dap_type::capabilities::Capabilities;
 use dap::msg::dap_type::thread::Thread;
-use dap::msg::event::initialized::InitializedEvent;
 use dap::msg::event::Event;
 use dap::msg::request::{
     InitializeResponse, Request, RequestExt, SetBreakpointsResponse, ThreadsResponse,
@@ -32,9 +31,7 @@ fn main() {
                     .unwrap(),
                 Request::Launch(launch_request) => {
                     launch_request.respond(Ok(()), &mut session).unwrap();
-                    session
-                        .send_event(Event::Initialized(InitializedEvent {}))
-                        .unwrap();
+                    session.send_event(Event::Initialized).unwrap();
                 }
                 Request::SetBreakpoints(set_breakpoint_request) => {
                     let breakpoints = set_breakpoint_request
