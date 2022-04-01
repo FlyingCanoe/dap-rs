@@ -118,8 +118,6 @@ impl SocketConnection {
     pub(crate) fn send_msg(&mut self, msg: &str) -> anyhow::Result<()> {
         let msg_header = format!("Content-Length: {}\r\n\r\n", msg.len());
 
-        println!("send:{msg}");
-
         self.inner_connection.write_all(msg_header.as_bytes())?;
         self.inner_connection.write_all(msg.as_bytes())?;
         Ok(())
