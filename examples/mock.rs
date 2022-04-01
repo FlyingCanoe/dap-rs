@@ -3,9 +3,12 @@ use std::net;
 use dap::codec::DapCodec;
 use dap::msg::dap_type::breakpoint::Breakpoint;
 use dap::msg::dap_type::capabilities::Capabilities;
+use dap::msg::dap_type::thread::Thread;
 use dap::msg::event::initialized::InitializedEvent;
 use dap::msg::event::Event;
-use dap::msg::request::{InitializeResponse, Request, RequestExt, SetBreakpointsResponse};
+use dap::msg::request::{
+    InitializeResponse, Request, RequestExt, SetBreakpointsResponse, ThreadsResponse,
+};
 
 fn main() {
     let listener = net::TcpListener::bind("127.0.0.1:4710").unwrap();
@@ -59,6 +62,17 @@ fn main() {
             Request::ConfigurationDone(config_done_request) => {
                 config_done_request.respond(Ok(()), &mut session).unwrap()
             }
+            Request::Threads(request) => request
+                .respond(
+                    Ok(ThreadsResponse {
+                        threads: vec![Thread {
+                            id: 0,
+                            name: "main".to_string(),
+                        }],
+                    }),
+                    &mut session,
+                )
+                .unwrap(),
             _ => println!("{request:#?}"),
         }
     }
