@@ -5,7 +5,7 @@ use serde_json as json;
 
 use crate::utils::Parse;
 
-use super::{AcknowledgementResponse, ErrorResponse, RequestExt, Response, ResponseType};
+use super::{AcknowledgementResponse, ErrorResponse, RequestExt, Response};
 
 /// The attach request is sent from the client to the debug adapter to attach to a debuggee that is already running.
 /// Since attaching is debugger/runtime specific, the arguments for this request are not part of this specification.
@@ -80,17 +80,11 @@ impl RequestExt for AttachRequest {
         response: Result<(), ErrorResponse>,
         session: &mut crate::codec::Session,
     ) -> Result<(), anyhow::Error> {
-        let response_type = match response {
-            Ok(_) => ResponseType::from(AcknowledgementResponse::new("attach".to_string())),
-            Err(err) => ResponseType::from(err),
+        let response = match response {
+            Ok(_) => Response::from(AcknowledgementResponse::new("attach".to_string())),
+            Err(err) => Response::from(err),
         };
 
-        let seq = session.next_seq();
-        session.connection.send_response(Response {
-            seq,
-            request_seq: self.seq,
-            response_type,
-        })?;
-        Ok(())
+        session.send_response(response, self.seq)
     }
 }

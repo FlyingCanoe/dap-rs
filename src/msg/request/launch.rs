@@ -5,7 +5,7 @@ use serde_json as json;
 
 use crate::utils::Parse;
 
-use super::{AcknowledgementResponse, RequestExt, Response, ResponseType};
+use super::{AcknowledgementResponse, RequestExt, Response};
 
 #[derive(Debug, Clone)]
 /// This launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if 'noDebug' is true).
@@ -63,21 +63,15 @@ impl RequestExt for LaunchRequest {
 
     fn respond(
         self,
-        response: Result<Self::Response, super::ErrorResponse>,
+        response: Result<(), super::ErrorResponse>,
         session: &mut crate::codec::Session,
     ) -> Result<(), anyhow::Error> {
-        let response_type = match response {
-            Ok(_) => ResponseType::from(AcknowledgementResponse::new("launch".to_string())),
-            Err(err) => ResponseType::from(err),
+        let response = match response {
+            Ok(_) => Response::from(AcknowledgementResponse::new("launch".to_string())),
+            Err(err) => Response::from(err),
         };
 
-        let seq = session.next_seq();
-        session.connection.send_response(Response {
-            seq,
-            request_seq: self.seq,
-            response_type,
-        })?;
-        Ok(())
+        session.send_response(response, self.seq)
     }
 }
 

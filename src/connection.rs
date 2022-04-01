@@ -4,10 +4,8 @@ use std::net::TcpStream;
 
 use anyhow::{bail, Error};
 use bstr::{BString, ByteSlice, B};
-use serde_json as Json;
 
-use crate::msg::request::{Request, Response};
-use crate::utils::ToValue;
+use crate::msg::request::Request;
 
 #[derive(Debug)]
 pub struct SocketConnection {
@@ -117,8 +115,7 @@ impl SocketConnection {
         Ok(request)
     }
 
-    pub(crate) fn send_response(&mut self, response: Response) -> anyhow::Result<()> {
-        let msg = Json::to_string_pretty(&response.to_value())?;
+    pub(crate) fn send_msg(&mut self, msg: &str) -> anyhow::Result<()> {
         let msg_header = format!("Content-Length: {}\r\n\r\n", msg.len());
 
         self.inner_connection.write_all(msg_header.as_bytes())?;

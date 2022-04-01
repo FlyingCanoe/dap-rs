@@ -1,4 +1,4 @@
-use crate::msg::dap_type::Source;
+use crate::msg::dap_type::source::Source;
 
 dap_type_enum!(
     /// The reason for the event.

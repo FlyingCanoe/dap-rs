@@ -1,4 +1,4 @@
-use super::DataBreakpointAccessType;
+use super::data_breakpoint_access_type::DataBreakpointAccessType;
 
 dap_type_struct!(
     /// Properties of a data breakpoint passed to the setDataBreakpoints request.

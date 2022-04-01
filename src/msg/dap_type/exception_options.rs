@@ -1,5 +1,5 @@
 ﻿use crate::msg::dap_type::exception_break_mode::ExceptionBreakMode;
-use crate::msg::dap_type::ExceptionPathSegment;
+use crate::msg::dap_type::exception_path_segment::ExceptionPathSegment;
 
 dap_type_struct!(
     /// An ExceptionOptions assigns configuration options to a set of exceptions.

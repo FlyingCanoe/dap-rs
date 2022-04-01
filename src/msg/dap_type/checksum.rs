@@ -1,4 +1,4 @@
-use super::ChecksumAlgorithm;
+use super::checksum_algorithm::ChecksumAlgorithm;
 
 dap_type_struct!(
     /// The checksum of an item calculated by the specified algorithm.
