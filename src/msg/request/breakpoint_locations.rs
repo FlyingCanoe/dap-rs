@@ -1,10 +1,9 @@
 use crate::msg::dap_type::breakpoint_location::BreakpointLocation;
 use crate::msg::dap_type::source::Source;
 use crate::msg::request::Response;
-use crate::utils::{Parse, ToValue};
+use crate::utils::Parse;
 
 use anyhow::Error;
-use serde_json as json;
 
 use super::RequestExt;
 
