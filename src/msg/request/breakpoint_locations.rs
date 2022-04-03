@@ -1,35 +1,45 @@
 use crate::msg::dap_type::breakpoint_location::BreakpointLocation;
 use crate::msg::dap_type::source::Source;
+use crate::msg::request::Response;
 use crate::utils::{Parse, ToValue};
 
+use anyhow::Error;
 use serde_json as json;
+
+use super::RequestExt;
 
 #[derive(Clone, Debug)]
 pub struct BreakpointLocationsRequest {
+    seq: u64,
     /// The source location of the breakpoints either 'source.path' or
     /// 'source.reference' must be specified.
-    source: Option<Source>,
+    pub source: Option<Source>,
 
     /// Start line of range to search possible breakpoint locations in. If only the
     /// line is specified, the request returns all possible locations in that line.
-    line: Option<u64>,
+    pub line: Option<u64>,
 
     /// Optional start column of range to search possible breakpoint locations in.
     /// If no start column is given, the first column in the start line is assumed.
-    column: Option<u64>,
+    pub column: Option<u64>,
 
     /// Optional end line of range to search possible breakpoint locations in. If
     /// no end line is given, then the end line is assumed to be the start line.
-    end_line: Option<u64>,
+    pub end_line: Option<u64>,
 
     /// Optional end column of range to search possible breakpoint locations in. If
     /// no end column is given, then it is assumed to be in the last column of the
     /// end line.
-    end_column: Option<u64>,
+    pub end_column: Option<u64>,
 }
 
 impl BreakpointLocationsRequest {
     pub(crate) fn parse(msg: serde_json::Value) -> anyhow::Result<BreakpointLocationsRequest> {
+        let seq = msg
+            .get("seq")
+            .ok_or(Error::msg("invalid request"))?
+            .as_u64()
+            .ok_or(Error::msg("invalid request"))?;
         if let Some(args) = msg.get("arguments") {
             let source = Source::parse(args.get("source"))?;
             let line = u64::parse(args.get("line"))?;
@@ -43,12 +53,14 @@ impl BreakpointLocationsRequest {
                 column,
                 end_line,
                 end_column,
+                seq,
             };
             Ok(request)
         } else {
             let request = BreakpointLocationsRequest {
                 source: None,
                 line: None,
+                seq,
                 column: None,
                 end_line: None,
                 end_column: None,
@@ -56,39 +68,22 @@ impl BreakpointLocationsRequest {
             Ok(request)
         }
     }
-
-    pub(crate) const fn command(&self) -> &'static str {
-        "breakpointLocations"
-    }
 }
 
-impl ToValue for BreakpointLocationsRequest {
-    fn to_value(self) -> Option<json::Value> {
-        let mut msg = json::Map::new();
-        let mut arguments = json::Map::new();
+impl RequestExt for BreakpointLocationsRequest {
+    type Response = BreakpointLocationsResponse;
 
-        msg.insert("type".to_string(), "response".into());
-        msg.insert("command".to_string(), self.command().into());
-        msg.insert("success".to_string(), true.into());
+    fn respond(
+        self,
+        response: Result<BreakpointLocationsResponse, super::ErrorResponse>,
+        session: &mut crate::codec::Session,
+    ) -> Result<(), anyhow::Error> {
+        let response = match response {
+            Ok(response) => Response::from(response),
+            Err(err) => Response::from(err),
+        };
 
-        if let Some(value) = self.source.to_value() {
-            arguments.insert("source".to_string(), value);
-        }
-        if let Some(value) = self.line.to_value() {
-            arguments.insert("line".to_string(), value);
-        }
-        if let Some(value) = self.column.to_value() {
-            arguments.insert("column".to_string(), value);
-        }
-        if let Some(value) = self.end_line.to_value() {
-            arguments.insert("endLine".to_string(), value);
-        }
-        if let Some(value) = self.end_column.to_value() {
-            arguments.insert("endColumn".to_string(), value);
-        }
-
-        msg.insert("arguments".to_string(), arguments.into());
-        Some(msg.into())
+        session.send_response(response, self.seq)
     }
 }
 
