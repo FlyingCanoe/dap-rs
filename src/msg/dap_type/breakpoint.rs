@@ -28,3 +28,22 @@ dap_type_struct!(
         end_line | "endLine": Option<u64>,
     }
 );
+
+builder!(
+    type BuildedType = Breakpoint;
+
+    BreakpointBuilder {
+        /// optional field
+        source: Option Source,
+        column: Option u64,
+        id: Option u64,
+        instruction_reference: Option String,
+        line: Option u64,
+        end_column: Option u64,
+        offset: Option u64,
+        message: Option String,
+        end_line: Option u64,
+        /// non optional field
+        verified: bool,
+    }
+);
