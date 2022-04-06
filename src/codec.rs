@@ -48,6 +48,10 @@ impl Session {
         self.connection.read_request()
     }
 
+    pub fn try_recv_request(&mut self) -> anyhow::Result<Option<Request>> {
+        self.connection.try_read_request()
+    }
+
     pub fn send_event(&mut self, event: Event) -> anyhow::Result<()> {
         let mut value = event.to_value().unwrap();
         let map = value.as_object_mut().unwrap();
