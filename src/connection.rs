@@ -97,8 +97,8 @@ impl SocketConnection {
         }
     }
 
-    #[allow(dead_code)]
     pub(crate) fn try_read_request(&mut self) -> anyhow::Result<Option<Request>> {
+        self.inner_connection.set_nonblocking(true)?;
         if let Some(raw_msg) = self.try_read_raw_msg()? {
             let msg = Request::parse(&raw_msg)?;
             Ok(Some(msg))
@@ -111,7 +111,6 @@ impl SocketConnection {
         self.inner_connection.set_nonblocking(false)?;
         let raw_request = self.try_read_raw_msg()?.unwrap();
         let request = Request::parse(&raw_request)?;
-        self.inner_connection.set_nonblocking(true)?;
         Ok(request)
     }
 

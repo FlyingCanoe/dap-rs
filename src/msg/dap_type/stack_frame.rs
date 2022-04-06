@@ -40,3 +40,23 @@ dap_type_struct!(
         can_restart | "canRestart": Option<bool>,
     }
 );
+
+builder!(
+    type BuildedType = StackFrame;
+
+    StackFrameBuilder {
+        /// optional field
+        source: Option Source,
+        end_column: Option u64,
+        end_line: Option u64,
+        can_restart: Option bool,
+        module_id: Option Either<u64, String>,
+        instruction_pointer_reference: Option String,
+        presentation_hint: Option PresentationHint,
+        /// non optional field
+        id: u64,
+        name: String,
+        line: u64,
+        column: u64,
+    }
+);
