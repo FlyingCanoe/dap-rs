@@ -42,3 +42,23 @@ dap_type_struct!(
         named_variables | "namedVariables": Option<u64>,
     }
 );
+
+builder!(
+    type BuildedType = Scope;
+
+    ScopeBuilder {
+        /// optional field
+        source : Option Source,
+        indexed_variables : Option u64,
+        line : Option u64,
+        column : Option u64,
+        presentation_hint  : Option PresentationHint,
+        end_column : Option u64,
+        end_line: Option u64,
+        named_variables : Option u64,
+        /// non optional field
+        name: String,
+        variables_reference: u64,
+        expensive: bool,
+    }
+);
