@@ -35,3 +35,22 @@ dap_type_struct!(
         named_variables | "namedVariables": Option<u64>,
     }
 );
+
+builder!(
+    type BuildedType = Variable;
+
+    VariableBuilder {
+        /// optional field
+        indexed_variables: Option u64,
+        r#type : Option String,
+        evaluate_name : Option String,
+        presentation_hint: Option VariablePresentationHint,
+        memory_reference : Option String,
+        named_variables : Option u64,
+
+        /// non optional field
+        value : String,
+        variables_reference : u64,
+        name: String,
+    }
+);

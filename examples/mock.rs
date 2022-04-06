@@ -1,17 +1,21 @@
 use std::net;
 use std::thread;
 
+use dap::msg::dap_type::variable::VariableBuilder;
+use dap::msg::request::VariablesResponse;
 use rand::Rng;
 
 use dap::codec::{DapCodec, Session};
 use dap::msg::dap_type::breakpoint::Breakpoint;
 use dap::msg::dap_type::breakpoint::BreakpointBuilder;
 use dap::msg::dap_type::capabilities::Capabilities;
+use dap::msg::dap_type::scope::ScopeBuilder;
 use dap::msg::dap_type::stack_frame::StackFrameBuilder;
 use dap::msg::dap_type::thread::Thread;
 use dap::msg::event;
 use dap::msg::event::stopped::StoppedEvent;
 use dap::msg::event::Event;
+use dap::msg::request::ScopesResponse;
 use dap::msg::request::StackTraceRequest;
 use dap::msg::request::StackTraceResponse;
 use dap::msg::request::{
@@ -60,6 +64,27 @@ fn run_session(mut session: Session) {
                 Request::StackTrace(request) => {
                     handle_stack_trace_request(request, &mut session, &debuggee)
                 }
+                Request::Scopes(request) => request
+                    .respond(
+                        Ok(ScopesResponse {
+                            scopes: vec![ScopeBuilder::new("Locals".to_string(), 1, false).build()],
+                        }),
+                        &mut session,
+                    )
+                    .unwrap(),
+                Request::Variables(request) => request
+                    .respond(
+                        Ok(VariablesResponse {
+                            variables: vec![VariableBuilder::new(
+                                "mock".to_string(),
+                                0,
+                                "var 1".to_string(),
+                            )
+                            .build()],
+                        }),
+                        &mut session,
+                    )
+                    .unwrap(),
                 _ => println!("{request:#?}"),
             }
         } else {
