@@ -203,6 +203,7 @@ mod continue_request;
 mod data_breakpoint_info;
 mod disassemble;
 mod disconnect;
+mod error;
 mod evaluate;
 mod exception_info;
 mod goto;
@@ -245,6 +246,7 @@ pub use continue_request::{ContinueRequest, ContinueResponse};
 pub use data_breakpoint_info::{DataBreakpointInfoRequest, DataBreakpointInfoResponse};
 pub use disassemble::{DisassembleRequest, DisassembleResponse};
 pub use disconnect::{DisconnectRequest, DisconnectResponse};
+pub use error::ErrorResponse;
 pub use evaluate::{EvaluateRequest, EvaluateResponse};
 pub use exception_info::{ExceptionInfoRequest, ExceptionInfoResponse};
 pub use goto::{GotoRequest, GotoResponse};
@@ -403,6 +405,7 @@ pub struct Response {
 
 #[derive(Debug)]
 pub enum ResponseType {
+    Error(ErrorResponse),
     Initialize(InitializeResponse),
     ConfigurationDone(ConfigurationDoneResponse),
     Completions(CompletionsResponse),
@@ -488,6 +491,7 @@ impl ToValue for Response {
             ResponseType::ReadMemory(response) => response.to_value(),
             ResponseType::WriteMemory(response) => response.to_value(),
             ResponseType::Disassemble(response) => response.to_value(),
+            ResponseType::Error(error) => error.to_value(),
         };
 
         let map = value.as_mut()?.as_object_mut().unwrap();
