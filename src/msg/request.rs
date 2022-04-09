@@ -195,6 +195,7 @@ macro_rules! response {
     };
 }
 
+mod acknowledgement;
 mod attach;
 mod breakpoint_locations;
 mod completions;
@@ -238,6 +239,7 @@ mod threads;
 mod variables;
 mod write_memory;
 
+pub(crate) use self::acknowledgement::AcknowledgementResponse;
 pub use attach::AttachRequest;
 pub use breakpoint_locations::{BreakpointLocationsRequest, BreakpointLocationsResponse};
 pub use completions::{CompletionsRequest, CompletionsResponse};
@@ -405,6 +407,7 @@ pub struct Response {
 
 #[derive(Debug)]
 pub enum ResponseType {
+    Acknowledgement(AcknowledgementResponse),
     Error(ErrorResponse),
     Initialize(InitializeResponse),
     ConfigurationDone(ConfigurationDoneResponse),
@@ -491,6 +494,7 @@ impl ToValue for Response {
             ResponseType::ReadMemory(response) => response.to_value(),
             ResponseType::WriteMemory(response) => response.to_value(),
             ResponseType::Disassemble(response) => response.to_value(),
+            ResponseType::Acknowledgement(response) => response.to_value(),
             ResponseType::Error(error) => error.to_value(),
         };
 
