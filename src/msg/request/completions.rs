@@ -1,4 +1,4 @@
-use crate::msg::dap_type::CompletionItem;
+use crate::msg::dap_type::completion_item::CompletionItem;
 
 request!(
     type Response = CompletionsResponse;
