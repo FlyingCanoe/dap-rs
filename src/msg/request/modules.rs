@@ -1,3 +1,5 @@
+use crate::msg::dap_type::module::Module;
+
 request!(
     type Response = ModulesResponse;
 
