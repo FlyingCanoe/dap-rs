@@ -21,6 +21,5 @@ request!(
         /// The attribute is only honored by a debug adapter if the capability 'supportSuspendDebuggee' is true.
         suspend_debuggee | "suspendDebuggee": Option<bool>,
         /// A value of true indicates that this 'disconnect' request is part of a restart sequence.
-        restart | "restart": Option<bool>,
     }
 );
