@@ -1,8 +1,7 @@
 use anyhow::Error;
 
-use crate::msg::dap_type::BreakpointLocation;
-use crate::msg::dap_type::Source;
-use crate::msg::request::Response;
+use crate::msg::dap_type::breakpoint_location::BreakpointLocation;
+use crate::msg::dap_type::source::Source;
 use crate::utils::Parse;
 
 //use super::RequestExt;
