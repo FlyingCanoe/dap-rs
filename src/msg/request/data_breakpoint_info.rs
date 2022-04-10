@@ -1,3 +1,6 @@
+use crate::msg::dap_type::data_breakpoint_access_type::DataBreakpointAccessType;
+use either::Either;
+
 request!(
     type Response = DataBreakpointInfoResponse;
 
