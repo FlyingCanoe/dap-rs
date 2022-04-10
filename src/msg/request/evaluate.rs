@@ -32,8 +32,7 @@ request!(
         /// Specifies details on how to format the Evaluate result.
         /// The attribute is only honored by a debug adapter if the capability 'supportsValueFormattingOptions' is true.
         format | "format": Option<ValueFormat>,
-        /// The expression to evaluate.
-        expression | "expression": String,
+
         /// The context in which the evaluate request is run.
         context | "context": Option<Context>,
     }
