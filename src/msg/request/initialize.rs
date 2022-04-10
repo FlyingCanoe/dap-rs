@@ -31,14 +31,12 @@ request!(
         supports_variable_type | "supportsVariableType": Option<bool>,
         /// Client supports memory references.
         supports_memory_references | "supportsMemoryReferences": Option<bool>,
-        /// The ID of the (frontend) client using this adapter.
-        client_id | "clientID": Option<String>,
+
         /// If true all line numbers are 1-based (default).
         lines_start_at1 | "linesStartAt1": Option<bool>,
         /// Client supports the paging of variables.
         supports_variable_paging | "supportsVariablePaging": Option<bool>,
-        /// The ID of the debug adapter.
-        adapter_id | "adapterID": String,
+
         /// Client supports progress reporting.
         supports_progress_reporting | "supportsProgressReporting": Option<bool>,
         /// Client supports the runInTerminal request.
@@ -51,8 +49,6 @@ request!(
         columns_start_at1 | "columnsStartAt1": Option<bool>,
         /// Client supports the memory event.
         supports_memory_event | "supportsMemoryEvent": Option<bool>,
-        /// The human readable name of the (frontend) client using this adapter.
-        client_name | "clientName": Option<String>,
     }
 );
 
