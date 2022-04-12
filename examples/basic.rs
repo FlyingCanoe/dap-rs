@@ -11,8 +11,8 @@ fn main() {
         let mut connection = SocketConnection::new(connection.unwrap());
 
         loop {
-            let msg_len = connection.parse_header().unwrap();
-            println!("{msg_len}");
+            let msg = connection.read_raw_msg().unwrap();
+            println!("{msg}");
         }
     }
 }
