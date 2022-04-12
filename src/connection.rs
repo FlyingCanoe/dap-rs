@@ -1,6 +1,7 @@
 use std::io::Read;
 use std::{io, net::TcpStream};
 
+use anyhow::Error;
 use bstr::{BString, ByteSlice};
 
 /// A connection betweens the adapter and the client.
@@ -34,7 +35,7 @@ impl SocketConnection {
         }
     }
 
-    pub fn read_header(&mut self) -> anyhow::Result<String> {
+    fn read_header(&mut self) -> anyhow::Result<String> {
         // block until the buffer contain a header
         while !self.buf.contains_str("\r\n\r\n") {
             self.read()?;
@@ -50,6 +51,25 @@ impl SocketConnection {
         // convert the bytes to a String
         let header = String::from_utf8(header)?;
         return Ok(header);
+    }
+
+    /// Find the length of the msg body.
+    /// The standard currently only specify one non optional field: the Content-Length field.
+    /// As such, this function return the value of this field.
+    pub fn parse_header(&mut self) -> anyhow::Result<usize> {
+        let header = self.read_header()?;
+
+        // find the Content-Length header field
+        let msg_len_field = header
+            .lines()
+            .find(|line| line.starts_with("Content-Length: "))
+            .ok_or(Error::msg("bad msg"))?;
+
+        // parse the Content-Length header field
+        let (_, msg_len) = msg_len_field.trim().split_once("Content-Length: ").unwrap();
+        let msg_len = msg_len.parse()?;
+
+        Ok(msg_len)
     }
 }
 
@@ -108,5 +128,37 @@ mod test {
         let socket = mock_client(input.to_vec());
         let mut connection = SocketConnection::new(socket);
         connection.read_header().unwrap();
+    }
+
+    #[test]
+    fn parse_header_test() {
+        let input = "Content-Length: 100\r\n\r\nbody".as_bytes();
+        let mut connection = Connection::new(input);
+        let msg_len = connection.parse_header().unwrap();
+        assert_eq!(msg_len, 100)
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_header_read_error_test() {
+        let input = ReadError {};
+        let mut connection = Connection::new(input);
+        connection.parse_header().unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_header_empty_header_test() {
+        let input = "\r\n\r\nbody".as_bytes();
+        let mut connection = Connection::new(input);
+        connection.parse_header().unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_header_invalid_len_test() {
+        let input = "Content-Length: -100\r\n\r\nbody".as_bytes();
+        let mut connection = Connection::new(input);
+        connection.parse_header().unwrap();
     }
 }
