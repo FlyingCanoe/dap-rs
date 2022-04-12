@@ -7,3 +7,4 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.51"
 bstr = "0.2.17"
+json = { package = "serde_json", version="1.0.79"}

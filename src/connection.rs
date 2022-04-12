@@ -72,7 +72,7 @@ impl SocketConnection {
         Ok(msg_len)
     }
 
-    pub fn read_raw_msg(&mut self) -> anyhow::Result<String> {
+    fn read_raw_msg(&mut self) -> anyhow::Result<String> {
         let msg_len = self.parse_header()?;
 
         // read the msg
@@ -90,6 +90,11 @@ impl SocketConnection {
         // convert the bytes into a string
         let msg = String::from_utf8(msg).unwrap();
         Ok(msg)
+    }
+
+    pub fn read_msg(&mut self) -> anyhow::Result<json::Value> {
+        let raw_msg = self.read_raw_msg()?;
+        Ok(json::from_str(&raw_msg)?)
     }
 }
 
@@ -118,70 +123,72 @@ mod test {
 
     #[test]
     #[should_panic]
-    fn read_raw_msg_invalid_utf8_test() {
+    fn read_msg_invalid_utf8_test() {
         // invalid utf-8 example from https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
         // copyright Markus Kuhn <http://www.cl.cam.ac.uk/~mgk25/> - 2015-08-28 - CC BY 4.0
         let mut input = vec![0xFF, 0xFF];
         input.extend_from_slice(b"\r\n\r\n");
 
-        let socket = mock_client(input.to_vec());
+        let socket = mock_client(input);
         let mut connection = SocketConnection::new(socket);
-        connection.read_raw_msg().unwrap();
+        connection.read_msg().unwrap();
     }
 
     #[test]
     #[should_panic]
-    fn read_raw_msg_unexpected_eoi_test() {
-        let input = "".as_bytes();
-
-        let socket = mock_client(input.to_vec());
+    fn read_msg_unexpected_eoi_test() {
+        let socket = mock_client(vec![]);
         let mut connection = SocketConnection::new(socket);
-        connection.read_raw_msg().unwrap();
-    }
-
-    #[test]
-    fn parse_header_test() {
-        let input = "Content-Length: 100\r\n\r\nbody".as_bytes();
-
-        let socket = mock_client(input.to_vec());
-        let mut connection = SocketConnection::new(socket);
-        let msg_len = connection.parse_header().unwrap();
-        assert_eq!(msg_len, 100)
+        connection.read_msg().unwrap();
     }
 
     #[test]
     #[should_panic]
-    fn parse_header_empty_header_test() {
-        let input = "\r\n\r\nbody".as_bytes();
+    fn read_msg_empty_header_test() {
+        let input = b"\r\n\r\nbody";
+
         let socket = mock_client(input.to_vec());
         let mut connection = SocketConnection::new(socket);
-        connection.parse_header().unwrap();
+        connection.read_msg().unwrap();
     }
 
     #[test]
     #[should_panic]
-    fn parse_header_invalid_len_test() {
-        let input = "Content-Length: -100\r\n\r\nbody".as_bytes();
-        let socket = mock_client(input.to_vec());
-        let mut connection = SocketConnection::new(socket);
-        connection.parse_header().unwrap();
-    }
+    fn read_msg_invalid_len_test() {
+        let input = b"Content-Length: -100\r\n\r\nbody";
 
-    #[test]
-    fn read_raw_msg_test() {
-        let input = "Content-Length: 4\r\n\r\nbody".as_bytes();
         let socket = mock_client(input.to_vec());
         let mut connection = SocketConnection::new(socket);
-        let msg = connection.read_raw_msg().unwrap();
-        assert_eq!(msg, "body")
+        connection.read_msg().unwrap();
     }
 
     #[test]
     #[should_panic]
-    fn read_raw_msg_len_bigger_thant_msg_test() {
-        let input = "Content-Length: 5\r\n\r\nbody".as_bytes();
+    fn read_msg_len_bigger_than_msg_test() {
+        let input = b"Content-Length: 5\r\n\r\nbody";
+
         let socket = mock_client(input.to_vec());
         let mut connection = SocketConnection::new(socket);
-        connection.read_raw_msg().unwrap();
+        connection.read_msg().unwrap();
+    }
+
+    #[test]
+    fn read_msg_test() {
+        let input = b"Content-Length: 2\r\n\r\n{}";
+
+        let socket = mock_client(input.to_vec());
+        let mut connection = SocketConnection::new(socket);
+        let msg = connection.read_msg().unwrap();
+        assert_eq!(msg, json::json!({}))
+    }
+
+    #[test]
+    #[should_panic]
+    fn read_msg_body_is_not_json_test() {
+        let input = b"Content-Length: 4\r\n\r\nbody";
+
+        let socket = mock_client(input.to_vec());
+        let mut connection = SocketConnection::new(socket);
+        connection.read_msg().unwrap();
     }
 }
