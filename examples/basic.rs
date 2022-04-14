@@ -1,18 +1,20 @@
 use std::net::TcpListener;
 
-use dap::connection::SocketConnection;
+use dap::adapter::Adapter;
 
 fn main() {
     // this example does not currently have any argument parsing.
     // as such, it can not be ask to listen on a specific port, and instead use a hardcoded value.
     let listener = TcpListener::bind("127.0.0.1:4711").unwrap();
 
-    for connection in listener.incoming() {
-        let mut connection = SocketConnection::new(connection.unwrap());
+    let mut adapter = Adapter::new(listener);
+
+    loop {
+        let mut session = adapter.accept().unwrap();
 
         loop {
-            let msg = connection.read_msg().unwrap();
-            println!("{msg:#}");
+            let msg = session.recv_request().unwrap();
+            println!("{msg:#?}");
         }
     }
 }
