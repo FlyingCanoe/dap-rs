@@ -1,7 +1,8 @@
 use std::net::{TcpListener, TcpStream};
 
 use crate::connection::SocketConnection;
-use crate::request::Request;
+use crate::request::{Request, Response};
+use crate::utils::ToValue;
 
 pub struct Adapter {
     listener: TcpListener,
@@ -21,39 +22,78 @@ impl Adapter {
 
 pub struct Session {
     connection: SocketConnection,
+    next_seq: u64,
 }
 
 impl Session {
     fn new(connection: TcpStream) -> Session {
         Session {
             connection: SocketConnection::new(connection),
+            next_seq: 1,
         }
+    }
+
+    pub(crate) fn next_seq(&mut self) -> u64 {
+        let output = self.next_seq;
+        self.next_seq += 1;
+        output
     }
 
     pub fn recv_request(&mut self) -> anyhow::Result<Request> {
         let msg_value = self.connection.read_msg()?;
         Request::parse(msg_value)
     }
+
+    pub(crate) fn send_response(
+        &mut self,
+        response: Response,
+        request_seq: u64,
+    ) -> anyhow::Result<()> {
+        let mut value = response.to_value().unwrap();
+        let map = value.as_object_mut().unwrap();
+
+        map.insert("seq".to_string(), self.next_seq().into());
+        map.insert("type".to_string(), "response".into());
+        map.insert("request_seq".to_string(), request_seq.into());
+
+        let msg = json::to_string(&value)?;
+        self.connection.send_msg(&msg)
+    }
 }
 
 #[cfg(test)]
 mod test {
+    use std::collections::HashMap;
     use std::io::Write;
     use std::net::{TcpListener, TcpStream};
     use std::thread;
 
+    use crate::dap_type::Message;
+    use crate::request::{Request, RequestExt};
+
     use super::Adapter;
 
+    fn get_init_request_basic() -> json::Value {
+        json::json!({
+            "command": "initialize",
+            "arguments": {
+                "adapterID": "mock",
+            },
+            "type": "request",
+            "seq": 1u8
+        })
+    }
+
     fn mock_client(input: Vec<u8>) -> TcpListener {
-        let adapter = TcpListener::bind("127.0.0.1:0").unwrap();
-        let port = adapter.local_addr().unwrap().port();
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
 
         thread::spawn(move || loop {
             let _ = TcpStream::connect(format!("127.0.0.1:{}", port)).map(|mut client| {
                 let _ = client.write_all(&input);
             });
         });
-        adapter
+        listener
     }
 
     #[test]
@@ -157,5 +197,77 @@ mod test {
         let mut session = adapter.accept().unwrap();
 
         session.recv_request().unwrap();
+    }
+
+    #[test]
+    fn response_test() {
+        let request = get_init_request_basic().to_string();
+
+        let input = format!("Content-Length: {}\r\n\r\n{request}", request.len());
+
+        let listener = mock_client(input.into_bytes());
+        let mut adapter = Adapter::new(listener);
+        let mut session = adapter.accept().unwrap();
+
+        let request = session.recv_request().unwrap();
+
+        match request {
+            Request::Initialize(request) => request.respond((), &mut session).unwrap(),
+        }
+    }
+
+    #[test]
+    fn response_with_error_test() {
+        let request = get_init_request_basic().to_string();
+
+        let input = format!("Content-Length: {}\r\n\r\n{request}", request.len());
+
+        let listener = mock_client(input.into_bytes());
+        let mut adapter = Adapter::new(listener);
+        let mut session = adapter.accept().unwrap();
+
+        let request = session.recv_request().unwrap();
+
+        match request {
+            Request::Initialize(request) => request
+                .respond_with_error(Some("error".to_string()), None, &mut session)
+                .unwrap(),
+        }
+    }
+
+    #[test]
+    fn response_with_structured_error_test() {
+        let request = get_init_request_basic().to_string();
+
+        let input = format!("Content-Length: {}\r\n\r\n{request}", request.len());
+
+        let listener = mock_client(input.into_bytes());
+        let mut adapter = Adapter::new(listener);
+        let mut session = adapter.accept().unwrap();
+
+        let request = session.recv_request().unwrap();
+
+        let var: HashMap<String, String> = vec![
+            ("test_key".to_string(), "test_value".to_string()),
+            ("test_key2".to_string(), "test_value2".to_string()),
+        ]
+        .into_iter()
+        .collect();
+
+        let msg = Message {
+            url: Some("http://example.com".to_string()),
+            id: 0,
+            format: "".to_string(),
+            variables: Some(var),
+            show_user: Some(true),
+            url_label: Some("test".to_string()),
+            send_telemetry: Some(false),
+        };
+
+        match request {
+            Request::Initialize(request) => request
+                .respond_with_error(Some("error".to_string()), Some(msg), &mut session)
+                .unwrap(),
+        };
     }
 }

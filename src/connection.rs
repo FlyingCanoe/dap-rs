@@ -1,4 +1,4 @@
-use std::io::Read;
+use std::io::{Read, Write};
 use std::{io, net::TcpStream};
 
 use anyhow::Error;
@@ -95,5 +95,11 @@ impl SocketConnection {
     pub fn read_msg(&mut self) -> anyhow::Result<json::Value> {
         let raw_msg = self.read_raw_msg()?;
         Ok(json::from_str(&raw_msg)?)
+    }
+
+    pub(crate) fn send_msg(&mut self, msg: &str) -> anyhow::Result<()> {
+        let msg = format!("Content-Length: {}\r\n\r\n{msg}", msg.len());
+        self.socket.write_all(msg.as_bytes())?;
+        Ok(())
     }
 }

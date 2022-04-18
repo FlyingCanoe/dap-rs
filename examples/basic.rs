@@ -1,6 +1,7 @@
 use std::net::TcpListener;
 
 use dap::adapter::Adapter;
+use dap::request::{Request, RequestExt};
 
 fn main() {
     // this example does not currently have any argument parsing.
@@ -14,7 +15,11 @@ fn main() {
 
         loop {
             let msg = session.recv_request().unwrap();
-            println!("{msg:#?}");
+            match msg {
+                Request::Initialize(request) => request
+                    .respond_with_error(Some("not implemented yet".to_string()), None, &mut session)
+                    .unwrap(),
+            }
         }
     }
 }
