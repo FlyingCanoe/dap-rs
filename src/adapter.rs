@@ -71,7 +71,7 @@ mod test {
     use crate::dap_type::Message;
     use crate::request::{Request, RequestExt};
 
-    use super::Adapter;
+    use super::{Adapter, Session};
 
     fn get_init_request_basic() -> json::Value {
         json::json!({
@@ -84,7 +84,7 @@ mod test {
         })
     }
 
-    fn mock_client(input: Vec<u8>) -> TcpListener {
+    fn mock_client(input: Vec<u8>) -> Session {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let port = listener.local_addr().unwrap().port();
 
@@ -93,7 +93,8 @@ mod test {
                 let _ = client.write_all(&input);
             });
         });
-        listener
+        let mut adapter = Adapter::new(listener);
+        adapter.accept().unwrap()
     }
 
     #[test]
@@ -104,19 +105,14 @@ mod test {
         let mut input = vec![0xFF, 0xFF];
         input.extend_from_slice(b"\r\n\r\n");
 
-        let socket = mock_client(input);
-
-        let mut adapter = Adapter::new(socket);
-        let mut session = adapter.accept().unwrap();
+        let mut session = mock_client(input.to_vec());
         session.recv_request().unwrap();
     }
 
     #[test]
     #[should_panic]
     fn recv_request_unexpected_eoi_test() {
-        let socket = mock_client(vec![]);
-        let mut adapter = Adapter::new(socket);
-        let mut session = adapter.accept().unwrap();
+        let mut session = mock_client(vec![]);
         session.recv_request().unwrap();
     }
 
@@ -125,10 +121,7 @@ mod test {
     fn recv_request_empty_header_test() {
         let input = b"\r\n\r\nbody";
 
-        let socket = mock_client(input.to_vec());
-
-        let mut adapter = Adapter::new(socket);
-        let mut session = adapter.accept().unwrap();
+        let mut session = mock_client(input.to_vec());
         session.recv_request().unwrap();
     }
 
@@ -137,11 +130,7 @@ mod test {
     fn recv_request_invalid_len_test() {
         let input = b"Content-Length: -100\r\n\r\nbody";
 
-        let socket = mock_client(input.to_vec());
-
-        let mut adapter = Adapter::new(socket);
-        let mut session = adapter.accept().unwrap();
-
+        let mut session = mock_client(input.to_vec());
         session.recv_request().unwrap();
     }
 
@@ -150,11 +139,7 @@ mod test {
     fn recv_request_len_bigger_than_msg_test() {
         let input = b"Content-Length: 5\r\n\r\nbody";
 
-        let socket = mock_client(input.to_vec());
-
-        let mut adapter = Adapter::new(socket);
-        let mut session = adapter.accept().unwrap();
-
+        let mut session = mock_client(input.to_vec());
         session.recv_request().unwrap();
     }
 
@@ -164,11 +149,7 @@ mod test {
         let msg = json::json!({"command": ""}).to_string();
         let input = format!("Content-Length: {}\r\n\r\n{msg}", msg.len());
 
-        let socket = mock_client(input.as_bytes().to_vec());
-
-        let mut adapter = Adapter::new(socket);
-        let mut session = adapter.accept().unwrap();
-
+        let mut session = mock_client(input.as_bytes().to_vec());
         session.recv_request().unwrap();
     }
 
@@ -178,11 +159,7 @@ mod test {
         let msg = json::json!({"command": 0}).to_string();
         let input = format!("Content-Length: {}\r\n\r\n{msg}", msg.len());
 
-        let socket = mock_client(input.as_bytes().to_vec());
-
-        let mut adapter = Adapter::new(socket);
-        let mut session = adapter.accept().unwrap();
-
+        let mut session = mock_client(input.as_bytes().to_vec());
         session.recv_request().unwrap();
     }
 
@@ -190,11 +167,7 @@ mod test {
     #[should_panic]
     fn recv_request_body_is_not_json_test() {
         let input = b"Content-Length: 4\r\n\r\nbody";
-
-        let socket = mock_client(input.to_vec());
-
-        let mut adapter = Adapter::new(socket);
-        let mut session = adapter.accept().unwrap();
+        let mut session = mock_client(input.to_vec());
 
         session.recv_request().unwrap();
     }
@@ -202,13 +175,9 @@ mod test {
     #[test]
     fn response_test() {
         let request = get_init_request_basic().to_string();
-
         let input = format!("Content-Length: {}\r\n\r\n{request}", request.len());
 
-        let listener = mock_client(input.into_bytes());
-        let mut adapter = Adapter::new(listener);
-        let mut session = adapter.accept().unwrap();
-
+        let mut session = mock_client(input.into_bytes());
         let request = session.recv_request().unwrap();
 
         match request {
@@ -219,13 +188,9 @@ mod test {
     #[test]
     fn response_with_error_test() {
         let request = get_init_request_basic().to_string();
-
         let input = format!("Content-Length: {}\r\n\r\n{request}", request.len());
 
-        let listener = mock_client(input.into_bytes());
-        let mut adapter = Adapter::new(listener);
-        let mut session = adapter.accept().unwrap();
-
+        let mut session = mock_client(input.into_bytes());
         let request = session.recv_request().unwrap();
 
         match request {
@@ -238,13 +203,9 @@ mod test {
     #[test]
     fn response_with_structured_error_test() {
         let request = get_init_request_basic().to_string();
-
         let input = format!("Content-Length: {}\r\n\r\n{request}", request.len());
 
-        let listener = mock_client(input.into_bytes());
-        let mut adapter = Adapter::new(listener);
-        let mut session = adapter.accept().unwrap();
-
+        let mut session = mock_client(input.into_bytes());
         let request = session.recv_request().unwrap();
 
         let var: HashMap<String, String> = vec![
