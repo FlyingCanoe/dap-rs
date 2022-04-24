@@ -11,6 +11,7 @@ pub mod initialize_request;
 
 use acknowledgement_response::AcknowledgementResponse;
 use error_response::ErrorResponse;
+use initialize_request::InitializeResponse;
 pub use initialize_request::{InitializeRequest, PathFormat};
 
 pub trait RequestExt {
@@ -47,6 +48,7 @@ impl Request {
 pub(crate) enum Response {
     Error(ErrorResponse),
     Acknowledgement(AcknowledgementResponse),
+    Initialize(InitializeResponse),
 }
 
 impl ToValue for Response {
@@ -54,6 +56,7 @@ impl ToValue for Response {
         match self {
             Response::Error(response) => response.to_value(),
             Response::Acknowledgement(response) => response.to_value(),
+            Response::Initialize(response) => response.to_value(),
         }
     }
 }

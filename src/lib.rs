@@ -9,7 +9,7 @@ macro_rules! request {
         }
     ) => {
         use crate::adapter::Session;
-        use crate::request::{Response, AcknowledgementResponse, ErrorResponse, RequestExt};
+        use crate::request::{Response, ErrorResponse, RequestExt};
         use crate::dap_type::Message;
 
         #[derive(Debug)]
@@ -42,29 +42,6 @@ macro_rules! request {
             }
         }
 
-        impl RequestExt for $request_name {
-            type Response = ();
-
-            fn respond(
-                self,
-                _response: (),
-                session: &mut Session,
-            ) -> Result<(), anyhow::Error> {
-                let response = Response::from(AcknowledgementResponse::new($command.to_string()));
-
-                session.send_response(response, self.seq)
-            }
-
-            fn respond_with_error(
-                self,
-                message: Option<String>,
-                error: Option<Message>,
-                session: &mut Session,
-            ) -> Result<(), anyhow::Error> {
-                let response = Response::from(ErrorResponse::new(message, error, $command.to_string()));
-                session.send_response(response, self.seq)
-            }
-        }
     };
 
 }
@@ -139,6 +116,58 @@ macro_rules! dap_type_enum {
                     _ => $type_name::Other(input.to_string()),
                 };
                 Ok(output)
+            }
+        }
+
+
+        impl crate::utils::ToValue for $type_name {
+            fn to_value(self) -> Option<json::Value> {
+                let value = match self {
+                    $(Self::$field => json::Value::String($field_wire_name.to_string()),)*
+                    Self::Other(value) => json::Value::String(value),
+                };
+                Some(value)
+            }
+        }
+    };
+
+    (
+        $(#[$type_meta:meta])*
+        $type_name:ident {
+            $(
+                $(#[$field_meta:meta])*
+                $field:ident | $field_wire_name:literal,
+            )*
+        }
+    ) => {
+        #[derive(Clone, Debug)]
+        $(#[$type_meta])*
+        pub enum $type_name {
+            $(
+                $(#[$field_meta])*
+                $field,
+            )*
+        }
+
+        impl crate::utils::Parse for $type_name {
+            fn parse(input: Option<&json::Value>) -> anyhow::Result<$type_name> {
+                let input = String::parse(input)?;
+
+                let output = match input.as_str() {
+                    $($field_wire_name => $type_name::$field,)*
+                    _ => anyhow::bail!("parsing error")
+                };
+                Ok(output)
+            }
+        }
+
+
+        impl crate::utils::ToValue for $type_name {
+            fn to_value(self) -> Option<json::Value> {
+                let value = match self {
+                    $(Self::$field => json::Value::String($field_wire_name.to_string()),)*
+                };
+                Some(value)
             }
         }
     };

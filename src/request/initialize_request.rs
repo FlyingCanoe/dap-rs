@@ -1,3 +1,5 @@
+use crate::{dap_type::Capabilities, utils::ToValue};
+
 dap_type_enum!(
     /// Determines in what format paths are specified. The default is 'path', which is the native format.
     PathFormat {
@@ -44,6 +46,44 @@ request!(
         client_name | "clientName": Option<String>,
     }
 );
+
+#[derive(Debug, Clone)]
+pub(crate) struct InitializeResponse(Capabilities);
+
+impl ToValue for InitializeResponse {
+    fn to_value(self) -> Option<json::Value> {
+        let mut msg = json::Map::new();
+
+        msg.insert("type".to_string(), "response".into());
+        msg.insert("success".to_string(), true.into());
+        msg.insert("command".to_string(), "initialize".into());
+
+        let cap = self.0.to_value().unwrap();
+        msg.insert("body".to_string(), cap);
+
+        Some(msg.into())
+    }
+}
+
+impl RequestExt for InitializeRequest {
+    type Response = Capabilities;
+    fn respond(self, response: Capabilities, session: &mut Session) -> Result<(), anyhow::Error> {
+        let init_response = InitializeResponse(response);
+        let response = Response::Initialize(init_response);
+
+        session.send_response(response, self.seq)
+    }
+
+    fn respond_with_error(
+        self,
+        message: Option<String>,
+        error: Option<Message>,
+        session: &mut Session,
+    ) -> Result<(), anyhow::Error> {
+        let response = Response::from(ErrorResponse::new(message, error, "initialize".to_string()));
+        session.send_response(response, self.seq)
+    }
+}
 
 #[cfg(test)]
 mod test {

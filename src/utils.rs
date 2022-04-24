@@ -86,6 +86,18 @@ impl<T: ToValue> ToValue for Option<T> {
     }
 }
 
+impl<T: ToValue> ToValue for Vec<T> {
+    fn to_value(self) -> Option<json::Value> {
+        let mut value_vec = vec![];
+        for elm in self.into_iter() {
+            value_vec.push(elm.to_value()?)
+        }
+
+        let value = value_vec.into_iter().collect();
+        Some(value)
+    }
+}
+
 impl<V: ToValue> ToValue for HashMap<String, V> {
     fn to_value(self) -> Option<json::Value> {
         use json::Value;

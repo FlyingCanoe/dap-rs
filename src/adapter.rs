@@ -68,7 +68,7 @@ mod test {
     use std::net::{TcpListener, TcpStream};
     use std::thread;
 
-    use crate::dap_type::Message;
+    use crate::dap_type::{Capabilities, Message};
     use crate::request::{Request, RequestExt};
 
     use super::{Adapter, Session};
@@ -173,15 +173,57 @@ mod test {
     }
 
     #[test]
-    fn response_test() {
+    fn init_response_test() {
         let request = get_init_request_basic().to_string();
         let input = format!("Content-Length: {}\r\n\r\n{request}", request.len());
 
         let mut session = mock_client(input.into_bytes());
         let request = session.recv_request().unwrap();
 
+        let cap = Capabilities {
+            supports_configuration_done_request: None,
+            supports_function_breakpoints: None,
+            supports_conditional_breakpoints: None,
+            supports_hit_conditional_breakpoints: None,
+            supports_evaluate_for_hovers: None,
+            exception_breakpoint_filters: None,
+            supports_step_back: None,
+            supports_set_variable: None,
+            supports_restart_frame: None,
+            supports_goto_targets_request: None,
+            supports_step_in_targets_request: None,
+            supports_completions_request: None,
+            completion_trigger_characters: None,
+            supports_modules_request: None,
+            additional_module_columns: None,
+            supported_checksum_algorithms: None,
+            supports_restart_request: None,
+            supports_exception_options: None,
+            supports_value_formatting_options: None,
+            supports_exception_info_request: None,
+            support_terminate_debuggee: None,
+            support_suspend_debuggee: None,
+            supports_delayed_stack_trace_loading: None,
+            supports_loaded_sources_request: None,
+            supports_log_points: None,
+            supports_terminate_threads_request: None,
+            supports_set_expression: None,
+            supports_terminate_request: None,
+            supports_data_breakpoints: None,
+            supports_read_memory_request: None,
+            supports_write_memory_request: None,
+            supports_disassemble_request: None,
+            supports_cancel_request: None,
+            supports_breakpoint_locations_request: None,
+            supports_clipboard_context: None,
+            supports_stepping_granularity: None,
+            supports_instruction_breakpoints: None,
+            supports_exception_filter_options: None,
+            supports_single_thread_execution_requests: None,
+        };
+
         match request {
-            Request::Initialize(request) => request.respond((), &mut session).unwrap(),
+            Request::Initialize(request) => request.respond(cap, &mut session).unwrap(),
         }
     }
 
