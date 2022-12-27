@@ -113,7 +113,7 @@ where
     }
 }
 
-pub(crate) trait ToValue {
+pub trait ToValue {
     fn to_value(self) -> Option<json::Value>
     where
         Self: Sized;

@@ -3,12 +3,12 @@ use serde_json as json;
 use crate::utils::ToValue;
 
 #[derive(Clone, Debug)]
-pub(crate) struct AcknowledgementResponse {
+pub struct AcknowledgementResponse {
     pub(crate) command: String,
 }
 
 impl AcknowledgementResponse {
-    pub(crate) fn new(command: String) -> AcknowledgementResponse {
+    pub fn new(command: String) -> AcknowledgementResponse {
         AcknowledgementResponse { command }
     }
 }

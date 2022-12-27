@@ -2,4 +2,4 @@
 pub mod codec;
 mod connection;
 pub mod msg;
-mod utils;
+pub mod utils;

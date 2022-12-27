@@ -118,7 +118,7 @@ impl SocketConnection {
     }
 
     pub fn send_msg(&mut self, msg: Msg) -> anyhow::Result<()> {
-        let msg = Json::to_string(&msg.to_value())?;
+        let msg = Json::to_string_pretty(&msg.to_value())?;
         let msg_header = format!("Content-Length: {}\r\n\r\n", msg.len());
 
         self.inner_connection.write_all(msg_header.as_bytes())?;

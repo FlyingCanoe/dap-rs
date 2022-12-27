@@ -155,8 +155,8 @@ use request::{Request, Response};
 
 #[derive(Clone, Debug)]
 pub struct Msg {
-    pub(crate) seq: u64,
-    pub(crate) msg_type: MsgType,
+    pub seq: u64,
+    pub msg_type: MsgType,
 }
 
 #[derive(Clone, Debug)]

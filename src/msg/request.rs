@@ -162,7 +162,7 @@ mod threads;
 mod variables;
 mod write_memory;
 
-pub(crate) use self::acknowledgement::AcknowledgementResponse;
+pub use self::acknowledgement::AcknowledgementResponse;
 pub use attach::{AttachRequest, AttachResponse};
 pub use breakpoint_locations::{BreakpointLocationsRequest, BreakpointLocationsResponse};
 pub use completions::{CompletionsRequest, CompletionsResponse};
@@ -322,7 +322,7 @@ impl Request {
         Ok(request)
     }
 
-    pub(crate) fn command(&self) -> &'static str {
+    pub fn command(&self) -> &'static str {
         match self {
             Request::Initialize(request) => request.command(),
             Request::ConfigurationDone(request) => request.command(),
@@ -421,13 +421,13 @@ impl ToValue for Request {
 
 #[derive(Clone, Debug)]
 pub struct Response {
-    pub(crate) request_seq: u64,
-    pub(crate) response_type: ResponseType,
+    pub request_seq: u64,
+    pub response_type: ResponseType,
 }
 
 #[derive(Clone, Debug)]
 #[allow(dead_code)]
-pub(crate) enum ResponseType {
+pub enum ResponseType {
     Acknowledgement(AcknowledgementResponse),
     Error(ErrorResponse),
     Initialize(InitializeResponse),
