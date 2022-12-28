@@ -45,6 +45,10 @@ impl Session {
         self.connection.read_msg()
     }
 
+    pub fn try_recv(&mut self) -> anyhow::Result<Option<Msg>> {
+        self.connection.try_read_msg()
+    }
+
     pub fn send(&mut self, msg: MsgType) -> Result<(), anyhow::Error> {
         let seq = self.next_seq();
         self.connection.send_msg(Msg { seq, msg_type: msg })

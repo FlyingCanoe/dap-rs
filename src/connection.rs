@@ -28,6 +28,12 @@ impl SocketConnection {
     fn read(&mut self) -> Result<(), io::Error> {
         let mut buf = [0; 4096];
         match self.inner_connection.read(&mut buf) {
+            Ok(0) => {
+                return Err(io::Error::new(
+                    io::ErrorKind::UnexpectedEof,
+                    anyhow::anyhow!("unexpected eof"),
+                ))
+            }
             Ok(read_size) => self.buf.extend_from_slice(&buf[0..read_size]),
             Err(err) => return Err(err),
         }
@@ -99,8 +105,8 @@ impl SocketConnection {
         }
     }
 
-    #[allow(dead_code)]
     pub fn try_read_msg(&mut self) -> anyhow::Result<Option<Msg>> {
+        self.inner_connection.set_nonblocking(true)?;
         if let Some(raw_msg) = self.try_read_raw_msg()? {
             let msg = parse_msg(&raw_msg)?;
             Ok(Some(msg))
