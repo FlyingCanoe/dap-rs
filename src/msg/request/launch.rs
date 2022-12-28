@@ -46,7 +46,7 @@ impl LaunchRequest {
         Ok(request)
     }
 
-    pub(crate) const fn command(&self) -> &'static str {
+    pub const fn command(&self) -> &'static str {
         "launch"
     }
 }

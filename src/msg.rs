@@ -18,7 +18,7 @@ macro_rules! dap_type_struct {
         pub struct $type_name {
             $(
                 $(#[$field_meta])*
-                pub(crate) $($field)+: $field_ty,
+                pub $($field)+: $field_ty,
             )*
         }
 
@@ -183,7 +183,7 @@ pub(crate) fn parse_msg(raw_msg: &str) -> anyhow::Result<Msg> {
     let msg_type = String::parse(msg.get("type"))?;
 
     let msg_type = match msg_type.as_str() {
-        "request" => MsgType::Request(Request::parse(msg)?),
+        "request" => MsgType::Request(Request::parse(msg).unwrap()),
         _ => {
             bail!("invalid msg")
         }

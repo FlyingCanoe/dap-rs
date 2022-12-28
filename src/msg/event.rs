@@ -13,7 +13,7 @@ macro_rules! event {
         pub struct $event_name {
             $(
                 $(#[$field_meta])*
-                $($field).+: $field_ty,
+                pub $($field).+: $field_ty,
             )*
         }
 
@@ -43,41 +43,41 @@ macro_rules! event {
     };
 }
 
-mod breakpoint;
-mod capabilities;
-mod continued;
-mod exited;
-mod initialized;
-mod invalidated;
-mod loaded_source;
-mod memory;
-mod module;
-mod output;
-mod process;
-mod progress_end;
-mod progress_start;
-mod progress_update;
-mod stopped;
-mod terminated;
-mod thread;
+pub mod breakpoint;
+pub mod capabilities;
+pub mod continued;
+pub mod exited;
+pub mod initialized;
+pub mod invalidated;
+pub mod loaded_source;
+pub mod memory;
+pub mod module;
+pub mod output;
+pub mod process;
+pub mod progress_end;
+pub mod progress_start;
+pub mod progress_update;
+pub mod stopped;
+pub mod terminated;
+pub mod thread;
 
-use breakpoint::BreakpointEvent;
-use capabilities::CapabilitiesEvent;
-use continued::ContinuedEvent;
-use exited::ExitedEvent;
-use initialized::InitializedEvent;
-use invalidated::InvalidatedEvent;
-use loaded_source::LoadedSourceEvent;
-use memory::MemoryEvent;
-use module::ModuleEvent;
-use output::OutputEvent;
-use process::ProcessEvent;
-use progress_end::ProgressEndEvent;
-use progress_start::ProgressStartEvent;
-use progress_update::ProgressUpdateEvent;
-use stopped::StoppedEvent;
-use terminated::TerminatedEvent;
-use thread::ThreadEvent;
+pub use breakpoint::BreakpointEvent;
+pub use capabilities::CapabilitiesEvent;
+pub use continued::ContinuedEvent;
+pub use exited::ExitedEvent;
+pub use initialized::InitializedEvent;
+pub use invalidated::InvalidatedEvent;
+pub use loaded_source::LoadedSourceEvent;
+pub use memory::MemoryEvent;
+pub use module::ModuleEvent;
+pub use output::OutputEvent;
+pub use process::ProcessEvent;
+pub use progress_end::ProgressEndEvent;
+pub use progress_start::ProgressStartEvent;
+pub use progress_update::ProgressUpdateEvent;
+pub use stopped::StoppedEvent;
+pub use terminated::TerminatedEvent;
+pub use thread::ThreadEvent;
 
 use crate::utils::ToValue;
 
@@ -104,7 +104,7 @@ pub enum Event {
 
 impl ToValue for Event {
     fn to_value(self) -> Option<serde_json::Value> {
-        match self {
+        let mut value = match self {
             Event::Breakpoint(event) => event.to_value(),
             Event::Continue(event) => event.to_value(),
             Event::Capabilities(event) => event.to_value(),
@@ -122,6 +122,11 @@ impl ToValue for Event {
             Event::Stopped(event) => event.to_value(),
             Event::Terminated(event) => event.to_value(),
             Event::Thread(event) => event.to_value(),
-        }
+        };
+        value
+            .as_mut()?
+            .as_object_mut()?
+            .insert("type".to_string(), "event".into());
+        value
     }
 }

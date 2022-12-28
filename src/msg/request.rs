@@ -6,6 +6,35 @@ use crate::utils::{Parse, ToValue};
 macro_rules! request {
     (
         $(#[$request_meta:meta])*
+        $request_name:ident | $command:literal
+    ) => {
+        #[derive(Clone, Debug)]
+        $(#[$request_meta])*
+        pub struct $request_name {}
+
+        impl $request_name {
+            pub(crate) fn parse(_: serde_json::Value) -> anyhow::Result<$request_name> {
+                let request = $request_name {};
+                Ok(request)
+            }
+
+            pub const fn command(&self) -> &'static str {
+                $command
+            }
+        }
+
+        impl crate::utils::ToValue for $request_name {
+            fn to_value(self) -> Option<serde_json::Value> {
+                let mut msg = serde_json::Map::new();
+
+                msg.insert("type".to_string(), "request".into());
+                msg.insert("command".to_string(), $command.into());
+                Some(msg.into())
+            }
+        }
+    };
+    (
+        $(#[$request_meta:meta])*
         $request_name:ident | $command:literal {
             $(
                 $(#[$field_meta:meta])*
@@ -38,7 +67,7 @@ macro_rules! request {
                 Ok(request)
             }
 
-            pub (crate) const fn command(&self) -> &'static str {
+            pub const fn command(&self) -> &'static str {
                 $command
             }
         }
@@ -49,8 +78,7 @@ macro_rules! request {
                 #[allow(unused_mut)]
                 let mut arguments = serde_json::Map::new();
 
-                msg.insert("type".to_string(), "response".into());
-                msg.insert("success".to_string(), true.into());
+                msg.insert("type".to_string(), "request".into());
                 msg.insert("command".to_string(), $command.into());
 
                 $(
@@ -86,7 +114,7 @@ macro_rules! response {
         pub struct $response_name {
             $(
                 $(#[$field_meta])*
-                $($field).+: $field_ty,
+                pub $($field).+: $field_ty,
             )*
         }
 

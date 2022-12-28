@@ -3,7 +3,13 @@ use std::net;
 use dap::{
     codec::DapCodec,
     msg::{
-        request::{AcknowledgementResponse, Response, ResponseType},
+        dap_type::{thread::Thread, Capabilities},
+        event::{Event, InitializedEvent},
+        request::{
+            AcknowledgementResponse, DisconnectResponse, InitializeResponse, PauseResponse,
+            Request, Response, ResponseType, SetBreakpointsResponse,
+            SetExceptionBreakpointsResponse, ThreadsResponse,
+        },
         MsgType,
     },
     utils::ToValue,
@@ -15,23 +21,75 @@ fn main() {
 
     let mut session = codec.accept().unwrap();
 
-    let msg = session.recv().unwrap();
+    let cap = Capabilities::default();
 
-    let MsgType::Request(request) = msg.msg_type else {panic!()};
+    let init_event = Event::Initialized(InitializedEvent {});
+    let init_event = MsgType::Event(init_event);
 
-    let response = AcknowledgementResponse::new(request.command().to_string());
-    let response = ResponseType::Acknowledgement(response);
+    loop {
+        let msg = session.recv().unwrap();
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&msg.clone().to_value().unwrap()).unwrap()
+        );
 
-    let response = Response {
-        request_seq: msg.seq,
-        response_type: response,
-    };
+        let MsgType::Request(request) = msg.msg_type else {panic!()};
 
-    session.send(MsgType::Response(response)).unwrap();
+        let response = match request {
+            Request::Launch(request) => ResponseType::Acknowledgement(
+                AcknowledgementResponse::new(request.command().to_string()),
+            ),
+            Request::SetExceptionBreakpoints(_) => {
+                let response = SetExceptionBreakpointsResponse { breakpoints: None };
+                ResponseType::SetExceptionBreakpoints(response)
+            }
+            Request::Threads(_) => {
+                let response = ThreadsResponse {
+                    threads: vec![Thread {
+                        id: 0,
+                        name: "main".to_string(),
+                    }],
+                };
+                ResponseType::Threads(response)
+            }
+            Request::SetBreakpoints(_) => {
+                let response = SetBreakpointsResponse {
+                    breakpoints: vec![],
+                };
+                ResponseType::SetBreakpoints(response)
+            }
+            Request::Pause(_) => {
+                let response = PauseResponse {};
 
-    let msg = session.recv().unwrap();
-    println!(
-        "{}",
-        serde_json::to_string_pretty(&msg.to_value().unwrap()).unwrap()
-    )
+                ResponseType::Pause(response)
+            }
+            Request::Disconnect(_) => {
+                let response = DisconnectResponse {};
+                ResponseType::Disconnect(response)
+            }
+            Request::Initialize(_) => {
+                let response = InitializeResponse {
+                    capabilities: Some(cap.clone()),
+                };
+                let response = ResponseType::Initialize(response);
+                let response = Response {
+                    request_seq: msg.seq,
+                    response_type: response,
+                };
+
+                session.send(MsgType::Response(response)).unwrap();
+
+                session.send(init_event.clone()).unwrap();
+                continue;
+            }
+            _ => panic!(),
+        };
+
+        session
+            .send(MsgType::Response(Response {
+                request_seq: msg.seq,
+                response_type: response,
+            }))
+            .unwrap();
+    }
 }
