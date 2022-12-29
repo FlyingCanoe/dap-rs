@@ -2,6 +2,7 @@ use std::net;
 use std::thread;
 
 use dap::msg::dap_type::variable::VariableBuilder;
+use dap::msg::request::ContinueResponse;
 use dap::msg::request::VariablesResponse;
 use rand::Rng;
 
@@ -85,6 +86,17 @@ fn run_session(mut session: Session) {
                         &mut session,
                     )
                     .unwrap(),
+                Request::Continue(request) => {
+                    debuggee.is_running = true;
+                    request
+                        .respond(
+                            Ok(ContinueResponse {
+                                all_threads_continued: Some(true),
+                            }),
+                            &mut session,
+                        )
+                        .unwrap()
+                }
                 _ => println!("{request:#?}"),
             }
         } else {
