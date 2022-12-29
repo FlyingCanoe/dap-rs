@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::net;
 use std::thread;
 
@@ -86,6 +87,7 @@ struct Context {
     event_queue: Vec<Event>,
     breakpoint_list: Vec<Breakpoint>,
     is_running: bool,
+    curent_pos: Option<Breakpoint>,
     session: Session,
 }
 
@@ -158,10 +160,23 @@ impl Context {
 
     fn handle_stack_trace_request(&mut self, request: StackTraceRequest) -> anyhow::Result<()> {
         let mut rng = rand::thread_rng();
-        let stack_frames: Vec<_> = self
+        let mut stack_frames: VecDeque<_> = self
             .breakpoint_list
             .iter()
             .map(|breakpoint| {
+                StackFrameBuilder::new(
+                    rng.gen(),
+                    "mock".to_string(),
+                    breakpoint.line.unwrap_or(0),
+                    breakpoint.column.unwrap_or(0),
+                )
+                .source(breakpoint.source.clone().unwrap())
+                .build()
+            })
+            .collect();
+
+        if let Some(breakpoint) = &self.curent_pos {
+            stack_frames.push_front(
                 StackFrameBuilder::new(
                     rng.gen(),
                     "mock".to_string(),
@@ -174,13 +189,13 @@ impl Context {
                         .clone()
                         .ok_or(anyhow!("breakpoint without source are not suported"))?,
                 )
-                .build()
-            })
-            .collect();
+                .build(),
+            );
+        }
 
         request.respond(
             Ok(StackTraceResponse {
-                stack_frames: stack_frames,
+                stack_frames: stack_frames.into(),
                 total_frames: None,
             }),
             &mut self.session,
@@ -223,6 +238,7 @@ impl Context {
             breakpoint_list: vec![],
             is_running: false,
             session,
+            curent_pos: None,
         }
     }
 
@@ -231,9 +247,10 @@ impl Context {
 
         let mut rng = rand::thread_rng();
         if self.event_queue.is_empty() {
-            if self.is_running && self.breakpoint_list.len() >= 2 {
+            if self.is_running && !self.breakpoint_list.is_empty() {
                 let index = rng.gen_range(0..self.breakpoint_list.len());
                 let breakpoint = &self.breakpoint_list[index];
+
                 self.event_queue.push(Event::Stopped(StoppedEvent {
                     hit_breakpoint_ids: Some(vec![breakpoint.id.unwrap()]),
                     description: None,
@@ -243,6 +260,8 @@ impl Context {
                     reason: event::stopped::Reason::Breakpoint,
                     thread_id: Some(0),
                 }));
+
+                self.curent_pos = Some(breakpoint.clone());
                 self.is_running = false;
             }
         }
