@@ -1,4 +1,4 @@
-﻿dap_type_enum!(
+dap_type_enum!(
     /// Names of checksum algorithms that may be supported by a debug adapter.
     ChecksumAlgorithm {
         MD5 | "MD5",
@@ -7,5 +7,3 @@
         Timestamp | "timestamp",
     }
 );
-
-

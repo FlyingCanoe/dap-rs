@@ -1,4 +1,4 @@
-﻿dap_type_enum!(
+dap_type_enum!(
     /// Some predefined types for the CompletionItem. Please note that not all clients have specific icons for all of them.
     CompletionItemType {
         Method | "method",
@@ -22,5 +22,3 @@
         Customcolor | "customcolor",
     }
 );
-
-

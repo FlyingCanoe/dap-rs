@@ -1,4 +1,4 @@
-﻿dap_type_enum!(
+dap_type_enum!(
     /// Logical areas that can be invalidated by the 'invalidated' event.
     InvalidatedAreas {
         Other,
@@ -12,5 +12,3 @@
         Variables | "variables",
     }
 );
-
-

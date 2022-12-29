@@ -1,4 +1,4 @@
-﻿dap_type_enum!(
+dap_type_enum!(
     /// The granularity of one 'step' in the stepping requests 'next', 'stepIn', 'stepOut', and 'stepBack'.
     SteppingGranularity {
         /// The step should allow the program to run until the current statement has finished executing.
@@ -11,5 +11,3 @@
         Instruction | "instruction",
     }
 );
-
-
