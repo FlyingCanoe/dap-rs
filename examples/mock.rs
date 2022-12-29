@@ -1,6 +1,7 @@
 use std::net;
 use std::thread;
 
+use anyhow::anyhow;
 use dap::msg::dap_type::variable::VariableBuilder;
 use dap::msg::request::ConfigurationDoneRequest;
 use dap::msg::request::ContinueRequest;
@@ -35,32 +36,39 @@ fn main() {
     loop {
         let session = codec.accept().unwrap();
         let context = Context::new(session);
-        run_session(context)
+        match run_session(context) {
+            Ok(_) => {}
+            Err(err) => {
+                println!("error running session: {}", err)
+            }
+        }
     }
 }
 
-fn run_session(mut context: Context) {
+fn run_session(mut context: Context) -> anyhow::Result<()> {
     loop {
         thread::yield_now();
         for event in context.event_queue.drain(..) {
-            context.session.send_event(event).unwrap();
+            context.session.send_event(event)?;
         }
 
-        if let Some(request) = context.session.try_recv_request().unwrap() {
+        if let Some(request) = context.session.try_recv_request()? {
             match request {
-                Request::Initialize(request) => context.handle_init_request(request),
-                Request::Launch(request) => context.handle_lunch_request(request),
-                Request::SetBreakpoints(request) => context.handle_set_breakpoints_request(request),
-                Request::ConfigurationDone(request) => {
-                    context.handle_configuration_done_request(request)
+                Request::Initialize(request) => context.handle_init_request(request)?,
+                Request::Launch(request) => context.handle_lunch_request(request)?,
+                Request::SetBreakpoints(request) => {
+                    context.handle_set_breakpoints_request(request)?
                 }
-                Request::Threads(request) => context.handle_threads_request(request),
-                Request::StackTrace(request) => context.handle_stack_trace_request(request),
-                Request::Scopes(request) => context.handle_scopes_request(request),
-                Request::Variables(request) => context.handle_variables_request(request),
-                Request::Continue(request) => context.handle_continue_request(request),
+                Request::ConfigurationDone(request) => {
+                    context.handle_configuration_done_request(request)?
+                }
+                Request::Threads(request) => context.handle_threads_request(request)?,
+                Request::StackTrace(request) => context.handle_stack_trace_request(request)?,
+                Request::Scopes(request) => context.handle_scopes_request(request)?,
+                Request::Variables(request) => context.handle_variables_request(request)?,
+                Request::Continue(request) => context.handle_continue_request(request)?,
                 Request::Disconnect(request) => {
-                    request.respond(Ok(()), &mut context.session).unwrap();
+                    request.respond(Ok(()), &mut context.session)?;
                     break;
                 }
                 _ => println!("{request:#?}"),
@@ -71,6 +79,7 @@ fn run_session(mut context: Context) {
             }
         }
     }
+    Ok(())
 }
 
 struct Context {
@@ -81,34 +90,37 @@ struct Context {
 }
 
 impl Context {
-    fn handle_init_request(&mut self, request: InitializeRequest) {
+    fn handle_init_request(&mut self, request: InitializeRequest) -> anyhow::Result<()> {
         let mut cap = Capabilities::default();
         cap.supports_configuration_done_request = Some(true);
 
-        request
-            .respond(
-                Ok(InitializeResponse {
-                    capabilities: Some(cap.clone()),
-                }),
-                &mut self.session,
-            )
-            .unwrap();
+        request.respond(
+            Ok(InitializeResponse {
+                capabilities: Some(cap.clone()),
+            }),
+            &mut self.session,
+        )?;
 
-        self.session.send_event(Event::Initialized).unwrap();
+        self.session.send_event(Event::Initialized)
     }
 
-    fn handle_lunch_request(&mut self, request: LaunchRequest) {
+    fn handle_lunch_request(&mut self, request: LaunchRequest) -> anyhow::Result<()> {
         self.is_running = true;
-        request.respond(Ok(()), &mut self.session).unwrap();
+        request.respond(Ok(()), &mut self.session)
     }
 
-    fn handle_configuration_done_request(&mut self, request: ConfigurationDoneRequest) {
-        request.respond(Ok(()), &mut self.session).unwrap();
+    fn handle_configuration_done_request(
+        &mut self,
+        request: ConfigurationDoneRequest,
+    ) -> anyhow::Result<()> {
+        request.respond(Ok(()), &mut self.session)
     }
 
-    fn handle_set_breakpoints_request(&mut self, request: SetBreakpointsRequest) {
+    fn handle_set_breakpoints_request(
+        &mut self,
+        request: SetBreakpointsRequest,
+    ) -> anyhow::Result<()> {
         let mut rng = rand::thread_rng();
-        println!("b len={}", request.breakpoints.as_ref().unwrap().len());
         self.breakpoint_list = request
             .breakpoints
             .clone()
@@ -124,31 +136,27 @@ impl Context {
             .collect();
 
         println!("b len after={}", self.breakpoint_list.len());
-        request
-            .respond(
-                Ok(SetBreakpointsResponse {
-                    breakpoints: self.breakpoint_list.clone(),
-                }),
-                &mut self.session,
-            )
-            .unwrap();
+        request.respond(
+            Ok(SetBreakpointsResponse {
+                breakpoints: self.breakpoint_list.clone(),
+            }),
+            &mut self.session,
+        )
     }
 
-    fn handle_threads_request(&mut self, request: ThreadsRequest) {
-        request
-            .respond(
-                Ok(ThreadsResponse {
-                    threads: vec![Thread {
-                        id: 0,
-                        name: "main".to_string(),
-                    }],
-                }),
-                &mut self.session,
-            )
-            .unwrap()
+    fn handle_threads_request(&mut self, request: ThreadsRequest) -> anyhow::Result<()> {
+        request.respond(
+            Ok(ThreadsResponse {
+                threads: vec![Thread {
+                    id: 0,
+                    name: "main".to_string(),
+                }],
+            }),
+            &mut self.session,
+        )
     }
 
-    fn handle_stack_trace_request(&mut self, request: StackTraceRequest) {
+    fn handle_stack_trace_request(&mut self, request: StackTraceRequest) -> anyhow::Result<()> {
         let mut rng = rand::thread_rng();
         let stack_frames: Vec<_> = self
             .breakpoint_list
@@ -157,62 +165,56 @@ impl Context {
                 StackFrameBuilder::new(
                     rng.gen(),
                     "mock".to_string(),
-                    breakpoint.line.unwrap_or(1),
-                    breakpoint.column.unwrap_or(1),
+                    breakpoint.line.unwrap_or(0),
+                    breakpoint.column.unwrap_or(0),
                 )
-                .source(breakpoint.source.clone().unwrap())
+                .source(
+                    breakpoint
+                        .source
+                        .clone()
+                        .ok_or(anyhow!("breakpoint without source are not suported"))?,
+                )
                 .build()
             })
             .collect();
 
-        request
-            .respond(
-                Ok(StackTraceResponse {
-                    stack_frames: stack_frames,
-                    total_frames: None,
-                }),
-                &mut self.session,
-            )
-            .unwrap()
+        request.respond(
+            Ok(StackTraceResponse {
+                stack_frames: stack_frames,
+                total_frames: None,
+            }),
+            &mut self.session,
+        )
     }
 
-    fn handle_scopes_request(&mut self, request: ScopesRequest) {
-        request
-            .respond(
-                Ok(ScopesResponse {
-                    scopes: vec![ScopeBuilder::new("Locals".to_string(), 1, false).build()],
-                }),
-                &mut self.session,
-            )
-            .unwrap()
+    fn handle_scopes_request(&mut self, request: ScopesRequest) -> anyhow::Result<()> {
+        request.respond(
+            Ok(ScopesResponse {
+                scopes: vec![ScopeBuilder::new("Locals".to_string(), 1, false).build()],
+            }),
+            &mut self.session,
+        )
     }
 
-    fn handle_variables_request(&mut self, request: VariablesRequest) {
-        request
-            .respond(
-                Ok(VariablesResponse {
-                    variables: vec![VariableBuilder::new(
-                        "mock".to_string(),
-                        0,
-                        "var 1".to_string(),
-                    )
-                    .build()],
-                }),
-                &mut self.session,
-            )
-            .unwrap()
+    fn handle_variables_request(&mut self, request: VariablesRequest) -> anyhow::Result<()> {
+        request.respond(
+            Ok(VariablesResponse {
+                variables: vec![
+                    VariableBuilder::new("mock".to_string(), 0, "var 1".to_string()).build(),
+                ],
+            }),
+            &mut self.session,
+        )
     }
 
-    fn handle_continue_request(&mut self, request: ContinueRequest) {
+    fn handle_continue_request(&mut self, request: ContinueRequest) -> anyhow::Result<()> {
         self.is_running = true;
-        request
-            .respond(
-                Ok(ContinueResponse {
-                    all_threads_continued: Some(true),
-                }),
-                &mut self.session,
-            )
-            .unwrap()
+        request.respond(
+            Ok(ContinueResponse {
+                all_threads_continued: Some(true),
+            }),
+            &mut self.session,
+        )
     }
 
     fn new(session: Session) -> Context {
@@ -231,8 +233,6 @@ impl Context {
         if self.event_queue.is_empty() {
             if self.is_running && self.breakpoint_list.len() >= 2 {
                 let index = rng.gen_range(0..self.breakpoint_list.len());
-                println!("index={}", index);
-                let index = 1;
                 let breakpoint = &self.breakpoint_list[index];
                 self.event_queue.push(Event::Stopped(StoppedEvent {
                     hit_breakpoint_ids: Some(vec![breakpoint.id.unwrap()]),
