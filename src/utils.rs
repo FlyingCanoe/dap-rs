@@ -28,6 +28,15 @@ impl Parse for u64 {
     }
 }
 
+impl Parse for i64 {
+    fn parse(input: Option<&json::Value>) -> anyhow::Result<i64> {
+        input
+            .ok_or(Error::msg("parsing error"))?
+            .as_i64()
+            .ok_or(Error::msg("parsing error"))
+    }
+}
+
 impl Parse for String {
     fn parse(input: Option<&json::Value>) -> anyhow::Result<String> {
         let output = input
@@ -126,6 +135,12 @@ impl ToValue for json::Value {
 }
 
 impl ToValue for u64 {
+    fn to_value(self) -> Option<json::Value> {
+        Some(self.into())
+    }
+}
+
+impl ToValue for i64 {
     fn to_value(self) -> Option<json::Value> {
         Some(self.into())
     }
